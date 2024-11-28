@@ -48,8 +48,8 @@ const createHandLandmarker = async () => {
 };
 
 const processImage = () => {
-  // img.src = `training/${currentImage + 1}a.png`;
-  img.src = `hands/${currentImage + 1}.png`;
+  // img.src = `assets/training/${currentImage + 1}a.png`;
+  img.src = `assets/hands/${currentImage + 1}.png`;
 
   img.onload = async () => {
     // resizeCanvas(((windowHeight - 200) / 16) * 9 + 200, windowHeight);
@@ -65,8 +65,8 @@ window.setup = async () => {
   canvas = p5.canvas;
   container.appendChild(canvas);
 
-  // handsData = await importJSON("training.json");
-  handsData = await importJSON("hands.json");
+  // handsData = await importJSON("json/training.json");
+  handsData = await importJSON("json/hands.json");
   newHandsData = handsData;
 
   createHandLandmarker(); // Avvia il riconoscimento delle mani
@@ -160,8 +160,8 @@ function saveJSON() {
   const blob = new Blob([jsonString], { type: "application/json" });
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
-  // a.download = "training-a.json";
-  a.download = "hands.json";
+  // a.download = "json/training-a.json";
+  a.download = "json/hands.json";
   a.click();
   URL.revokeObjectURL(a.href);
 }

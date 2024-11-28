@@ -54,8 +54,8 @@ window.setup = async () => {
   canvas = p5.canvas;
   container.appendChild(canvas);
 
-  handsDataA = await importJSON("training-a.json");
-  handsDataB = await importJSON("training-b.json");
+  handsDataA = await importJSON("json/training-a.json");
+  handsDataB = await importJSON("json/training-b.json");
   handsData = [handsDataA, handsDataB];
 
   video = createCapture(VIDEO);
@@ -129,9 +129,9 @@ const drawHands = () => {
       // const similarHandB = differences[1].indexOf(minB);
       const similarHandC = differences[0].indexOf(minA);
 
-      // imgLATO.src = `training/${similarHandA + 1}a.png`;
-      // imgALTO.src = `training/${similarHandB + 1}b.png`;
-      imgSCH.src = `detection/${similarHandC + 1}c.png`;
+      // imgLATO.src = `assets/training/${similarHandA + 1}a.png`;
+      // imgALTO.src = `assets/training/${similarHandB + 1}b.png`;
+      imgSCH.src = `assets/detection/${similarHandC + 1}c.png`;
       console.log(imgSCH);
 
       differenceElC.innerHTML = Math.round(minA);

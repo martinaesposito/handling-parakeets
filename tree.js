@@ -1,6 +1,8 @@
+//P5
 let p5, canvas;
 let container = document.querySelector(".container");
 
+// MAIN ALBERO
 let branchesss = [];
 let branchLength;
 let branchLengths = [];
@@ -15,9 +17,11 @@ window.setup = async () => {
   container.appendChild(canvas);
   background(245);
 
-  translate(width / 2, height / 3); // Sposta l'origine in basso al centro dello schermo
-  drawTree((height / 3) * 2, 6); // Disegna l'albero
+  translate(width / 2, height / 3); // Sposta l'origine a un terzo dall'alto dello schermo
+  drawTree((height / 3) * 2, 6); // Disegna l'albero alto due terzi dello schermo con 6 rami = framings
 };
+
+window.draw = () => {};
 
 function drawTree(trunk, branches) {
   // TRONCO
@@ -29,18 +33,14 @@ function drawTree(trunk, branches) {
   push();
   for (let i = 0; i < branches; i++) {
     stroke("black");
-    branchLength = Math.round(random(150, (trunk / 3) * 2));
-    console.log(branchLength);
-    branchLengths.push(branchLength);
+    branchLength = Math.round(random(150, (trunk / 3) * 2)); //TRONCO
 
     l = i % 2 === 0 ? 1 : -1; // se è divisibile per due (pari) a destra (1), dispari a sinistra (-1)
 
-    // Save current position
     push();
     translate(0, p);
 
-    // angolo main branch
-    let mainBranchAngle = l * (PI / 6 - random(-PI / 18, PI / 18)); //45+-10
+    let mainBranchAngle = l * (PI / 6 - random(-PI / 18, PI / 18)); //angolo main branch = 30 gradi +-10
     // calcolo x e y using cos e sin
     let mainBranchEndX = cos(mainBranchAngle) * branchLength * l;
     let mainBranchEndY = sin(mainBranchAngle) * branchLength;
@@ -49,35 +49,35 @@ function drawTree(trunk, branches) {
     strokeWeight(2.5);
     line(0, 0, mainBranchEndX, -abs(mainBranchEndY)); // Make Y negative to grow upward
 
-    // First sub-branch
+    // SUB BRANCH 1
     let randomPoint1 = random(0.3, 0.8); //calcolo il random point nel main branche e lo uso per calcolare x e y del punto di partenza del primo subbranch
     let startX1 = mainBranchEndX * randomPoint1;
     let startY1 = -abs(mainBranchEndY) * randomPoint1;
+    drawSubBranch(
+      startX1,
+      startY1,
+      mainBranchAngle,
+      l,
+      PI / 12,
+      PI / 6,
+      25,
+      branchLength / 3
+    );
 
-    push();
-    translate(startX1, startY1);
-    strokeWeight(1.25);
-    let subAngle1 = mainBranchAngle + l * random(PI / 12, PI / 6); //dall'angolo principale + un valore tra 15 e 30
-    let subLength1 = random(25, branchLength / 3); //lunghezza random del ramo
-    let endX1 = cos(subAngle1) * subLength1 * l;
-    let endY1 = sin(subAngle1) * subLength1;
-    line(0, 0, endX1, -abs(endY1));
-    pop();
-
-    // Second sub-branch
+    // SUB BRANCH 2
     let randomPoint2 = random(0.2, 0.9);
     let startX2 = mainBranchEndX * randomPoint2;
     let startY2 = -abs(mainBranchEndY) * randomPoint2;
-
-    push();
-    translate(startX2, startY2);
-    strokeWeight(1.25);
-    let subAngle2 = mainBranchAngle + l * random(-PI / 6, -PI / 12);
-    let subLength2 = random(25, branchLength / 3);
-    let endX2 = cos(subAngle2) * subLength2 * l;
-    let endY2 = sin(subAngle2) * subLength2;
-    line(0, 0, endX2, abs(endY2));
-    pop();
+    drawSubBranch(
+      startX2,
+      startY2,
+      mainBranchAngle,
+      l,
+      -PI / 6,
+      -PI / 12,
+      25,
+      branchLength / 3
+    );
 
     pop();
     p += trunk / 9;
@@ -85,4 +85,27 @@ function drawTree(trunk, branches) {
   pop();
 }
 
-window.draw = () => {};
+function drawSubBranch(
+  startX,
+  startY,
+  mainBranchAngle,
+  l,
+  angleRangeMin,
+  angleRangeMax,
+  lengthRangeMin,
+  lengthRangeMax
+) {
+  push(); // Spostati nel punto di partenza del sottoramo
+  translate(startX, startY);
+  strokeWeight(1.25);
+
+  let subAngle = mainBranchAngle + l * random(angleRangeMin, angleRangeMax); //angolo sottoramo
+  let subLength = random(lengthRangeMin, lengthRangeMax); //lunghezza sottoramo
+
+  let endX = cos(subAngle) * subLength * l; //coordinate sottoramo - coseno e seno del'angolo
+  let endY = sin(subAngle) * subLength;
+
+  line(0, 0, endX, -abs(endY));
+
+  pop();
+}
