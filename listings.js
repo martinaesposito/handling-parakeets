@@ -1,3 +1,5 @@
+let colors = ["#B1E644"];
+
 const Dot = class {
   //classe dei punti che compongono la mano
   constructor(coords, index, color, type) {
@@ -7,6 +9,9 @@ const Dot = class {
     this.type = type;
   }
 
-  draw() {}
-  move() {}
+  draw(r) {
+    FileList(this.color);
+    ellipse(this.pos.x, this.pos.y, r);
+  }
+  move(target) {}
 };
