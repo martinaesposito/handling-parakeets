@@ -27,6 +27,7 @@ window.setup = async () => {
 
   // LISTINGS
   let dotsPerBranch = Math.floor(885 / branchesss.length); // Numero di pallini per ramo
+
   for (let branch of branchesss) {
     let start = branch.start;
     let end = branch.end;
@@ -52,9 +53,6 @@ window.setup = async () => {
       candidateDots.push({ x: finalX, y: finalY });
     }
 
-    // Debug: stampa il numero di punti candidati
-    console.log("Punti candidati:", candidateDots.length);
-
     // Verifichiamo ogni punto contro TUTTI quelli già esistenti
     for (let point of candidateDots) {
       let valid = true;
@@ -62,7 +60,7 @@ window.setup = async () => {
       // Controlla contro i punti già validati in questo ramo
       for (let validPoint of validDots) {
         let d = dist(point.x, point.y, validPoint.x, validPoint.y);
-        if (d < 12) {
+        if (d < 13) {
           // Aumentato il raggio minimo
           valid = false;
           break;
@@ -74,14 +72,12 @@ window.setup = async () => {
       }
     }
 
-    // Debug: stampa il numero di punti validi
-    console.log("Punti validi:", validDots.length);
-
     // Crea i Dot solo per i punti validi
     for (let point of validDots) {
       dots.push(new Dot({ x: point.x, y: point.y }, dots.length, "ellipse"));
     }
   }
+  console.log(candidateDots.length, dots.length);
 };
 
 // Helper function to convert local coordinates to global
@@ -91,20 +87,13 @@ function localToGlobal(x, y, baseX, baseY) {
     y: y + baseY,
   };
 }
-function isPositionValid(x, y, currentDots, minDistance) {
-  for (let dot of currentDots) {
-    let d = dist(x, y, dot.position.x, dot.position.y);
-    if (d < minDistance) {
-      return false;
-    }
-  }
-  return true;
-}
 
 window.draw = () => {
   for (let dot of dots) {
     dot.move(5, 0.1); // Movimento fluido con noise (fattore e velocità)
-    dot.draw(10); // Disegna i punti con raggio 30
+
+    // blendMode(MULTIPLY);
+    dot.draw(12.5); // Disegna i punti con raggio 30
   }
 };
 

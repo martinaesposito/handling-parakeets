@@ -29,6 +29,7 @@ export const Dot = class {
     } else {
       // Disegna un'ellisse se il tipo non è "image"
       noStroke();
+
       fill(this.color);
       ellipse(this.pos.x, this.pos.y, r);
     }
