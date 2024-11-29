@@ -16,7 +16,7 @@ export const Dot = class {
     this.index = index; // Indice del punto
     this.color = random(colors); // Colore casuale dall'array
     this.type = type; // Tipo del punto (es. normale o immagine)
-    this.noiseOffsetX = random(1000); // Offset casuale per il Perlin noise (x)
+    this.noiseOffsetX = random(10000); // Offset casuale per il Perlin noise (x)
     this.noiseOffsetY = random(1000); // Offset casuale per il Perlin noise (y)
     this.img = image;
   }
@@ -37,8 +37,8 @@ export const Dot = class {
 
   move(noiseFactor, noiseSpeed) {
     // Usa il Perlin noise per calcolare uno spostamento fluido
-    let noiseX = noise(this.noiseOffsetX) * noiseFactor - noiseFactor / 2;
-    let noiseY = noise(this.noiseOffsetY) * noiseFactor - noiseFactor / 2;
+    let noiseX = noise(this.noiseOffsetX) * noiseFactor;
+    let noiseY = noise(this.noiseOffsetY) * noiseFactor;
 
     // Aggiorna la posizione con il rumore
     this.pos.x = this.basePos.x + noiseX;

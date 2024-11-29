@@ -7,6 +7,7 @@ let branchLength;
 let p = 0;
 let l;
 let branchesss = [];
+let nBranches = 9;
 
 let dots = [];
 import { Dot } from "./listings.js";
@@ -22,7 +23,7 @@ window.setup = async () => {
   //ALBERO
   push();
   translate(width / 2, height / 3); // Sposta l'origine a un terzo dall'alto dello schermo
-  drawTree((height / 3) * 2, 6); // Disegna l'albero alto due terzi dello schermo con 6 rami = framings
+  drawTree(height / 2, nBranches); // Disegna l'albero alto due terzi dello schermo con 6 rami = framings
   pop();
 
   // LISTINGS
@@ -99,19 +100,19 @@ function drawTree(trunk, branches) {
   const baseY = height / 3;
 
   // TRONCO
-  strokeWeight(5);
+  strokeWeight(4);
   line(0, -15, 0, trunk);
 
   //RAMI
   strokeWeight(2);
   for (let i = 0; i < branches; i++) {
     stroke("black");
-    branchLength = Math.round(random(200, trunk - 150));
+    branchLength = Math.round(random(100, trunk - 100));
     l = i % 2 === 0 ? 1 : -1;
 
     let mainBranchStartPos = localToGlobal(0, p, baseX, baseY); //pozisione di partenza del tronco
 
-    let mainBranchAngle = l * (PI / 6 - random(-PI / 18, PI / 18));
+    let mainBranchAngle = l * (PI / 9 - random(-PI / 12, PI / 12));
     let mainBranchEndX = cos(mainBranchAngle) * branchLength * l;
     let mainBranchEndY = -abs(sin(mainBranchAngle) * branchLength);
 
@@ -167,7 +168,7 @@ function drawTree(trunk, branches) {
       baseY
     );
 
-    p += trunk / 9;
+    p += trunk / 12;
   }
 }
 
