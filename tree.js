@@ -26,58 +26,7 @@ window.setup = async () => {
   pop();
 
   // LISTINGS
-  let dotsPerBranch = Math.floor(885 / branchesss.length); // Numero di pallini per ramo
-
-  for (let branch of branchesss) {
-    let start = branch.start;
-    let end = branch.end;
-    let candidateDots = [];
-    let validDots = [];
-
-    // Prima creiamo tutti i punti candidati per questo ramo
-    for (let i = 0; i < dotsPerBranch; i++) {
-      let t = random();
-      let spreadMultiplier = 1 - 4 * Math.pow(t - 0.5, 2);
-      let baseSpreadFactor = 30;
-      let spreadFactor = baseSpreadFactor * spreadMultiplier;
-
-      let baseX = lerp(start.x, end.x, t);
-      let baseY = lerp(start.y, end.y, t);
-
-      let gaussianSpread = randomGaussian() * spreadFactor;
-      let angle = random(TWO_PI);
-
-      let finalX = baseX + cos(angle) * abs(gaussianSpread);
-      let finalY = baseY + sin(angle) * abs(gaussianSpread);
-
-      candidateDots.push({ x: finalX, y: finalY });
-    }
-
-    // Verifichiamo ogni punto contro TUTTI quelli già esistenti
-    for (let point of candidateDots) {
-      let valid = true;
-
-      // Controlla contro i punti già validati in questo ramo
-      for (let validPoint of validDots) {
-        let d = dist(point.x, point.y, validPoint.x, validPoint.y);
-        if (d < 13) {
-          // Aumentato il raggio minimo
-          valid = false;
-          break;
-        }
-      }
-
-      if (valid) {
-        validDots.push(point);
-      }
-    }
-
-    // Crea i Dot solo per i punti validi
-    for (let point of validDots) {
-      dots.push(new Dot({ x: point.x, y: point.y }, dots.length, "ellipse"));
-    }
-  }
-  console.log(candidateDots.length, dots.length);
+  dots = generateValidDots(branchesss, 885);
 };
 
 // Helper function to convert local coordinates to global
@@ -93,9 +42,56 @@ window.draw = () => {
     dot.move(5, 0.1); // Movimento fluido con noise (fattore e velocità)
 
     // blendMode(MULTIPLY);
-    dot.draw(12.5); // Disegna i punti con raggio 30
+    dot.draw(7); // Disegna i punti con raggio 30
   }
 };
+
+function generateValidDots(branches, totalDotsNeeded) {
+  const dots = [];
+  const allValidDots = []; // Keep track of all valid dots for distance checking
+
+  while (dots.length < totalDotsNeeded) {
+    // Randomly select a branch to add dots to
+    const branchIndex = Math.floor(random(branches.length));
+    const branch = branches[branchIndex];
+    const start = branch.start;
+    const end = branch.end;
+
+    // Generate a single candidate dot
+    let t = random();
+    let spreadMultiplier = 1 - 4 * Math.pow(t - 0.5, 2);
+    let baseSpreadFactor = 30;
+    let spreadFactor = baseSpreadFactor * spreadMultiplier;
+
+    let baseX = lerp(start.x, end.x, t);
+    let baseY = lerp(start.y, end.y, t);
+
+    let gaussianSpread = randomGaussian() * spreadFactor;
+    let angle = random(TWO_PI);
+
+    let finalX = baseX + cos(angle) * abs(gaussianSpread);
+    let finalY = baseY + sin(angle) * abs(gaussianSpread);
+
+    // Check if the new dot is valid
+    let valid = true;
+    for (let existingDot of allValidDots) {
+      let d = dist(finalX, finalY, existingDot.x, existingDot.y);
+      if (d < 7) {
+        valid = false;
+        break;
+      }
+    }
+
+    // If valid, add it to both tracking arrays
+    if (valid) {
+      const newDot = new Dot({ x: finalX, y: finalY }, dots.length, "ellipse");
+      dots.push(newDot);
+      allValidDots.push({ x: finalX, y: finalY });
+    }
+  }
+
+  return dots;
+}
 
 function drawTree(trunk, branches) {
   // TRONCO
@@ -110,7 +106,7 @@ function drawTree(trunk, branches) {
   strokeWeight(2);
   for (let i = 0; i < branches; i++) {
     stroke("black");
-    branchLength = Math.round(random(150, (trunk / 3) * 2));
+    branchLength = Math.round(random(200, trunk - 150));
     l = i % 2 === 0 ? 1 : -1;
 
     let mainBranchStartPos = localToGlobal(0, p, baseX, baseY); //pozisione di partenza del tronco
@@ -198,12 +194,12 @@ function drawSubBranch(
   // SUBBRANCH
   line(startX, startY, endX, endY);
 
-  // // converto le coordinate
-  // let subBranchStart = localToGlobal(startX, startY, baseX, baseY);
-  // let subBranchEnd = localToGlobal(endX, endY, baseX, baseY);
-  // // e le pusho nell'array
-  // branchesss.push({
-  //   start: createVector(subBranchStart.x, subBranchStart.y),
-  //   end: createVector(subBranchEnd.x, subBranchEnd.y),
-  // });
+  // converto le coordinate
+  let subBranchStart = localToGlobal(startX, startY, baseX, baseY);
+  let subBranchEnd = localToGlobal(endX, endY, baseX, baseY);
+  // e le pusho nell'array
+  branchesss.push({
+    start: createVector(subBranchStart.x, subBranchStart.y),
+    end: createVector(subBranchEnd.x, subBranchEnd.y),
+  });
 }
