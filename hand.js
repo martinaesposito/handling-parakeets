@@ -140,6 +140,26 @@ export const Hand = class {
 
   calculateAngles() {
     let angles = [
+      // [17, 0, 1],
+      // [0, 1, 2],
+      // [1, 2, 3],
+      // [2, 3, 4],
+      // [17, 0, 5],
+      // [0, 5, 6],
+      // [5, 6, 7],
+      // [5, 9, 13],
+      // [6, 7, 8],
+      // [0, 9, 10],
+      // [9, 10, 11],
+      // [9, 13, 17],
+      // [10, 11, 12],
+      // [0, 13, 14],
+      // [13, 14, 15],
+      // [14, 15, 16],
+      // [0, 17, 18],
+      // [17, 18, 19],
+      // [18, 19, 20],
+
       [2, 0, 5], //angolo del palmo
       [5, 0, 17], //angolo del palmo
       [0, 1, 4], //pollice
@@ -147,11 +167,20 @@ export const Hand = class {
       [0, 9, 12], //medio
       [0, 13, 16], //anulare
       [0, 17, 20], //mignolo
+      [5, 6, 8], //giunture dita indice
+      [9, 10, 12], //giunture dita medio
+      [13, 14, 16], //giunture dita anulare
+      [17, 18, 20], //giunture dita  mignolo
     ];
+
     const colors = [
       "blue",
       "green",
       "yellow",
+      "pink",
+      "orange",
+      "brown",
+      "red",
       "pink",
       "orange",
       "brown",
@@ -162,7 +191,10 @@ export const Hand = class {
       const p1 = this.points[a[0]].pos;
       const p2 = this.points[a[1]].pos;
       const p3 = this.points[a[2]].pos;
+      const base = { ...this.points[a[1]].pos };
+      base.x = base.x + 50;
 
+      stroke("red");
       stroke(colors[index]);
       strokeWeight(2);
 
@@ -171,14 +203,16 @@ export const Hand = class {
 
       noStroke();
       fill(colors[index]);
+      fill("red");
 
-      let angle = calculateAngle(p1, p2, p3);
+      let relativeAangle = calculateAngle(p1, p2, p3);
+      let absoluteAngle = calculateAngle(p1, p2, base);
 
       textSize(12);
       textAlign(CENTER);
-      text(Math.round(angle), p3.x, p3.y);
+      text(Math.round(relativeAangle), p3.x, p3.y);
 
-      return angle;
+      return { relative: relativeAangle, absolute: absoluteAngle };
     });
   }
 };

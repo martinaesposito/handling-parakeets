@@ -68,6 +68,9 @@ img {
   font-family: monospace;
   bottom: -10;
   color: black;
+  background-color: white;
+  padding: 4px;
+  border-radius: 2px;
   stroke: #b1e644;
   width: 100%;
   text-align: center;

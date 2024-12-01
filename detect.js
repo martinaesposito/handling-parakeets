@@ -101,6 +101,8 @@ window.setup = async () => {
 };
 
 window.draw = () => {
+  if (!video) return;
+
   videoSize = {
     w: width > height ? width : (height / video.height) * video.width,
     h: height > width ? height : (width / video.width) * video.height,
@@ -140,13 +142,7 @@ const drawHands = () => {
       imageSegmenter.segmentForVideo(video, startTimeMs, callbackForVideo);
 
       function callbackForVideo(result) {
-        // const canvasCtx = canvas.getContext("2d");
-
-        loadPixels();
-
         const mask = result.categoryMask.getAsFloat32Array();
-        const img = createImage(video.width, video.height);
-        img.loadPixels();
 
         let j = 0;
         // Disegna la forma con i punti ordinati
@@ -156,21 +152,17 @@ const drawHands = () => {
         for (let i = 0; i < mask.length; ++i) {
           const maskVal = Math.round(mask[i] * 255.0);
           const index = maskVal % legendColors.length;
-          const legendColor = legendColors[index];
 
           if (index === 2) {
-            img.pixels[j] = legendColor[0];
-            img.pixels[j + 1] = legendColor[1];
-            img.pixels[j + 2] = legendColor[2];
-            img.pixels[j + 3] = 100;
-
             if (isEdgePixel(i, mask, video.width)) {
-              const coords = indexToCanvasCoords(
-                j,
-                video.width,
-                video.height,
-                width,
-                height
+              const pixelIndex = Math.floor(j / 4);
+
+              const coords = mapCoords(
+                {
+                  x: (pixelIndex % video.width) / video.width,
+                  y: Math.floor(pixelIndex / video.width) / video.height,
+                },
+                videoSize
               );
 
               if (isNearLandmarks(coords.x, coords.y, points, 70)) {
@@ -200,21 +192,45 @@ const drawHands = () => {
             }
           }
         }
-
-        // push();
-        // scale(-1, 1);
-        // image(img, -width, 0, width, height)
-        //  pop();
       }
+
+      const calculateAngleDifferences = (userAngles, refAngles) => {
+        return userAngles.map((userAngle, index) =>
+          Math.abs(userAngle - refAngles[index])
+        );
+      };
 
       const calculateDifferences = (dataSet) => {
         return dataSet.map((data) => {
-          let diff = 0;
-          data.angles.forEach(
-            (dataAngle, index) =>
-              (diff += Math.abs(dataAngle - hands[0].angles[index])) //alla differenza iniziale 0 sommo
+          const absoluteWeight = 0.4; // Adjustable weight
+          const relativeWeight = 0.6; // Adjustable weight
+
+          const absoluteDifferences = calculateAngleDifferences(
+            hands[0].angles.map((a) => a.absolute),
+            data.angles.map((a) => a.absolute)
           );
-          return diff;
+
+          const relativeDifferences = calculateAngleDifferences(
+            hands[0].angles.map((a) => a.relative),
+            data.angles.map((a) => a.relative)
+          );
+
+          const combinedScore = absoluteDifferences.reduce(
+            (sum, diff, index) =>
+              sum +
+              (diff * absoluteWeight +
+                relativeDifferences[index] * relativeWeight),
+            0
+          );
+
+          return combinedScore;
+
+          //   let diff = 0;
+          //   data.angles.forEach(
+          //     (dataAngle, index) =>
+          //       (diff += Math.abs(dataAngle - hands[0].angles[index])) //alla differenza iniziale 0 sommo
+          //   );
+          //   return diff;
         });
       };
 
