@@ -8,30 +8,14 @@ import { Hand } from "./hand.js"; //importa l'oggetto mano definito nel javascri
 
 let handLandmarker,
   imageSegmenter,
-  labels = undefined;
+  labels = null;
 
 const legendColors = [
   [255, 197, 0, 255], // Vivid Yellow
   [128, 62, 117, 255], // Strong Purple
-  [255, 104, 0, 255], // Vivid Orange
+  [255, 104, 0, 255], // Vivid Orange - BODY COLOR
   [166, 189, 215, 255], // Very Light Blue
   [193, 0, 32, 255], // Vivid Red
-  // [206, 162, 98, 255], // Grayish Yellow
-  // [129, 112, 102, 255], // Medium Gray
-  // [0, 125, 52, 255], // Vivid Green
-  // [246, 118, 142, 255], // Strong Purplish Pink
-  // [0, 83, 138, 255], // Strong Blue
-  // [255, 112, 92, 255], // Strong Yellowish Pink
-  // [83, 55, 112, 255], // Strong Violet
-  // [255, 142, 0, 255], // Vivid Orange Yellow
-  // [179, 40, 81, 255], // Strong Purplish Red
-  // [244, 200, 0, 255], // Vivid Greenish Yellow
-  // [127, 24, 13, 255], // Strong Reddish Brown
-  // [147, 170, 0, 255], // Vivid Yellowish Green
-  // [89, 51, 21, 255], // Deep Yellowish Brown
-  // [241, 58, 19, 255], // Vivid Reddish Orange
-  // [35, 44, 22, 255], // Dark Olive Green
-  // [0, 161, 194, 255], // Vivid Blue
 ];
 
 let container = document.querySelector(".container");
@@ -54,6 +38,24 @@ function mapCoords(point, v) {
     y: point.y * v.h - (v.h - height) / 2,
     z: 0,
   };
+}
+function indexToCanvasCoords(
+  index,
+  sourceWidth,
+  sourceHeight,
+  canvasWidth,
+  canvasHeight
+) {
+  // Convert from rgba index to pixel index
+  const pixelIndex = Math.floor(index / 4);
+
+  return mapCoords(
+    {
+      x: (pixelIndex % video.width) / video.width,
+      y: Math.floor(pixelIndex / video.width) / video.height,
+    },
+    videoSize
+  );
 }
 
 const createHandLandmarker = async () => {
@@ -138,19 +140,21 @@ const drawHands = () => {
       imageSegmenter.segmentForVideo(video, startTimeMs, callbackForVideo);
 
       function callbackForVideo(result) {
-        const canvasCtx = canvas.getContext("2d");
+        // const canvasCtx = canvas.getContext("2d");
 
         loadPixels();
 
         const mask = result.categoryMask.getAsFloat32Array();
-
         const img = createImage(video.width, video.height);
         img.loadPixels();
 
         let j = 0;
+        // Disegna la forma con i punti ordinati
+        let shapePoints = []; // Raccolta dei punti della forma
+        let orderedPoints = []; // Punti ordinati
+
         for (let i = 0; i < mask.length; ++i) {
           const maskVal = Math.round(mask[i] * 255.0);
-
           const index = maskVal % legendColors.length;
           const legendColor = legendColors[index];
 
@@ -160,27 +164,47 @@ const drawHands = () => {
             img.pixels[j + 2] = legendColor[2];
             img.pixels[j + 3] = 100;
 
-            const pixelIndex = Math.floor(j / 4);
+            if (isEdgePixel(i, mask, video.width)) {
+              const coords = indexToCanvasCoords(
+                j,
+                video.width,
+                video.height,
+                width,
+                height
+              );
 
-            fill("black");
-
-            const point = mapCoords(
-              {
-                x: (pixelIndex % video.width) / video.width,
-                y: Math.floor(pixelIndex / video.width) / video.height,
-              },
-              { w: video.width, h: video.height }
-            );
-
-            circle(point.x, point.y, 1);
+              if (isNearLandmarks(coords.x, coords.y, points, 70)) {
+                shapePoints.push(coords);
+              }
+            }
           }
           j += 4;
         }
-        img.updatePixels();
 
-        push();
-        scale(-1, 1);
-        image(img, -width, 0, width, height);
+        // Ordina i punti prima di disegnare
+        orderedPoints = orderShapePoints(shapePoints);
+
+        // Disegna la forma
+        if (orderedPoints.length > 0) {
+          stroke("white");
+          strokeWeight(12);
+
+          for (let i = 0; i < orderedPoints.length; i++) {
+            const curr = orderedPoints[i];
+            const next = orderedPoints[(i + 10) % orderedPoints.length]; // Punto successivo
+
+            if (dist(curr.x, curr.y, next.x, next.y) < 30) {
+              // Disegna solo se la distanza è minore di 20
+
+              line(curr.x, curr.y, next.x, next.y);
+            }
+          }
+        }
+
+        // push();
+        // scale(-1, 1);
+        // image(img, -width, 0, width, height)
+        //  pop();
       }
 
       const calculateDifferences = (dataSet) => {
@@ -195,8 +219,7 @@ const drawHands = () => {
       };
 
       const differences = handsData.map(
-        //applico la funzione ad entrambi gli array di handsData
-        (dataSet) => calculateDifferences(dataSet)
+        (dataSet) => calculateDifferences(dataSet) //applico la funzione ad entrambi gli array di handsData
       );
 
       //prendo i due array di differenze risultanti e trovo quello la cui somma è la minore
@@ -209,6 +232,100 @@ const drawHands = () => {
     }
   }
 };
+
+function orderShapePoints(points) {
+  if (points.length === 0) return [];
+
+  const ordered = [points[0]]; // Inizia con il primo punto
+  const remaining = [...points.slice(1)]; // Copia i punti rimanenti
+
+  while (remaining.length > 0) {
+    let lastPoint = ordered[ordered.length - 1];
+    let closestIndex = 0;
+    let closestDistance = dist(
+      lastPoint.x,
+      lastPoint.y,
+      remaining[0].x,
+      remaining[0].y
+    );
+
+    // Trova il punto più vicino
+    for (let i = 1; i < remaining.length; i++) {
+      const d = dist(lastPoint.x, lastPoint.y, remaining[i].x, remaining[i].y);
+      if (d < closestDistance) {
+        closestDistance = d;
+        closestIndex = i;
+      }
+    }
+
+    // Aggiungi il punto più vicino all'array ordinato
+    ordered.push(remaining[closestIndex]);
+    remaining.splice(closestIndex, 1); // Rimuovi il punto selezionato dai rimanenti
+  }
+
+  return ordered;
+}
+function isEdgePixel(i, mask, videoWidth) {
+  // Convert mask value to the same scale as we use in the main loop
+  const currentMaskVal = Math.round(mask[i] * 255.0) % legendColors.length;
+  if (currentMaskVal !== 2) return false;
+
+  // Get row and column of current pixel
+  const row = Math.floor(i / videoWidth);
+  const col = i % videoWidth;
+
+  // Check all 8 surrounding pixels
+  const neighbors = [
+    [-1, -1],
+    [-1, 0],
+    [-1, 1], // Top row
+    [0, -1],
+    [0, 1], // Middle row
+    [1, -1],
+    [1, 0],
+    [1, 1], // Bottom row
+  ];
+
+  for (let [dx, dy] of neighbors) {
+    const newRow = row + dx;
+    const newCol = col + dy;
+
+    // Skip if outside image bounds
+    if (
+      newRow < 0 ||
+      newRow >= video.height ||
+      newCol < 0 ||
+      newCol >= videoWidth
+    ) {
+      continue;
+    }
+
+    // Get index in the mask array
+    const neighborIndex = newRow * videoWidth + newCol;
+    const neighborMaskVal =
+      Math.round(mask[neighborIndex] * 255.0) % legendColors.length;
+
+    // If any neighbor is not mask 2, this is an edge pixel
+    if (neighborMaskVal !== 2) {
+      return true;
+    }
+  }
+
+  // If all neighbors are mask 2, this is not an edge pixel
+  return false;
+}
+
+function isNearLandmarks(x, y, landmarks, threshold) {
+  for (let landmark of landmarks) {
+    const distance = Math.sqrt(
+      Math.pow(landmark.x - x, 2) + Math.pow(landmark.y - y, 2)
+    );
+    if (distance < threshold) {
+      return true;
+    }
+  }
+  return false;
+}
 
 async function importJSON(path) {
   const response = await fetch(path);

@@ -60,12 +60,15 @@ img {
 .container.full .img {
   height: 40vh;
   width: auto;
-  /* background-color: aqua; */
+  background-color: #b1e644;
 }
 
-.diff {
+.diff-c {
   position: absolute;
-  top: 110%;
+  font-family: monospace;
+  bottom: -10;
+  color: black;
+  stroke: #b1e644;
   width: 100%;
   text-align: center;
 }

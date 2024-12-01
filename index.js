@@ -8,8 +8,8 @@ import { Hand } from "./hand.js"; //importa l'oggetto mano definito nel javascri
 let handLandmarker = undefined;
 let runningMode = "IMAGE";
 let currentImage = 0;
-// let imageCount = 7;
-let imageCount = 113;
+let imageCount = 6;
+// let imageCount = 113;
 
 let handsData, newHandsData;
 
@@ -49,24 +49,24 @@ const createHandLandmarker = async () => {
 
 const processImage = () => {
   // img.src = `assets/training/${currentImage + 1}a.png`;
-  img.src = `assets/hands/${currentImage + 1}.png`;
+  img.src = `assets/training/${currentImage + 1}a.png`;
 
   img.onload = async () => {
-    // resizeCanvas(((windowHeight - 200) / 16) * 9 + 200, windowHeight);
-    resizeCanvas(windowHeight, windowHeight);
+    resizeCanvas(((windowHeight - 200) / 16) * 9 + 200, windowHeight);
+    // resizeCanvas(windowHeight, windowHeight);
     drawHands(img);
   };
 };
 
 window.setup = async () => {
-  // p5 = createCanvas(((windowHeight - 200) / 16) * 9 + 200, windowHeight); // canvas sedici noni
-  p5 = createCanvas(windowHeight, windowHeight); // canvas quadrato
+  p5 = createCanvas(((windowHeight - 200) / 16) * 9 + 200, windowHeight); // canvas sedici noni
+  // p5 = createCanvas(windowHeight, windowHeight); // canvas quadrato
   pixelDensity(1);
   canvas = p5.canvas;
   container.appendChild(canvas);
 
   // handsData = await importJSON("json/training.json");
-  handsData = await importJSON("json/hands.json");
+  handsData = await importJSON("json/training-a.json");
   newHandsData = handsData;
 
   createHandLandmarker(); // Avvia il riconoscimento delle mani
@@ -97,7 +97,7 @@ const drawHands = async (target) => {
   }
 
   newHandsData[currentImage] = {
-    name: `${currentImage + 1}.png`,
+    name: `${currentImage + 1}a.png`,
     points,
     angles: hands[0].angles,
   };
@@ -113,7 +113,7 @@ window.mouseDragged = () => {
     h.movePoint({ x: mouseX, y: mouseY });
 
     newHandsData[currentImage] = {
-      name: `${currentImage + 1}.png`,
+      name: `${currentImage + 1}a.png`,
       points: h.points.map((p) => p.pos),
       angles: hands[0].angles,
     };
@@ -125,7 +125,7 @@ window.mousePressed = () => {
     h.toggleSelectedPoint({ x: mouseX, y: mouseY });
 
     newHandsData[currentImage] = {
-      name: `${currentImage + 1}.png`,
+      name: `${currentImage + 1}a.png`,
       points: h.points.map((p) => p.pos),
       angles: hands[0].angles,
     };
@@ -135,7 +135,7 @@ window.mousePressed = () => {
 window.mouseReleased = () => {
   hands.forEach((h) => h.deselect());
   newHandsData[currentImage] = {
-    name: `${currentImage + 1}.png`,
+    name: `${currentImage + 1}a.png`,
     points: hands[0].points.map((p) => p.pos),
     angles: hands[0].angles,
   };
@@ -151,7 +151,7 @@ document.addEventListener("keydown", (e) => {
   } else if (e.code === "Space") {
     console.log("s");
     //S
-    window.saveCanvas(`${currentImage + 1}.png`);
+    window.saveCanvas(`${currentImage + 1}a.png`);
   }
 });
 
@@ -160,8 +160,8 @@ function saveJSON() {
   const blob = new Blob([jsonString], { type: "application/json" });
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
-  // a.download = "json/training-a.json";
-  a.download = "json/hands.json";
+  a.download = "training-a.json";
+  // a.download = "json/hands.json";
   a.click();
   URL.revokeObjectURL(a.href);
 }

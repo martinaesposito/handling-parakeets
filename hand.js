@@ -24,12 +24,15 @@ const Point = class {
 
     // ellipse(this.pos.x, this.pos.y, this.size, this.size);
 
-    noStroke();
+    // noStroke();
     fill(255);
+    stroke(0);
+    strokeWeight(1);
 
-    textSize(9);
-    textAlign(CENTER);
-    text(this.index, this.pos.x, this.pos.y);
+    // textSize(9);
+    // textAlign(CENTER);
+    // text(this.index, this.pos.x, this.pos.y);
+    circle(this.pos.x, this.pos.y, 8);
   }
 
   update(coords) {
@@ -79,7 +82,7 @@ export const Hand = class {
 
         vertex(...Object.values(coords)); //crea i vertici della forma a partire dalle coordinate dei punti
 
-        strokeWeight(1);
+        strokeWeight(2);
         stroke(255);
         noFill();
       }
