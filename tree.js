@@ -8,7 +8,8 @@ let p = 0;
 let l;
 let branchesss = [];
 let nBranches = 15;
-let r = 10;
+let r = 12.5;
+let rDots = [];
 
 let dotsxBranch = [
   19,
@@ -33,6 +34,14 @@ let dotsxBranch = [
 let dots = [];
 import { Dot } from "./listings.js";
 
+// Store tree drawing parameters
+let treeParams = {
+  baseX: 0,
+  baseY: 0,
+  trunk: 0,
+  branches: [], // Will store all branch positions and parameters
+};
+
 window.setup = async () => {
   p5 = createCanvas(windowWidth, windowHeight);
   pixelDensity(1);
@@ -42,40 +51,39 @@ window.setup = async () => {
   background(245);
 
   //ALBERO
-  push();
-  translate(width / 2, height / 3 - 50);
-  drawTree((height / 3) * 2, nBranches); // Ridotta l'altezza dell'albero
-  pop();
+  calculateTreeStructure();
 
   // LISTINGS
   dots = generateBranchDots(branchesss);
 
-  for (let dot of dots) {
-    dot.draw(random(8, 12)); // Disegna i punti con raggio 30
+  for (let d of dots) {
+    d = random(7.5, 15);
+    rDots.push(d);
   }
 };
 
-// Helper function to convert local coordinates to global
-function localToGlobal(x, y, baseX, baseY) {
-  return {
-    x: x + baseX,
-    y: y + baseY,
-  };
-}
-
 window.draw = () => {
-  // background(245, 40);
-  for (let dot of dots) {
+  // Reset completo del background ad ogni frame
+  clear();
+  background(245);
+
+  drawTreeFromParams();
+
+  dots.forEach((dot, i) => {
+    // Impostiamo il blend mode prima di disegnare ogni dot
     blendMode(MULTIPLY);
-    dot.move(3, 0.5); // Movimento fluido con noise (fattore e velocità)
-  }
+    dot.move(10, 0.03);
+    dot.draw(rDots[i]);
+  });
+
+  // Resettiamo il blend mode alla fine
+  blendMode(BLEND);
 };
 
 function generateBranchDots(branches) {
-  const dots = []; // Array principale per tutti i punti
+  const allDots = []; // Array per tutti i dots finali di tutti i rami
 
   branches.forEach((branch, bIndex) => {
-    const branchDots = []; // Array temporaneo per i punti di questo ramo
     const branchLength = dist(
       branch.start.x,
       branch.start.y,
@@ -89,129 +97,136 @@ function generateBranchDots(branches) {
     );
 
     // Parametri della parabola
-    const a = -1; // Inverso per parabola decrescente
-    const h = 2 / 3; // Punto di massimo (2/3 della lunghezza)
-    const k = 1; // Valore massimo della parabola
+    const a = -1;
+    const h = 1 / 2;
+    const k = 1;
 
-    // Generazione dei punti direttamente
-    while (branchDots.length < dotsxBranch[bIndex]) {
-      // Generazione casuale di t lungo il ramo
+    let currentBranchDots = [];
+
+    while (currentBranchDots.length < dotsxBranch[bIndex]) {
       let t = random();
-
-      // Calcolo della densità basata sulla parabola
       const density = a * pow(t - h, 2) + k;
 
-      // Accettazione basata sulla densità
       if (random() < density) {
-        // Calcolo delle coordinate lungo il ramo
-        const baseX = lerp(branch.start.x, branch.end.x, t);
-        const baseY = lerp(branch.start.y, branch.end.y, t);
+        // Calcola l'offset come percentuale della lunghezza del ramo (es. 10%)
+        const offsetDistance = branchLength * 0.15;
 
-        // Spread basato sulla posizione lungo il ramo
-        const spread = map(t, 0, 1, branchLength * 0.02, branchLength * 0.09);
+        // Applica l'offset considerando l'angolo del ramo
+        const offsetX = cos(branchAngle) * offsetDistance;
+        const offsetY = sin(branchAngle) * offsetDistance;
 
-        // Calcolo della variazione perpendicolare
+        // Usa il punto di partenza spostato per il lerp
+        const baseX = lerp(branch.start.x + offsetX, branch.end.x, t);
+        const baseY = lerp(branch.start.y + offsetY, branch.end.y, t);
+
+        const spread = map(t, 0, 1, branchLength * 0.03, branchLength * 0.09);
         const perpAngle = branchAngle + HALF_PI;
         const distance = randomGaussian() * spread;
 
         const finalX = baseX + cos(perpAngle) * distance;
         const finalY = baseY + sin(perpAngle) * distance;
 
-        // Verifica che il punto non si sovrapponga ad altri punti nel ramo
         let validPosition = true;
 
-        for (const dot of branchDots) {
-          if (dist(finalX, finalY, dot.x, dot.y) < r) {
+        // Controlla distanza r con i dots dello stesso ramo
+        for (const sameBranchDot of currentBranchDots) {
+          const d = dist(
+            finalX,
+            finalY,
+            sameBranchDot.pos.x,
+            sameBranchDot.pos.y
+          );
+          if (d < r) {
             validPosition = false;
             break;
           }
         }
 
-        // Se valido, aggiungi il punto
+        // Se la posizione è ancora valida, controlla distanza r*2 con i dots degli altri rami
         if (validPosition) {
-          branchDots.push({ x: finalX, y: finalY });
+          for (const otherBranchDot of allDots) {
+            const d = dist(
+              finalX,
+              finalY,
+              otherBranchDot.pos.x,
+              otherBranchDot.pos.y
+            );
+            if (d < r * 2) {
+              validPosition = false;
+              break;
+            }
+          }
+        }
+
+        if (validPosition) {
+          currentBranchDots.push(
+            new Dot(
+              { x: finalX, y: finalY },
+              allDots.length + currentBranchDots.length,
+              "ellipse"
+            )
+          );
         }
       }
     }
 
-    // Unisci i punti del ramo all'array principale
-    branchDots.forEach((dot, index) => {
-      dots.push(new Dot(dot, dots.length + index, "ellipse"));
-    });
+    // Aggiungi tutti i dots del ramo corrente all'array principale
+    allDots.push(...currentBranchDots);
   });
 
-  return dots;
+  return allDots;
 }
 
-function drawTree(trunk, branches) {
+// Function to calculate tree structure and store parameters
+function calculateTreeStructure() {
+  const trunk = (height / 3) * 2.5;
   const baseX = width / 2;
-  const baseY = height / 3 - 50;
+  const baseY = height / 3 + 50;
 
-  // TRONCO
-  strokeWeight(6);
-  stroke(180);
-  line(0, 0, 0, trunk);
+  treeParams = {
+    baseX,
+    baseY,
+    trunk,
+    branches: [],
+  };
 
+  let p = 0;
   let heightProgress = 0;
-
-  // Calcola il numero massimo di dots per trovare il fattore di scala
   const maxDots = Math.max(...dotsxBranch);
 
-  //RAMI
-  for (let i = branches; i > 0; i--) {
-    heightProgress = i / (branches - 1);
-
-    // Calcola la lunghezza del ramo in base al numero di dots
-    const dotsForThisBranch = dotsxBranch[branches - i] || 0;
-
-    // Scala la lunghezza del ramo in base al numero di dots
-    // Usa una funzione logaritmica per evitare rami troppo lunghi con molti dots
+  for (let i = nBranches; i > 0; i--) {
+    heightProgress = i / (nBranches - 1);
+    const dotsForThisBranch = dotsxBranch[nBranches - i];
     const scaleFactor = Math.log(dotsForThisBranch + 1) / Math.log(maxDots + 1);
-
-    // Calcola la lunghezza finale combinando il fattore dots con la posizione verticale
     branchLength =
-      lerp(trunk - 500, trunk - 200, scaleFactor) * (1 - heightProgress * 0.5);
+      lerp(trunk - 500, trunk - 100, scaleFactor) * (1 - heightProgress * 0.5);
 
-    strokeWeight(4);
-    stroke(180);
-
-    l = i % 2 === 0 ? 1 : -1;
-
-    let mainBranchStartPos = localToGlobal(0, p, baseX, baseY);
-
-    let baseAngle = map(heightProgress, 0, 1, PI / 18, PI / 3); // angolo più stretto alla base, più ampio in cima
-    let angleVariation = baseAngle + random(-PI / 18, PI / 18); // aggiungi un po' di variazione casuale
+    l = i % 2 === 0 ? 1 : -1; //cambia il valore di l in base a i se i è pari allora 1 se no -1 - serve per disegnare i rami a destra e sinistra dell'albero
+    let baseAngle = map(heightProgress, 0, 1, -PI / 18, PI / 3.5);
+    let angleVariation = baseAngle + random(-PI / 24, PI / 24);
     let mainBranchAngle = l * angleVariation;
 
     let mainBranchEndX = cos(mainBranchAngle) * branchLength * l;
     let mainBranchEndY = -abs(sin(mainBranchAngle) * branchLength);
 
-    // MAINBRANCH
-    line(0, p, mainBranchEndX, p + mainBranchEndY);
-
-    let mainBranchEndPos = localToGlobal(
-      mainBranchEndX,
-      p + mainBranchEndY,
-      baseX,
-      baseY
-    );
-
-    branchesss.push({
-      start: createVector(mainBranchStartPos.x, mainBranchStartPos.y),
-      end: createVector(mainBranchEndPos.x, mainBranchEndPos.y),
+    // Store main branch parameters
+    treeParams.branches.push({
+      type: "main",
+      start: { x: 0, y: p },
+      end: { x: mainBranchEndX, y: p + mainBranchEndY },
+      width: 6,
+      heightProgress,
     });
 
-    // Regola la lunghezza dei rami secondari in base al numero di dots
+    // Calculate and store sub-branches
     let subBranchMaxLength = branchLength * (0.4 * scaleFactor);
     let subBranchMinLength = branchLength * (0.2 * scaleFactor);
 
+    // First sub-branch
     let randomPoint1 = random(0.3, 0.8);
-    let startX1 = mainBranchEndX * randomPoint1;
-    let startY1 = p + mainBranchEndY * randomPoint1;
-
-    drawSubBranch(
-      startX1,
-      startY1,
+    calculateSubBranch(
+      mainBranchEndX * randomPoint1,
+      p + mainBranchEndY * randomPoint1,
       mainBranchAngle,
       l,
       PI / 12,
@@ -221,13 +236,11 @@ function drawTree(trunk, branches) {
       heightProgress
     );
 
+    // Second sub-branch
     let randomPoint2 = random(0.2, 0.9);
-    let startX2 = mainBranchEndX * randomPoint2;
-    let startY2 = p + mainBranchEndY * randomPoint2;
-
-    drawSubBranch(
-      startX2,
-      startY2,
+    calculateSubBranch(
+      mainBranchEndX * randomPoint2,
+      p + mainBranchEndY * randomPoint2,
       mainBranchAngle,
       l,
       -PI / 6,
@@ -237,11 +250,26 @@ function drawTree(trunk, branches) {
       heightProgress
     );
 
-    p += branchLength / 5;
+    let pr = (p += 27.5);
+    console.log(pr);
   }
+
+  // Calculate branch vectors for dots
+  branchesss = treeParams.branches
+    .filter((branch) => branch.type === "main")
+    .map((branch) => ({
+      start: createVector(
+        branch.start.x + treeParams.baseX,
+        branch.start.y + treeParams.baseY
+      ),
+      end: createVector(
+        branch.end.x + treeParams.baseX,
+        branch.end.y + treeParams.baseY
+      ),
+    }));
 }
 
-function drawSubBranch(
+function calculateSubBranch(
   startX,
   startY,
   mainBranchAngle,
@@ -252,24 +280,37 @@ function drawSubBranch(
   lengthRangeMax,
   heightProgress
 ) {
-  // Riduci lo spessore dei rami secondari in base all'altezza
-  let subBranchWidth = map(heightProgress, 0, 1, 1.25, 0.75);
-  strokeWeight(subBranchWidth);
-  stroke(180); // Colore grigio per i rami secondari
-
   let subAngle = mainBranchAngle + l * random(angleRangeMin, angleRangeMax);
   let subLength = random(lengthRangeMin, lengthRangeMax);
+  let subBranchWidth = map(heightProgress, 0, 1, 1.25, 0.75);
 
   let endX = startX + cos(subAngle) * subLength * l;
   let endY = startY - abs(sin(subAngle) * subLength);
 
-  line(startX, startY, endX, endY);
+  treeParams.branches.push({
+    type: "sub",
+    start: { x: startX, y: startY },
+    end: { x: endX, y: endY },
+    width: subBranchWidth,
+    heightProgress,
+  });
+}
 
-  // let subBranchStart = localToGlobal(startX, startY, baseX, baseY);
-  // let subBranchEnd = localToGlobal(endX, endY, baseX, baseY);
+function drawTreeFromParams() {
+  push();
+  translate(treeParams.baseX, treeParams.baseY);
 
-  // branchesss.push({
-  //   start: createVector(subBranchStart.x, subBranchStart.y),
-  //   end: createVector(subBranchEnd.x, subBranchEnd.y),
-  // });
+  // Draw trunk
+  strokeWeight(4);
+  stroke(180);
+  line(0, 0, 0, treeParams.trunk);
+
+  // Draw all branches
+  treeParams.branches.forEach((branch) => {
+    strokeWeight(branch.type === "main" ? 2 : branch.width);
+    stroke(180);
+    line(branch.start.x, branch.start.y, branch.end.x, branch.end.y);
+  });
+
+  pop();
 }

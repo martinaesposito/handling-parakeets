@@ -32,6 +32,7 @@ export const Dot = class {
 
       fill(this.color);
       ellipse(this.pos.x, this.pos.y, r);
+      // rect(this.pos.x, this.pos.y, r);
     }
   }
 

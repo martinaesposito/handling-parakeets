@@ -202,8 +202,8 @@ const drawHands = () => {
 
       const calculateDifferences = (dataSet) => {
         return dataSet.map((data) => {
-          const absoluteWeight = 0.4; // Adjustable weight
-          const relativeWeight = 0.6; // Adjustable weight
+          const absoluteWeight = 0.25; // Adjustable weight
+          const relativeWeight = 0.75; // Adjustable weight
 
           const absoluteDifferences = calculateAngleDifferences(
             hands[0].angles.map((a) => a.absolute),
