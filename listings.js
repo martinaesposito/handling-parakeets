@@ -10,7 +10,7 @@ let colors = [
 
 // Classe Dot
 export const Dot = class {
-  constructor(coords, index, type, image) {
+  constructor(coords, index, radius, type, image) {
     this.pos = createVector(coords.x, coords.y); // Posizione iniziale
     this.basePos = this.pos.copy(); // Posizione di riferimento (per tornare "a casa")
     this.index = index; // Indice del punto
@@ -19,19 +19,20 @@ export const Dot = class {
     this.noiseOffsetX = random(10000); // Offset casuale per il Perlin noise (x)
     this.noiseOffsetY = random(1000); // Offset casuale per il Perlin noise (y)
     this.img = image;
+    this.radius = radius;
   }
 
-  draw(r) {
+  draw() {
     if (this.type === "image") {
       // Disegna un'immagine se il tipo è "image"
       imageMode(CENTER);
-      image(this.img, this.pos.x, this.pos.y, r, r); // Disegna l'immagine nella posizione del punto
+      image(this.img, this.pos.x, this.pos.y, this.radius, this.radius); // Disegna l'immagine nella posizione del punto
     } else {
       // Disegna un'ellisse se il tipo non è "image"
       noStroke();
 
       fill(this.color);
-      ellipse(this.pos.x, this.pos.y, r);
+      ellipse(this.pos.x, this.pos.y, this.radius);
       // rect(this.pos.x, this.pos.y, r);
     }
   }
