@@ -32,8 +32,8 @@ export const Dot = class {
       noStroke();
 
       fill(this.color);
-      ellipse(this.pos.x, this.pos.y, this.radius);
-      // rect(this.pos.x, this.pos.y, r);
+      // ellipse(this.pos.x, this.pos.y, this.radius);
+      rect(this.pos.x, this.pos.y, this.radius);
     }
   }
 

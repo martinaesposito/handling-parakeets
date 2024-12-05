@@ -10,13 +10,12 @@ let dotsxBranch = [
   { value: 18, start: 0.8, end: 1 },
   { value: 7, start: 0.4, end: 0.6 },
   { value: 94, start: 0, end: 1 },
-  { value: 11, start: 0, end: 1 },
-  { value: 3, start: 0, end: 1 },
-  { value: 3, start: 0, end: 1 },
-  { value: 10, start: 0, end: 1 },
+  { value: 11, start: 0.8, end: 0.9 },
+  { value: 3, start: 0.6, end: 0.7 },
+  { value: 10, start: 0, end: 0.5 },
   { value: 150, start: 0, end: 1 },
   { value: 44, start: 0, end: 1 }, //telegram
-  { value: 11, start: 0, end: 1 },
+  { value: 11, start: 0.5, end: 1 },
   { value: 177, start: 0, end: 1 }, //Facebook groups
   { value: 12, start: 0, end: 1 },
   { value: 14, start: 0, end: 1 }, //marketplace
