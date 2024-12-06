@@ -6,22 +6,25 @@ let branchesss = [];
 let r = 12.5;
 
 let dotsxBranch = [
-  { value: 19, start: 0.6, end: 0.8 },
-  { value: 18, start: 0.8, end: 1 },
-  { value: 7, start: 0.4, end: 0.6 },
-  { value: 94, start: 0, end: 1 },
-  { value: 11, start: 0.8, end: 0.9 },
-  { value: 3, start: 0.6, end: 0.7 },
-  { value: 10, start: 0, end: 0.5 },
-  { value: 150, start: 0, end: 1 },
-  { value: 44, start: 0, end: 1 }, //telegram
-  { value: 11, start: 0.5, end: 1 },
-  { value: 177, start: 0, end: 1 }, //Facebook groups
-  { value: 12, start: 0, end: 1 },
-  { value: 14, start: 0, end: 1 }, //marketplace
-  { value: 149, start: 0, end: 1 }, //pages
-  { value: 14, start: 0, end: 1 },
-  { value: 149, start: 0, end: 1 },
+  { value: 19, start: 0.7, end: 0.8, name: "AAAnnunci" },
+
+  { value: 3, start: 0.6, end: 0.7, name: "petfocus" },
+  { value: 3, start: 0.1, end: 0.3, name: "petpappagalli" },
+  { value: 94, start: 0.4, end: 1, name: "Clasf.it" },
+  { value: 11, start: 0.85, end: 0.9, name: "likesx" },
+  { value: 10, start: 0.4, end: 0.5, name: "Secondamano" },
+
+  { value: 18, start: 0.95, end: 1, name: "AnimaleAmico" },
+  { value: 7, start: 0.2, end: 0.3, name: "Animalissimo" },
+  { value: 150, start: 0.3, end: 0.9, name: " Subito.it " },
+  { value: 44, start: 0.6, end: 0.9, name: "telegram" }, //telegram
+  { value: 11, start: 0.9, end: 1, name: "trovacuccioli" },
+  { value: 177, start: 0.2, end: 1, name: "FB groups" }, //Facebook groups
+  { value: 12, start: 0.7, end: 1, name: "TrovaloSubito" },
+  { value: 14, start: 0.3, end: 0.6, name: "FB marketplace" }, //marketplace
+  { value: 149, start: 0.3, end: 0.9, name: "FB pages" }, //pages
+  { value: 14, start: 0.5, end: 1, name: "TrovaPet" },
+  { value: 149, start: 0.2, end: 1, name: "usato.it" },
 ];
 
 let dots = [];
@@ -30,6 +33,7 @@ import { Dot } from "./listings.js";
 window.setup = async () => {
   p5 = createCanvas(windowWidth, windowHeight);
   pixelDensity(1);
+  rectMode(CENTER);
 
   canvas = p5.canvas;
   container.appendChild(canvas);
@@ -37,7 +41,7 @@ window.setup = async () => {
 
   const totalDots = dotsxBranch.reduce((acc, { value }) => acc + value, 0);
   const angles = dotsxBranch.map(({ value }) =>
-    map(value, 0, totalDots, 0, 2 * PI)
+    Math.max(0.2, map(value, 0, totalDots, 0, 2 * PI))
   );
 
   let total = 0;
@@ -81,138 +85,67 @@ window.draw = () => {
   clear();
   background(245);
 
+  // branchesss.forEach(({ bounds: { start, end } }, index) => {
+  //   stroke("lightgray");
+  //   strokeWeight(1);
+  //   line(start.x, start.y, end.x, end.y);
+  //   noStroke();
+  //   text(`${index} - ${dotsxBranch[index].value}`, end.x, end.y);
+  // });
+
+  // // drawTreeFromParams();
+  // dots.forEach((dot, i) => {
+  //   // Impostiamo il blend mode prima di disegnare ogni dot
+  //   blendMode(MULTIPLY);
+  //   dot.move(10, 0.03);
+  //   dot.draw();
+  // });
+  // // // Resettiamo il blend mode alla fine
+  // blendMode(BLEND);
+
   branchesss.forEach(({ bounds: { start, end } }, index) => {
     stroke("lightgray");
     strokeWeight(1);
     line(start.x, start.y, end.x, end.y);
     noStroke();
-    text(`${index} - ${dotsxBranch[index].value}`, end.x, end.y);
+    fill("black");
+    //text(`${index} - ${dotsxBranch[index].name}`, end.x, end.y);
+    text(`${dotsxBranch[index].name}`, end.x, end.y);
   });
 
-  // drawTreeFromParams();
-  dots.forEach((dot, i) => {
-    // Impostiamo il blend mode prima di disegnare ogni dot
-    blendMode(MULTIPLY);
-    dot.move(10, 0.03);
+  // Update and draw dots
+  dots.forEach((dot) => {
+    dot.move(dots, 1); // Single iteration per frame for smooth animation
     dot.draw();
   });
-  // // Resettiamo il blend mode alla fine
-  blendMode(BLEND);
 };
 
 function generateBranchDots(branches) {
-  const allDots = []; // Array per tutti i dots finali di tutti i rami
+  const allDots = [];
 
   branches.forEach((branch, bIndex) => {
-    const branchLength = dist(
-      branch.start.x,
-      branch.start.y,
-      branch.end.x,
-      branch.end.y
-    );
+    const branchDots = [];
 
-    const branchAngle = atan2(
-      branch.end.y - branch.start.y,
-      branch.end.x - branch.start.x
-    );
-
-    // Parametri della parabola
-    const a = -1;
-    const h = 1 / 2;
-    const k = 1;
-
-    let currentBranchDots = [];
-
-    let tries = 0;
-
-    while (currentBranchDots.length < dotsxBranch[bIndex].value) {
-      tries++;
-      let t = random();
-      const density = a * pow(t - h, 2) + k;
-
-      if (random() < density) {
-        // Calcola l'offset come percentuale della lunghezza del ramo (es. 10%)
-        const offsetDistance = branchLength * 0.3;
-
-        // Applica l'offset considerando l'angolo del ramo
-        const offsetX = cos(branchAngle) * offsetDistance;
-        const offsetY = sin(branchAngle) * offsetDistance;
-
-        // Usa il punto di partenza spostato per il lerp
-        const baseX = lerp(branch.start.x + offsetX, branch.end.x, t);
-        const baseY = lerp(branch.start.y + offsetY, branch.end.y, t);
-
-        const spread =
-          map(
-            t,
-            0,
-            1,
-            (branchLength - offsetDistance) * 0.02,
-            (branchLength - offsetDistance) * 0.12,
-            true
-          ) *
-          branch.angleWidth *
-          1.5;
-        const perpAngle = branchAngle + HALF_PI;
-        const distance = randomGaussian() * spread;
-
-        const finalX = baseX + cos(perpAngle) * distance;
-        const finalY = baseY + sin(perpAngle) * distance;
-
-        let radius = random(7.5, 15);
-
-        let validPosition = true;
-
-        // Controlla distanza r con i dots dello stesso ramo
-        for (const sameBranchDot of currentBranchDots) {
-          const d = dist(
-            finalX,
-            finalY,
-            sameBranchDot.pos.x,
-            sameBranchDot.pos.y
-          );
-          if (d < radius + sameBranchDot.radius) {
-            validPosition = false;
-            break;
-          }
-        }
-
-        // Se la posizione è ancora valida, controlla distanza r*2 con i dots degli altri rami
-        if (validPosition) {
-          for (const otherBranchDot of allDots) {
-            const d = dist(
-              finalX,
-              finalY,
-              otherBranchDot.pos.x,
-              otherBranchDot.pos.y
-            );
-            if (d < radius + otherBranchDot.radius) {
-              validPosition = false;
-              break;
-            }
-          }
-        }
-
-        if (tries > 200) {
-          validPosition = true;
-        }
-
-        if (validPosition) {
-          currentBranchDots.push(
-            new Dot(
-              { x: finalX, y: finalY },
-              allDots.length + currentBranchDots.length,
-              radius,
-              "ellipse"
-            )
-          );
-        }
-      }
+    for (let i = 0; i < dotsxBranch[bIndex].value; i++) {
+      const dot = new Dot(
+        branch,
+        allDots.length + branchDots.length,
+        random(11, 13),
+        "ellipse"
+      );
+      branchDots.push(dot);
     }
 
-    // Aggiungi tutti i dots del ramo corrente all'array principale
-    allDots.push(...currentBranchDots);
+    allDots.push(...branchDots);
   });
+
+  // Initial overlap resolution
+  for (let i = 0; i < 50; i++) {
+    // Initial iterations to settle
+    allDots.forEach((dot) => {
+      dot.move(allDots, 1);
+    });
+  }
 
   return allDots;
 }
