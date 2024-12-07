@@ -42,6 +42,8 @@ import { Dot } from "./listings.js";
 let listingsDataReady = false;
 
 let meCamera;
+let meCameraX = 0;
+let meCameraY = 0;
 
 function processData(jsonData) {
   // Group data by platform
@@ -164,13 +166,14 @@ window.draw = () => {
 
   // Update and draw dots
   dots.forEach((dot) => {
-    dot.move(dots, 1); // Single iteration per frame for smooth animation
+    dot.move(dots, pose); // Single iteration per frame for smooth animation
     dot.draw(pose);
   });
 
   push();
   strokeWeight(1);
   stroke("black");
+  noFill();
   meCamera = rect(0, 0, 150, (150 / 4) * 3);
   pop();
 };

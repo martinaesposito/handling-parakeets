@@ -56,10 +56,20 @@ export class Dot {
     this.noiseOffsetY = random(1000);
   }
 
-  move(dots) {
-    // Calculate attraction force
+  move(dots, currentPose) {
+    // Calculate attraction force toward the base position
     let attraction = p5.Vector.sub(this.basePos, this.pos);
     attraction.mult(this.config.attractionForce);
+
+    // If the dot should highlight, add an additional attraction toward the center
+    if (this.shouldHighlight(currentPose)) {
+      console.log(currentPose);
+      this.highlighted = true;
+      const center = createVector(0, 0); // Center of the canvas
+      const centerAttraction = p5.Vector.sub(center, this.pos);
+      centerAttraction.mult(0.05); // Adjust the strength of the attraction force
+      attraction.add(centerAttraction);
+    }
 
     // Separation calculation with more efficient loop
     let separation = createVector(0, 0);
@@ -76,6 +86,12 @@ export class Dot {
         }
       }
     }
+
+    // Separation from meCamera rectangle
+    const halfWidth = 150 / 2;
+    const halfHeight = ((150 / 4) * 3) / 2;
+
+    // Push the dots outside the meCamera rectangle
 
     // Add Perlin noise
     let noiseX = (noise(this.noiseOffsetX) - 0.5) * this.config.noiseStrength;
@@ -119,26 +135,34 @@ export class Dot {
   draw(currentPose) {
     push(); // Save current drawing state
 
+    let x;
+    let y;
+
     if (this.shouldHighlight(currentPose)) {
-      stroke("#FF0000"); // Bright red for visibility
-      strokeWeight(2);
+      // stroke("#FF0000"); // Bright red for visibility
+      // strokeWeight(2);
       this.highlighted = true;
+
+      // x = 0;
+      // y = 0;
     } else {
       noStroke();
       this.highlighted = false;
+      // x = this.pos.x;
+      // y = this.pos.y;
     }
 
+    x = this.pos.x;
+    y = this.pos.y;
     fill(this.color);
-    rect(this.pos.x, this.pos.y, this.radius);
+    rect(x, y, this.radius);
 
     pop(); // Restore drawing state
   }
 
   shouldHighlight(currentPose) {
-    // Make sure both values exist and do case-insensitive comparison
     if (!currentPose) return false;
-    //console.log(this.itemData.Pose, currentPose);
-    else return this.itemData.Pose == currentPose;
+    return this.itemData.Pose == currentPose;
   }
 
   getItemInfo() {
