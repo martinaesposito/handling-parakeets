@@ -3,20 +3,22 @@ let p5, canvas;
 let container = document.querySelector(".container");
 
 let branchesss = [];
-let r = 12.5;
+let dotsxBranch;
 
-let dotsxBranch = [
+const branchConfig = [
   { value: 19, start: 0.7, end: 0.8, name: "AAAnnunci" },
+  { value: 18, start: 0.7, end: 0.8, name: "AnimaleAmico" },
+  { value: 7, start: 0.7, end: 0.8, name: "animalissimo" },
   { value: 3, start: 0.6, end: 0.7, name: "petfocus" },
   { value: 3, start: 0.1, end: 0.3, name: "petpappagalli" },
   { value: 94, start: 0.4, end: 1, name: "Clasf.it" },
   { value: 11, start: 0.85, end: 0.9, name: "likesx" },
   { value: 10, start: 0.4, end: 0.5, name: "Secondamano" },
-  { value: 150, start: 0.3, end: 0.9, name: " Subito.it " },
-  { value: 44, start: 0.6, end: 0.9, name: "telegram" }, //telegram
+  { value: 150, start: 0.3, end: 0.9, name: "Subito.it" },
+  { value: 44, start: 0.6, end: 0.9, name: "Telegram" }, //telegram
   { value: 11, start: 0.9, end: 1, name: "trovacuccioli" },
   { value: 177, start: 0.2, end: 1, name: "FB groups" }, //Facebook groups
-  { value: 12, start: 0.7, end: 1, name: "TrovaloSubito" },
+  { value: 12, start: 0.7, end: 1, name: "Trovalosubito" },
   { value: 14, start: 0.3, end: 0.6, name: "FB marketplace" }, //marketplace
   { value: 149, start: 0.3, end: 0.9, name: "FB pages" }, //pages
   { value: 14, start: 0.5, end: 1, name: "TrovaPet" },
@@ -26,9 +28,60 @@ let dotsxBranch = [
 let dots = [];
 import { Dot } from "./listings.js";
 
-window.setup = async () => {
-  p5 = createCanvas(windowWidth, windowHeight, WEBGL);
+let font;
 
+function processData(jsonData) {
+  // Group data by platform
+  const platformGroups = {};
+  jsonData.forEach((item) => {
+    if (!platformGroups[item.Platform]) {
+      platformGroups[item.Platform] = [];
+    }
+    platformGroups[item.Platform].push(item);
+  });
+
+  // Create combined data structure maintaining original branch config
+  return branchConfig.map((config) => ({
+    value: platformGroups[config.name]?.length || config.value, // Use original value if no data
+    start: config.start,
+    end: config.end,
+    name: config.name,
+    items: platformGroups[config.name] || [], // Store platform items
+  }));
+}
+
+let listingsDataReady = false;
+
+window.preload = async () => {
+  font = loadFont("/assets/Helvetica/HelveticaLTStd-Roman.otf");
+
+  try {
+    const response = await fetch("listings.json");
+    const jsonData = await response.json();
+
+    window.listingsData = processData(jsonData);
+    listingsDataReady = true;
+  } catch (error) {
+    console.error("Failed to load listings data", error);
+    window.listingsData = branchConfig.map((config) => ({
+      ...config,
+      items: [],
+    }));
+    listingsDataReady = true;
+  }
+};
+
+window.setup = async () => {
+  // Fetch your JSON data (replace with your actual data source)
+
+  if (!listingsDataReady) {
+    setTimeout(window.setup, 10);
+    return;
+  }
+  // Process the data
+  dotsxBranch = window.listingsData;
+
+  p5 = createCanvas(windowWidth, windowHeight, WEBGL);
   pixelDensity(1);
   rectMode(CENTER);
 
@@ -36,6 +89,9 @@ window.setup = async () => {
   container.appendChild(canvas);
   background(245);
 
+  textFont(font);
+
+  // Rest of your setup code remains the same
   const totalDots = dotsxBranch.reduce((acc, { value }) => acc + value, 0);
   const angles = dotsxBranch.map(({ value }) =>
     Math.max(0.2, map(value, 0, totalDots, 0, 2 * PI))
@@ -82,25 +138,9 @@ window.draw = () => {
   clear();
   background(245);
 
+  textFont(font);
+
   camera(0, 0, 800);
-
-  // branchesss.forEach(({ bounds: { start, end } }, index) => {
-  //   stroke("lightgray");
-  //   strokeWeight(1);
-  //   line(start.x, start.y, end.x, end.y);
-  //   noStroke();
-  //   text(`${index} - ${dotsxBranch[index].value}`, end.x, end.y);
-  // });
-
-  // // drawTreeFromParams();
-  // dots.forEach((dot, i) => {
-  //   // Impostiamo il blend mode prima di disegnare ogni dot
-  //   blendMode(MULTIPLY);
-  //   dot.move(10, 0.03);
-  //   dot.draw();
-  // });
-  // // // Resettiamo il blend mode alla fine
-  // blendMode(BLEND);
 
   branchesss.forEach(({ bounds: { start, end } }, index) => {
     stroke("lightgray");
@@ -124,23 +164,24 @@ function generateBranchDots(branches) {
 
   branches.forEach((branch, bIndex) => {
     const branchDots = [];
+    const items = dotsxBranch[bIndex].items;
 
-    for (let i = 0; i < dotsxBranch[bIndex].value; i++) {
+    items.forEach((item, i) => {
       const dot = new Dot(
         branch,
         allDots.length + branchDots.length,
         random(11, 13),
-        "ellipse"
+        "ellipse",
+        item // Pass the full item data
       );
       branchDots.push(dot);
-    }
+    });
 
     allDots.push(...branchDots);
   });
 
   // Initial overlap resolution
   for (let i = 0; i < 50; i++) {
-    // Initial iterations to settle
     allDots.forEach((dot) => {
       dot.move(allDots, 1);
     });

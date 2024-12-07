@@ -10,46 +10,49 @@ let colors = [
 
 // Classe Dot
 export class Dot {
-  constructor(branch, index, radius, type) {
-    // Calculate initial position along the branch
-    const t = random(0.4, 0.9); // Random position along branch
+  constructor(branch, index, radius, type, itemData) {
+    // Optimize initial positioning
+    const t = random(0.4, 0.9);
     const branchAngle = atan2(
       branch.end.y - branch.start.y,
       branch.end.x - branch.start.x
     );
 
-    // Calculate base position along branch
     const baseX = lerp(branch.start.x, branch.end.x, t);
     const baseY = lerp(branch.start.y, branch.end.y, t);
 
-    // Add some random spread perpendicular to the branch
-    const spread = 50; // Adjust this value to control spread
+    const spread = 50;
     const perpAngle = branchAngle + HALF_PI;
     const offset = randomGaussian() * spread;
-    const x = baseX + cos(perpAngle) * offset;
-    const y = baseY + sin(perpAngle) * offset;
 
-    // Initialize properties
-    this.pos = createVector(x, y);
-    this.basePos = createVector(baseX, baseY); // Keep track of base position
+    this.pos = createVector(
+      baseX + cos(perpAngle) * offset,
+      baseY + sin(perpAngle) * offset
+    );
+    this.basePos = createVector(baseX, baseY);
+
+    // Optimization: Reduce object creation
+    this.vel = createVector(0, 0);
+    this.noiseForce = createVector(0, 0);
+
+    // Simplified and cached properties
     this.index = index;
     this.color = random(colors);
     this.type = type;
     this.baseRadius = radius;
     this.radius = radius;
+    this.itemData = itemData;
 
-    // Movement properties
-    this.vel = createVector(0, 0);
-    this.maxSpeed = 5;
-    this.attractionForce = 0.005;
-    this.separationForce = 0.05;
-    this.damping = 0.5;
+    // Reduced number of properties
+    this.maxSpeed = 3;
+    this.attractionForce = 0.003;
+    this.separationForce = 0.03;
+    this.damping = 0.4;
 
-    //Noise properties
-    this.noiseOffsetX = random(1000); // Random starting point for noise
+    this.noiseOffsetX = random(1000);
     this.noiseOffsetY = random(1000);
-    this.noiseStep = 0.001; // How fast the noise changes
-    this.noiseStrength = 0.5; // How much the noise affects position
+    this.noiseStep = 0.0005;
+    this.noiseStrength = 0.3;
   }
 
   move(dots) {
@@ -108,5 +111,9 @@ export class Dot {
     fill(this.color);
     //circle(this.pos.x, this.pos.y, this.radius);
     rect(this.pos.x, this.pos.y, this.radius);
+  }
+
+  getItemInfo() {
+    return this.itemData;
   }
 }
