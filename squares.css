@@ -1,0 +1,26 @@
+.image {
+    max-width: 60px;
+    max-height: 60px;
+}
+
+@keyframes appear {
+    from {
+        visibility: hidden;
+        opacity: 0%;
+    }
+    to {
+        visibility: visible;
+        opacity: 100%;
+    }
+}
+
+@keyframes disappear {
+    from {
+        visibility: visible;
+        opacity: 100%;
+    }
+    to {
+        visibility: hidden;
+        opacity: 0%;
+    }
+}
