@@ -1,34 +1,47 @@
 //P5
-let p5, canvas;
+let p5, canvas, font;
 let container = document.querySelector(".container");
 
 let branchesss = [];
 let dotsxBranch;
 
-const branchConfig = [
-  { value: 19, start: 0.7, end: 0.8, name: "AAAnnunci" },
-  { value: 18, start: 0.7, end: 0.8, name: "AnimaleAmico" },
-  { value: 7, start: 0.7, end: 0.8, name: "animalissimo" },
-  { value: 3, start: 0.6, end: 0.7, name: "petfocus" },
-  { value: 3, start: 0.1, end: 0.3, name: "petpappagalli" },
-  { value: 94, start: 0.4, end: 1, name: "Clasf.it" },
+const branchPlatform = [
+  { value: 149, start: 0.3, end: 0.7, name: "usato.it" },
+  { value: 14, start: 0.6, end: 0.8, name: "TrovaPet" },
+  { value: 3, start: 0.9, end: 1, name: "petpappagalli" },
+  { value: 44, start: 0.45, end: 0.55, name: "Telegram" },
+  { value: 7, start: 0.9, end: 1, name: "animalissimo" },
+  { value: 12, start: 0.6, end: 0.7, name: "Trovalosubito" },
   { value: 11, start: 0.85, end: 0.9, name: "likesx" },
-  { value: 10, start: 0.4, end: 0.5, name: "Secondamano" },
-  { value: 150, start: 0.3, end: 0.9, name: "Subito.it" },
-  { value: 44, start: 0.6, end: 0.9, name: "Telegram" }, //telegram
-  { value: 11, start: 0.9, end: 1, name: "trovacuccioli" },
-  { value: 177, start: 0.2, end: 1, name: "FB groups" }, //Facebook groups
-  { value: 12, start: 0.7, end: 1, name: "Trovalosubito" },
-  { value: 14, start: 0.3, end: 0.6, name: "FB marketplace" }, //marketplace
-  { value: 149, start: 0.3, end: 0.9, name: "FB pages" }, //pages
-  { value: 14, start: 0.5, end: 1, name: "TrovaPet" },
-  { value: 149, start: 0.2, end: 1, name: "usato.it" },
+  { value: 149, start: 0.5, end: 0.9, name: "FB pages" },
+  { value: 10, start: 0.5, end: 0.6, name: "Secondamano" },
+  { value: 18, start: 0.9, end: 1, name: "AnimaleAmico" },
+  { value: 14, start: 0.2, end: 0.4, name: "FB marketplace" },
+  { value: 177, start: 0.2, end: 0.9, name: "FB groups" },
+  { value: 19, start: 0.7, end: 0.8, name: "AAAnnunci" },
+  { value: 11, start: 0.3, end: 0.5, name: "trovacuccioli" },
+  { value: 3, start: 0.9, end: 1, name: "petfocus" },
+  { value: 94, start: 0.8, end: 1, name: "Clasf.it" },
 ];
+
+const handPoses = [
+  "Finger perch",
+  "Grip",
+  "Half-closed",
+  "Open",
+  "Relaxed",
+  "Shell",
+  "Touching tips",
+];
+let pose;
+let poseIndex = 0;
 
 let dots = [];
 import { Dot } from "./listings.js";
 
-let font;
+let listingsDataReady = false;
+
+let meCamera;
 
 function processData(jsonData) {
   // Group data by platform
@@ -41,7 +54,7 @@ function processData(jsonData) {
   });
 
   // Create combined data structure maintaining original branch config
-  return branchConfig.map((config) => ({
+  return branchPlatform.map((config) => ({
     value: platformGroups[config.name]?.length || config.value, // Use original value if no data
     start: config.start,
     end: config.end,
@@ -49,8 +62,6 @@ function processData(jsonData) {
     items: platformGroups[config.name] || [], // Store platform items
   }));
 }
-
-let listingsDataReady = false;
 
 window.preload = async () => {
   font = loadFont("/assets/Helvetica/HelveticaLTStd-Roman.otf");
@@ -63,7 +74,7 @@ window.preload = async () => {
     listingsDataReady = true;
   } catch (error) {
     console.error("Failed to load listings data", error);
-    window.listingsData = branchConfig.map((config) => ({
+    window.listingsData = branchPlatform.map((config) => ({
       ...config,
       items: [],
     }));
@@ -88,16 +99,16 @@ window.setup = async () => {
   canvas = p5.canvas;
   container.appendChild(canvas);
   background(245);
-
   textFont(font);
 
-  // Rest of your setup code remains the same
+  // ANGLES
   const totalDots = dotsxBranch.reduce((acc, { value }) => acc + value, 0);
   const angles = dotsxBranch.map(({ value }) =>
-    Math.max(0.2, map(value, 0, totalDots, 0, 2 * PI))
+    Math.max(0.15, 2 * PI * (value / totalDots))
   );
 
   let total = 0;
+  console.log(angles);
 
   angles.forEach((a, index) => {
     const angle = total + a / 2 + (index > 0 ? angles[index - 1] / 2 : 0);
@@ -136,8 +147,7 @@ window.setup = async () => {
 window.draw = () => {
   // Reset completo del background ad ogni frame
   clear();
-  background(245);
-
+  background(255);
   textFont(font);
 
   camera(0, 0, 800);
@@ -155,8 +165,14 @@ window.draw = () => {
   // Update and draw dots
   dots.forEach((dot) => {
     dot.move(dots, 1); // Single iteration per frame for smooth animation
-    dot.draw();
+    dot.draw(pose);
   });
+
+  push();
+  strokeWeight(1);
+  stroke("black");
+  meCamera = rect(0, 0, 150, (150 / 4) * 3);
+  pop();
 };
 
 function generateBranchDots(branches) {
@@ -189,3 +205,16 @@ function generateBranchDots(branches) {
 
   return allDots;
 }
+
+window.keyPressed = () => {
+  pose = null;
+
+  const keyNum = parseInt(key); // Convert key to number and check if it's within valid range
+  if (keyNum >= 1 && keyNum <= handPoses.length) {
+    pose = handPoses[keyNum - 1];
+    poseIndex = keyNum;
+
+    const matchingDots = dots.filter((dot) => dot.shouldHighlight(pose));
+    console.log(`Found ${matchingDots.length} dots matching pose: ${pose}`);
+  }
+};
