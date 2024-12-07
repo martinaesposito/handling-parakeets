@@ -1,18 +1,17 @@
-let colors = [
-  "#87BDF3",
-  "#7DE44A",
-  "#BDFF91",
-  "#2CA02C",
-  "#FCFF5C",
-  "#009DB8",
-  "#2E7F2E",
-];
-
-// Classe Dot
 export class Dot {
+  // Static color pool to reduce random calls
+  static colors = [
+    "#87BDF3",
+    "#7DE44A",
+    "#BDFF91",
+    "#2CA02C",
+    "#FCFF5C",
+    "#009DB8",
+    "#2E7F2E",
+  ];
+
   constructor(branch, index, radius, type, itemData) {
-    // Optimize initial positioning
-    const t = random(0.4, 0.9);
+    const t = random(0.5, 0.9);
     const branchAngle = atan2(
       branch.end.y - branch.start.y,
       branch.end.x - branch.start.x
@@ -31,38 +30,66 @@ export class Dot {
     );
     this.basePos = createVector(baseX, baseY);
 
-    // Optimization: Reduce object creation
-    this.vel = createVector(0, 0);
-    this.noiseForce = createVector(0, 0);
-
-    // Simplified and cached properties
+    // Simplified property initialization
     this.index = index;
-    this.color = random(colors);
+    this.color = Dot.colors[Math.floor(random(Dot.colors.length))];
     this.type = type;
     this.baseRadius = radius;
     this.radius = radius;
     this.itemData = itemData;
 
-    // Reduced number of properties
-    this.maxSpeed = 3;
-    this.attractionForce = 0.003;
-    this.separationForce = 0.03;
-    this.damping = 0.4;
+    // properties of the vector for positioning
+    this.config = {
+      maxSpeed: 5,
+      attractionForce: 0.005,
+      separationForce: 0.09,
+      damping: 0.4,
+      noiseStrength: 0.5,
+      noiseStep: 0.0005,
+    };
 
+    // Velocity vector
+    this.vel = createVector(0, 0);
+
+    // Noise offset pre-generation
     this.noiseOffsetX = random(1000);
     this.noiseOffsetY = random(1000);
-    this.noiseStep = 0.0005;
-    this.noiseStrength = 0.3;
   }
 
-  move(dots) {
-    // Calculate forces
+  move(dots, currentPose) {
+    // Calculate attraction force toward the base position
     let attraction = p5.Vector.sub(this.basePos, this.pos);
-    attraction.mult(this.attractionForce);
+    attraction.mult(this.config.attractionForce);
 
-    // Separation from other dots
+    // Separation from meCamera rectangle
+    const halfWidth = 150 / 2;
+    const halfHeight = ((150 / 4) * 3) / 2;
+
+    // If the dot should highlight, add an additional attraction toward the center
+    if (this.shouldHighlight(currentPose)) {
+      console.log(currentPose);
+      this.highlighted = true;
+      const center = createVector(0, 0); // Center of the canvas
+      const centerAttraction = p5.Vector.sub(center, this.pos);
+      centerAttraction.mult(0.05); // Adjust the strength of the attraction force
+      attraction.add(centerAttraction);
+
+      // Check if the dot is within the meCamera rectangle bounds
+      // if (
+      //   -windowWidth / 2 > this.pos.x > -halfWidth ||
+      //   halfWidth < this.pos.x < windowWidth / 2 ||
+      //   -windowHeight / 2 > this.pos.y > -halfHeight ||
+      //   halfHeight < this.pos.y < windowHeight / 2
+      // ) {
+      //   // If the dot is inside the meCamera rectangle, limit its position to the boundaries
+      //   this.pos.x = constrain(this.pos.x, -halfWidth, halfWidth);
+      //   this.pos.y = constrain(this.pos.y, -halfHeight, halfHeight);
+      // }
+    }
+
+    // Separation calculation with more efficient loop
     let separation = createVector(0, 0);
-    dots.forEach((other) => {
+    for (const other of dots) {
       if (other !== this) {
         let diff = p5.Vector.sub(this.pos, other.pos);
         let distance = diff.mag();
@@ -70,31 +97,34 @@ export class Dot {
 
         if (distance < minDistance) {
           diff.normalize();
-          diff.mult(this.separationForce * (minDistance - distance));
+          diff.mult(this.config.separationForce * (minDistance - distance));
           separation.add(diff);
         }
       }
-    });
+    }
 
     // Add Perlin noise
-    let noiseX = (noise(this.noiseOffsetX) - 0.5) * this.noiseStrength;
-    let noiseY = (noise(this.noiseOffsetY) - 0.5) * this.noiseStrength;
+    let noiseX = (noise(this.noiseOffsetX) - 0.5) * this.config.noiseStrength;
+    let noiseY = (noise(this.noiseOffsetY) - 0.5) * this.config.noiseStrength;
     let noiseForce = createVector(noiseX, noiseY);
 
     // Update noise offsets
-    this.noiseOffsetX += this.noiseStep;
-    this.noiseOffsetY += this.noiseStep;
+    this.noiseOffsetX += this.config.noiseStep;
+    this.noiseOffsetY += this.config.noiseStep;
 
-    // Apply forces
+    // Apply forces more efficiently
     this.vel.add(attraction);
     this.vel.add(separation);
-    this.vel.add(noiseForce); // Aggiungiamo la forza del noise
-    this.vel.mult(this.damping);
-    this.vel.limit(this.maxSpeed);
+    this.vel.add(noiseForce);
+
+    // Damping and speed limit
+    this.vel.mult(this.config.damping);
+    this.vel.limit(this.config.maxSpeed);
+
+    // Update position
     this.pos.add(this.vel);
 
-    // Update radius based on hover
-
+    // Radius adjustment for hover effect
     const d = dist(
       mouseX - width / 2,
       mouseY - height / 2,
@@ -103,14 +133,41 @@ export class Dot {
     );
     const targetRadius =
       d < this.baseRadius + 2.5 ? this.baseRadius * 3 : this.baseRadius;
+
     this.radius += (targetRadius - this.radius) * 0.1;
+
+    // Log listing info when the mouse is within the hover range
+    if (d < this.baseRadius + 2.5) {
+      console.log(this.itemData.Description);
+    }
   }
 
-  draw() {
-    noStroke();
+  draw(currentPose) {
+    push(); // Save current drawing state
+
+    let x;
+    let y;
+
+    if (this.shouldHighlight(currentPose)) {
+      stroke("#C9FF4C"); // Bright red for visibility
+      strokeWeight(3);
+      this.highlighted = true;
+    } else {
+      noStroke();
+      this.highlighted = false;
+    }
+
+    x = this.pos.x;
+    y = this.pos.y;
     fill(this.color);
-    //circle(this.pos.x, this.pos.y, this.radius);
-    rect(this.pos.x, this.pos.y, this.radius);
+    rect(x, y, this.radius);
+
+    pop(); // Restore drawing state
+  }
+
+  shouldHighlight(currentPose) {
+    if (!currentPose) return false;
+    return this.itemData.Pose == currentPose;
   }
 
   getItemInfo() {
