@@ -1,6 +1,6 @@
 //LOADING
 let loading = document.getElementById("loading");
-let img = (document.getElementById("loading-img").src =
+let imgLoading = (document.getElementById("loading-img").src =
   "/assets/loading/" + Math.floor(Math.random() * 8 + 1).toString() + ".gif");
 
 //P5
@@ -18,13 +18,13 @@ const branchPlatform = [
   { value: 7, start: 0.9, end: 1, name: "animalissimo" },
   { value: 12, start: 0.6, end: 0.7, name: "Trovalosubito" },
   { value: 11, start: 0.85, end: 0.9, name: "likesx" },
-  { value: 149, start: 0.5, end: 0.9, name: "FB pages" },
-  { value: 10, start: 0.5, end: 0.6, name: "Secondamano" },
+  { value: 149, start: 0.5, end: 1, name: "FB pages" },
+  { value: 10, start: 0.6, end: 0.7, name: "Secondamano" },
   { value: 18, start: 0.9, end: 1, name: "AnimaleAmico" },
-  { value: 14, start: 0.2, end: 0.4, name: "FB marketplace" },
+  { value: 14, start: 0.4, end: 0.6, name: "FB marketplace" },
   { value: 177, start: 0.2, end: 0.9, name: "FB groups" },
-  { value: 19, start: 0.7, end: 0.8, name: "AAAnnunci" },
-  { value: 11, start: 0.3, end: 0.5, name: "trovacuccioli" },
+  { value: 19, start: 0.8, end: 0.9, name: "AAAnnunci" },
+  { value: 11, start: 0.5, end: 0.6, name: "trovacuccioli" },
   { value: 3, start: 0.9, end: 1, name: "petfocus" },
   { value: 94, start: 0.8, end: 1, name: "Clasf.it" },
 ];
@@ -39,7 +39,9 @@ const handPoses = [
   "Touching tips",
 ];
 let pose;
-let poseIndex = 0;
+
+let images = [];
+const imagePromises = [];
 
 let dots = [];
 import { Dot } from "./listings.js";
@@ -47,8 +49,6 @@ import { Dot } from "./listings.js";
 let listingsDataReady = false;
 
 let meCamera;
-let meCameraX = 0;
-let meCameraY = 0;
 
 function processData(jsonData) {
   // Group data by platform
@@ -72,6 +72,28 @@ function processData(jsonData) {
 
 window.preload = async () => {
   font = loadFont("/assets/fonts/HelveticaLTStd-Roman.otf");
+
+  for (let i = 2; i < 886; i++) {
+    const imagePromise = new Promise((resolve) => {
+      const img = loadImage(
+        "/assets/immagini/" + i + ".png",
+        () => {
+          images.push(img);
+          resolve(img);
+        },
+        () => {
+          console.log(`Skipping image ${i}.png`);
+          resolve(null); // Resolve with null if image fails to load
+        }
+      );
+    });
+
+    imagePromises.push(imagePromise);
+  }
+
+  // Wait for all image loading attempts to complete
+  await Promise.all(imagePromises);
+  console.log(images);
 
   try {
     const response = await fetch("listings.json");
@@ -103,10 +125,11 @@ window.setup = async () => {
   p5 = createCanvas(windowWidth, windowHeight, WEBGL);
   pixelDensity(1);
   rectMode(CENTER);
+  imageMode(CENTER);
 
   canvas = p5.canvas;
   container.appendChild(canvas);
-  background(245);
+  background("#F5F5F5");
   textFont(font);
 
   // ANGLES
@@ -127,8 +150,8 @@ window.setup = async () => {
         y: 0,
       },
       end: {
-        x: 0 + (width / 2.2) * cos(angle),
-        y: 0 + (height / 2.2) * sin(angle),
+        x: 0 + (width / 2.4) * cos(angle),
+        y: 0 + (height / 2.4) * sin(angle),
       },
     };
 
@@ -152,13 +175,16 @@ window.setup = async () => {
   dots = generateBranchDots(branchesss);
 };
 
+let z = 800;
+let targetZ = 800;
 window.draw = () => {
   // Reset completo del background ad ogni frame
   clear();
-  background(255);
+  background("#F5F5F5");
   textFont(font);
 
-  camera(0, 0, 800);
+  z += (targetZ - z) * 0.1; // Adjust 0.1 to control zoom speed
+  camera(0, 0, z);
 
   branchesss.forEach(({ bounds: { start, end } }, index) => {
     stroke("lightgray");
@@ -173,7 +199,7 @@ window.draw = () => {
   // Update and draw dots
   dots.forEach((dot) => {
     dot.move(dots, pose); // Single iteration per frame for smooth animation
-    dot.draw(pose);
+    dot.draw(pose, images);
   });
 
   let cW = 150;
@@ -203,8 +229,8 @@ function generateBranchDots(branches) {
       const dot = new Dot(
         branch,
         allDots.length + branchDots.length,
-        random(11, 13),
-        "ellipse",
+        random(12.5, 15),
+        "image",
         item // Pass the full item data
       );
       branchDots.push(dot);
@@ -216,7 +242,7 @@ function generateBranchDots(branches) {
   // Initial overlap resolution
   for (let i = 0; i < 50; i++) {
     allDots.forEach((dot) => {
-      dot.move(allDots, 1);
+      dot.move(allDots);
     });
   }
 
@@ -229,9 +255,10 @@ window.keyPressed = () => {
   const keyNum = parseInt(key); // Convert key to number and check if it's within valid range
   if (keyNum >= 1 && keyNum <= handPoses.length) {
     pose = handPoses[keyNum - 1];
-    poseIndex = keyNum;
+    let poseIndex = keyNum;
 
     const matchingDots = dots.filter((dot) => dot.shouldHighlight(pose));
     console.log(`Found ${matchingDots.length} dots matching pose: ${pose}`);
-  }
+    targetZ = 400;
+  } else targetZ = 800;
 };

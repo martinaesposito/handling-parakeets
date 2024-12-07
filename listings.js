@@ -54,13 +54,14 @@ export class Dot {
     // Noise offset pre-generation
     this.noiseOffsetX = random(1000);
     this.noiseOffsetY = random(1000);
+    this.randomC = random(1, 4);
   }
 
   move(dots, currentPose) {
     if (!this.shouldHighlight(currentPose) && currentPose) {
-      this.basePos = p5.Vector.mult(this.originalPos, 1.5);
+      this.basePos = p5.Vector.mult(this.originalPos, 2);
     } else if (!currentPose) {
-      this.basePos = this.originalPos;
+      this.basePos = p5.Vector.mult(this.originalPos, 1);
     }
 
     //Attraction
@@ -76,10 +77,11 @@ export class Dot {
 
     //separation
     let separation = createVector(0, 0);
-    const halfWidth = 150 / 4 + this.radius;
-    const halfHeight = ((150 / 4) * 3) / 4 + this.radius;
 
     if (this.shouldHighlight(currentPose)) {
+      const halfWidth = 150 / 4 + this.baseRadius;
+      const halfHeight = ((150 / 4) * 3) / 4 + this.baseRadius;
+
       const center = createVector(0, 0);
       const centerAttraction = p5.Vector.sub(center, this.pos);
 
@@ -108,8 +110,9 @@ export class Dot {
 
       // Wider repulsion zone with softer boundaries
       const outerRepulsionZone =
-        this.radius + Math.max(halfWidth, halfHeight) * 3;
-      const innerRepulsionZone = this.radius + Math.min(halfWidth, halfHeight);
+        this.baseRadius + Math.max(halfWidth, halfHeight) * 3;
+      const innerRepulsionZone =
+        this.baseRadius + Math.min(halfWidth, halfHeight);
 
       if (distance < outerRepulsionZone) {
         // Smoother repulsion with noise influence
@@ -117,8 +120,8 @@ export class Dot {
           distance * (1 + individualNoise * 0.5),
           innerRepulsionZone,
           outerRepulsionZone,
-          this.config.separationForce * 1.5,
-          this.config.separationForce * 0.05
+          this.config.separationForce * 4, // Increased separation force
+          this.config.separationForce * 0.1
         );
 
         let repulsionVector = createVector(distanceX, distanceY);
@@ -132,54 +135,59 @@ export class Dot {
           distance,
           innerRepulsionZone,
           outerRepulsionZone,
-          0.005 + individualNoise * 0.01,
-          0.03 + individualNoise * 0.02
+          0.005,
+          0.05
         );
         centerAttraction.mult(attractionStrength);
       }
+      // Add movement noise for more organic flow
 
-      // Add circular and noise-based movement
-      separation.add(circularForce);
       separation.add(
         createVector(individualNoise - 0.5, individualNoise - 0.5).mult(
           this.config.noiseStrength * 3
         )
       );
 
+      // Apply center attraction after distance and repulsion logic
       attraction.add(centerAttraction);
-    }
-    // Separation calculation with more efficient loop
 
+      // Adjust radius dynamically (hover effect)
+      this.radius += (this.baseRadius * this.randomC - this.radius) * 0.1;
+    }
+
+    // Handle interaction between dots for separation
     for (const other of dots) {
       if (other !== this) {
         let diff = p5.Vector.sub(this.pos, other.pos);
         let distance = diff.mag();
         let minDistance = this.radius + other.radius;
+
+        // Adjust the minimum distance with a dynamic factor
         if (this.shouldHighlight(currentPose)) {
-          minDistance += 25;
+          minDistance += this.randomC * 3; // Increased minimum distance when highlighted
         }
 
         if (distance < minDistance) {
           diff.normalize();
-          diff.mult(this.config.separationForce * (minDistance - distance));
+          diff.mult(this.config.separationForce * (minDistance - distance)); // Increase separation force during collision
           separation.add(diff);
         }
       }
     }
 
-    // Apply forces more efficiently
+    // Apply calculated forces to velocity
     this.vel.add(attraction);
     this.vel.add(separation);
     this.vel.add(noiseForce);
 
-    // Damping and speed limit
+    // Damping and velocity limit
     this.vel.mult(this.config.damping);
     this.vel.limit(this.config.maxSpeed);
 
     // Update position
     this.pos.add(this.vel);
 
-    // Radius adjustment for hover effect
+    // Handle radius based on mouse distance (hover effect)
     const d = dist(
       mouseX - width / 2,
       mouseY - height / 2,
@@ -188,34 +196,32 @@ export class Dot {
     );
     const targetRadius =
       d < this.baseRadius + 2.5 ? this.baseRadius * 3 : this.baseRadius;
-
     this.radius += (targetRadius - this.radius) * 0.1;
-
-    // Log listing info when the mouse is within the hover range
-    if (d < this.baseRadius + 2.5) {
-      //console.log(this.itemData.Description);
-    }
   }
 
-  draw(currentPose) {
+  draw(currentPose, images) {
     push(); // Save current drawing state
 
-    let x;
-    let y;
+    this.shouldHighlight(currentPose)
+      ? (this.highlighted = true)
+      : (this.highlighted = false);
 
-    if (this.shouldHighlight(currentPose)) {
+    if (this.itemData.Hand == "Hand") {
       stroke("#C9FF4C"); // Bright red for visibility
       strokeWeight(3);
-      this.highlighted = true;
     } else {
       noStroke();
-      this.highlighted = false;
     }
-
-    x = this.pos.x;
-    y = this.pos.y;
-    fill(this.color);
-    rect(x, y, this.radius);
+    noFill();
+    // fill(this.color);
+    rect(this.pos.x, this.pos.y, this.radius);
+    image(
+      images[this.index % images.length],
+      this.pos.x,
+      this.pos.y,
+      this.radius,
+      this.radius
+    ); // Scale image size based on radius
 
     pop(); // Restore drawing state
   }
