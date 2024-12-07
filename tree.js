@@ -1,7 +1,7 @@
 //LOADING
 let loading = document.getElementById("loading");
 let imgLoading = (document.getElementById("loading-img").src =
-  "/assets/loading/" + Math.floor(Math.random() * 8 + 1).toString() + ".gif");
+  "assets/loading/" + Math.floor(Math.random() * 8 + 1).toString() + ".gif");
 
 //P5
 let p5, canvas, font;
@@ -71,12 +71,12 @@ function processData(jsonData) {
 }
 
 window.preload = async () => {
-  font = loadFont("/assets/fonts/HelveticaLTStd-Roman.otf");
+  font = loadFont("assets/fonts/HelveticaLTStd-Roman.otf");
 
   for (let i = 2; i < 886; i++) {
     const imagePromise = new Promise((resolve) => {
       const img = loadImage(
-        "/assets/immagini/" + i + ".png",
+        "assets/immagini/" + i + ".png",
         () => {
           images.push(img);
           resolve(img);
