@@ -214,7 +214,7 @@ export class Dot {
     }
     noFill();
     // fill(this.color);
-    rect(this.pos.x, this.pos.y, this.radius);
+    rect(this.pos.x, this.pos.y, this.radius + 3);
     image(
       images[this.index % images.length],
       this.pos.x,
