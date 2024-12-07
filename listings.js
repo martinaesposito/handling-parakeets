@@ -29,7 +29,7 @@ export class Dot {
       baseY + sin(perpAngle) * offset
     );
     this.basePos = createVector(baseX, baseY);
-
+    this.originalPos = this.basePos;
     // Simplified property initialization
     this.index = index;
     this.color = Dot.colors[Math.floor(random(Dot.colors.length))];
@@ -40,12 +40,12 @@ export class Dot {
 
     // properties of the vector for positioning
     this.config = {
-      maxSpeed: 5,
-      attractionForce: 0.005,
-      separationForce: 0.09,
-      damping: 0.4,
-      noiseStrength: 0.5,
-      noiseStep: 0.0005,
+      maxSpeed: 6, // Increased for more dynamic movement
+      attractionForce: 0.005, // Reduced for looser grouping
+      separationForce: 0.1, // Adjusted for balance
+      damping: 0.45, // Slightly increased for more organic movement
+      noiseStrength: 0.5, // Increased for more randomness
+      noiseStep: 0.005, // Reduced for smoother transitions
     };
 
     // Velocity vector
@@ -57,50 +57,97 @@ export class Dot {
   }
 
   move(dots, currentPose) {
-    // Calculate attraction force toward the base position
+    if (!this.shouldHighlight(currentPose) && currentPose) {
+      this.basePos = p5.Vector.mult(this.originalPos, 1.5);
+    } else if (!currentPose) {
+      this.basePos = this.originalPos;
+    }
+
+    //Attraction
     let attraction = p5.Vector.sub(this.basePos, this.pos);
     attraction.mult(this.config.attractionForce);
 
+    // noise
+    let noiseX = (noise(this.noiseOffsetX) - 0.5) * this.config.noiseStrength;
+    let noiseY = (noise(this.noiseOffsetY) - 0.5) * this.config.noiseStrength;
+    let noiseForce = createVector(noiseX, noiseY);
+    this.noiseOffsetX += this.config.noiseStep;
+    this.noiseOffsetY += this.config.noiseStep;
+
+    //separation
     let separation = createVector(0, 0);
+    const halfWidth = 150 / 4 + this.radius;
+    const halfHeight = ((150 / 4) * 3) / 4 + this.radius;
 
-    // Separation from meCamera rectangle
-    const halfWidth = 150 / 2;
-    const halfHeight = ((150 / 4) * 3) / 2;
-
-    // If the dot should highlight, add an additional attraction toward the center
     if (this.shouldHighlight(currentPose)) {
-      //(currentPose);
-      this.highlighted = true;
-      const center = createVector(0, 0); // Center of the canvas
+      const center = createVector(0, 0);
       const centerAttraction = p5.Vector.sub(center, this.pos);
-      centerAttraction.mult(0.05); // Adjust the strength of the attraction force
-      attraction.add(centerAttraction);
 
-      let diffR = p5.Vector.sub(this.pos, center);
-      let distanceR = diffR.mag();
-      let minDistanceO = this.radius + halfWidth;
-      let minDistanceH = this.radius + halfHeight;
+      // Rectangular distance calculation
+      const distanceX =
+        this.pos.x - constrain(this.pos.x, -halfWidth, halfWidth);
+      const distanceY =
+        this.pos.y - constrain(this.pos.y, -halfHeight, halfHeight);
+      const distanceSquared = distanceX * distanceX + distanceY * distanceY;
+      const distance = sqrt(distanceSquared);
 
-      if (distanceR <= minDistanceO) {
-        diffR.normalize();
-        diffR.mult(this.config.separationForce * (minDistanceO + distanceR));
-        separation.add(diffR);
-        //return;
+      // Enhanced noise effect
+      const time = millis() * 0.001; // Use time for flowing movement
+      const individualNoise = noise(
+        this.pos.x * 0.01 + time,
+        this.pos.y * 0.01 + time,
+        this.index * 0.1
+      );
+
+      // Create circular movement tendency
+      const angle = noise(this.index * 0.5, time * 0.2) * TWO_PI;
+      const circularForce = createVector(
+        cos(angle) * this.config.noiseStrength * 2,
+        sin(angle) * this.config.noiseStrength * 2
+      );
+
+      // Wider repulsion zone with softer boundaries
+      const outerRepulsionZone =
+        this.radius + Math.max(halfWidth, halfHeight) * 3;
+      const innerRepulsionZone = this.radius + Math.min(halfWidth, halfHeight);
+
+      if (distance < outerRepulsionZone) {
+        // Smoother repulsion with noise influence
+        let repulsionStrength = map(
+          distance * (1 + individualNoise * 0.5),
+          innerRepulsionZone,
+          outerRepulsionZone,
+          this.config.separationForce * 1.5,
+          this.config.separationForce * 0.05
+        );
+
+        let repulsionVector = createVector(distanceX, distanceY);
+        repulsionVector.normalize();
+        repulsionVector.rotate(individualNoise * PI * 0.25); // Add slight rotation
+        repulsionVector.mult(repulsionStrength);
+        separation.add(repulsionVector);
+
+        // Variable center attraction
+        const attractionStrength = map(
+          distance,
+          innerRepulsionZone,
+          outerRepulsionZone,
+          0.005 + individualNoise * 0.01,
+          0.03 + individualNoise * 0.02
+        );
+        centerAttraction.mult(attractionStrength);
       }
 
-      // Check if the dot is within the meCamera rectangle bounds
-      // if (
-      //   -windowWidth / 2 > this.pos.x > -halfWidth ||
-      //   halfWidth < this.pos.x < windowWidth / 2 ||
-      //   -windowHeight / 2 > this.pos.y > -halfHeight ||
-      //   halfHeight < this.pos.y < windowHeight / 2
-      // ) {
-      //   // If the dot is inside the meCamera rectangle, limit its position to the boundaries
-      //   this.pos.x = constrain(this.pos.x,  -windowWidth / 2, -halfWidth);
-      //   this.pos.y = constrain(this.pos.y, -halfHeight, halfHeight);
-      // }
-    }
+      // Add circular and noise-based movement
+      separation.add(circularForce);
+      separation.add(
+        createVector(individualNoise - 0.5, individualNoise - 0.5).mult(
+          this.config.noiseStrength * 3
+        )
+      );
 
+      attraction.add(centerAttraction);
+    }
     // Separation calculation with more efficient loop
 
     for (const other of dots) {
@@ -108,6 +155,9 @@ export class Dot {
         let diff = p5.Vector.sub(this.pos, other.pos);
         let distance = diff.mag();
         let minDistance = this.radius + other.radius;
+        if (this.shouldHighlight(currentPose)) {
+          minDistance += 25;
+        }
 
         if (distance < minDistance) {
           diff.normalize();
@@ -116,15 +166,6 @@ export class Dot {
         }
       }
     }
-
-    // Add Perlin noise
-    let noiseX = (noise(this.noiseOffsetX) - 0.5) * this.config.noiseStrength;
-    let noiseY = (noise(this.noiseOffsetY) - 0.5) * this.config.noiseStrength;
-    let noiseForce = createVector(noiseX, noiseY);
-
-    // Update noise offsets
-    this.noiseOffsetX += this.config.noiseStep;
-    this.noiseOffsetY += this.config.noiseStep;
 
     // Apply forces more efficiently
     this.vel.add(attraction);

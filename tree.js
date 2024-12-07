@@ -1,3 +1,8 @@
+//LOADING
+let loading = document.getElementById("loading");
+let img = (document.getElementById("loading-img").src =
+  "/assets/loading/" + Math.floor(Math.random() * 8 + 1).toString() + ".gif");
+
 //P5
 let p5, canvas, font;
 let container = document.querySelector(".container");
@@ -66,7 +71,7 @@ function processData(jsonData) {
 }
 
 window.preload = async () => {
-  font = loadFont("/assets/Helvetica/HelveticaLTStd-Roman.otf");
+  font = loadFont("/assets/fonts/HelveticaLTStd-Roman.otf");
 
   try {
     const response = await fetch("listings.json");
@@ -91,6 +96,7 @@ window.setup = async () => {
     setTimeout(window.setup, 10);
     return;
   }
+  loading.style.display = "none";
   // Process the data
   dotsxBranch = window.listingsData;
 
