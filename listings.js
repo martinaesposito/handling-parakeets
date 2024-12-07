@@ -61,6 +61,10 @@ export class Dot {
     let attraction = p5.Vector.sub(this.basePos, this.pos);
     attraction.mult(this.config.attractionForce);
 
+    // Separation from meCamera rectangle
+    const halfWidth = 150 / 2;
+    const halfHeight = ((150 / 4) * 3) / 2;
+
     // If the dot should highlight, add an additional attraction toward the center
     if (this.shouldHighlight(currentPose)) {
       console.log(currentPose);
@@ -69,6 +73,18 @@ export class Dot {
       const centerAttraction = p5.Vector.sub(center, this.pos);
       centerAttraction.mult(0.05); // Adjust the strength of the attraction force
       attraction.add(centerAttraction);
+
+      // Check if the dot is within the meCamera rectangle bounds
+      // if (
+      //   -windowWidth / 2 > this.pos.x > -halfWidth ||
+      //   halfWidth < this.pos.x < windowWidth / 2 ||
+      //   -windowHeight / 2 > this.pos.y > -halfHeight ||
+      //   halfHeight < this.pos.y < windowHeight / 2
+      // ) {
+      //   // If the dot is inside the meCamera rectangle, limit its position to the boundaries
+      //   this.pos.x = constrain(this.pos.x, -halfWidth, halfWidth);
+      //   this.pos.y = constrain(this.pos.y, -halfHeight, halfHeight);
+      // }
     }
 
     // Separation calculation with more efficient loop
@@ -86,12 +102,6 @@ export class Dot {
         }
       }
     }
-
-    // Separation from meCamera rectangle
-    const halfWidth = 150 / 2;
-    const halfHeight = ((150 / 4) * 3) / 2;
-
-    // Push the dots outside the meCamera rectangle
 
     // Add Perlin noise
     let noiseX = (noise(this.noiseOffsetX) - 0.5) * this.config.noiseStrength;
@@ -139,17 +149,12 @@ export class Dot {
     let y;
 
     if (this.shouldHighlight(currentPose)) {
-      // stroke("#FF0000"); // Bright red for visibility
-      // strokeWeight(2);
+      stroke("#C9FF4C"); // Bright red for visibility
+      strokeWeight(3);
       this.highlighted = true;
-
-      // x = 0;
-      // y = 0;
     } else {
       noStroke();
       this.highlighted = false;
-      // x = this.pos.x;
-      // y = this.pos.y;
     }
 
     x = this.pos.x;

@@ -170,12 +170,20 @@ window.draw = () => {
     dot.draw(pose);
   });
 
+  let cW = 150;
+  let cH = (150 / 4) * 3;
+
   push();
   strokeWeight(1);
   stroke("black");
   noFill();
-  meCamera = rect(0, 0, 150, (150 / 4) * 3);
+  meCamera = rect(0, 0, cW, cH);
   pop();
+
+  if (pose) {
+    textAlign(CENTER);
+    text(pose, 0, cH / 2 + 25);
+  }
 };
 
 function generateBranchDots(branches) {
