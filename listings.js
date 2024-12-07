@@ -61,18 +61,32 @@ export class Dot {
     let attraction = p5.Vector.sub(this.basePos, this.pos);
     attraction.mult(this.config.attractionForce);
 
+    let separation = createVector(0, 0);
+
     // Separation from meCamera rectangle
     const halfWidth = 150 / 2;
     const halfHeight = ((150 / 4) * 3) / 2;
 
     // If the dot should highlight, add an additional attraction toward the center
     if (this.shouldHighlight(currentPose)) {
-      console.log(currentPose);
+      //(currentPose);
       this.highlighted = true;
       const center = createVector(0, 0); // Center of the canvas
       const centerAttraction = p5.Vector.sub(center, this.pos);
       centerAttraction.mult(0.05); // Adjust the strength of the attraction force
       attraction.add(centerAttraction);
+
+      let diffR = p5.Vector.sub(this.pos, center);
+      let distanceR = diffR.mag();
+      let minDistanceO = this.radius + halfWidth;
+      let minDistanceH = this.radius + halfHeight;
+
+      if (distanceR <= minDistanceO) {
+        diffR.normalize();
+        diffR.mult(this.config.separationForce * (minDistanceO + distanceR));
+        separation.add(diffR);
+        //return;
+      }
 
       // Check if the dot is within the meCamera rectangle bounds
       // if (
@@ -82,13 +96,13 @@ export class Dot {
       //   halfHeight < this.pos.y < windowHeight / 2
       // ) {
       //   // If the dot is inside the meCamera rectangle, limit its position to the boundaries
-      //   this.pos.x = constrain(this.pos.x, -halfWidth, halfWidth);
+      //   this.pos.x = constrain(this.pos.x,  -windowWidth / 2, -halfWidth);
       //   this.pos.y = constrain(this.pos.y, -halfHeight, halfHeight);
       // }
     }
 
     // Separation calculation with more efficient loop
-    let separation = createVector(0, 0);
+
     for (const other of dots) {
       if (other !== this) {
         let diff = p5.Vector.sub(this.pos, other.pos);
@@ -138,7 +152,7 @@ export class Dot {
 
     // Log listing info when the mouse is within the hover range
     if (d < this.baseRadius + 2.5) {
-      console.log(this.itemData.Description);
+      //console.log(this.itemData.Description);
     }
   }
 
