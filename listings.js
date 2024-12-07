@@ -91,7 +91,13 @@ export class Dot {
     this.pos.add(this.vel);
 
     // Update radius based on hover
-    const d = dist(mouseX, mouseY, this.pos.x, this.pos.y);
+
+    const d = dist(
+      mouseX - width / 2,
+      mouseY - height / 2,
+      this.pos.x,
+      this.pos.y
+    );
     const targetRadius =
       d < this.baseRadius + 2.5 ? this.baseRadius * 3 : this.baseRadius;
     this.radius += (targetRadius - this.radius) * 0.1;

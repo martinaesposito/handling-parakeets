@@ -7,15 +7,11 @@ let r = 12.5;
 
 let dotsxBranch = [
   { value: 19, start: 0.7, end: 0.8, name: "AAAnnunci" },
-
   { value: 3, start: 0.6, end: 0.7, name: "petfocus" },
   { value: 3, start: 0.1, end: 0.3, name: "petpappagalli" },
   { value: 94, start: 0.4, end: 1, name: "Clasf.it" },
   { value: 11, start: 0.85, end: 0.9, name: "likesx" },
   { value: 10, start: 0.4, end: 0.5, name: "Secondamano" },
-
-  { value: 18, start: 0.95, end: 1, name: "AnimaleAmico" },
-  { value: 7, start: 0.2, end: 0.3, name: "Animalissimo" },
   { value: 150, start: 0.3, end: 0.9, name: " Subito.it " },
   { value: 44, start: 0.6, end: 0.9, name: "telegram" }, //telegram
   { value: 11, start: 0.9, end: 1, name: "trovacuccioli" },
@@ -31,7 +27,8 @@ let dots = [];
 import { Dot } from "./listings.js";
 
 window.setup = async () => {
-  p5 = createCanvas(windowWidth, windowHeight);
+  p5 = createCanvas(windowWidth, windowHeight, WEBGL);
+
   pixelDensity(1);
   rectMode(CENTER);
 
@@ -51,12 +48,12 @@ window.setup = async () => {
 
     const bounds = {
       start: {
-        x: width / 2,
-        y: height / 2,
+        x: 0,
+        y: 0,
       },
       end: {
-        x: width / 2 + (width / 2.2) * cos(angle),
-        y: height / 2 + (height / 2.2) * sin(angle),
+        x: 0 + (width / 2.2) * cos(angle),
+        y: 0 + (height / 2.2) * sin(angle),
       },
     };
 
@@ -84,6 +81,8 @@ window.draw = () => {
   // Reset completo del background ad ogni frame
   clear();
   background(245);
+
+  camera(0, 0, 800);
 
   // branchesss.forEach(({ bounds: { start, end } }, index) => {
   //   stroke("lightgray");
