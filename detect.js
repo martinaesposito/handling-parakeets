@@ -34,28 +34,10 @@ let videoSize;
 function mapCoords(point, v) {
   //funzione per rimappare le coordinate dei punti della mano rispetto alla dimensione del video e alla dimensione della canva
   return {
-    x: width - point.x * v.w + (v.w - width) / 2,
-    y: point.y * v.h - (v.h - height) / 2,
+    x: width - point.x * v.w + (v.w - width) / 2 - width / 2,
+    y: point.y * v.h - (v.h - height) / 2 - height / 2,
     z: 0,
   };
-}
-function indexToCanvasCoords(
-  index,
-  sourceWidth,
-  sourceHeight,
-  canvasWidth,
-  canvasHeight
-) {
-  // Convert from rgba index to pixel index
-  const pixelIndex = Math.floor(index / 4);
-
-  return mapCoords(
-    {
-      x: (pixelIndex % video.width) / video.width,
-      y: Math.floor(pixelIndex / video.width) / video.height,
-    },
-    videoSize
-  );
 }
 
 const createHandLandmarker = async () => {
@@ -86,7 +68,7 @@ const createHandLandmarker = async () => {
 };
 
 window.setup = async () => {
-  p5 = createCanvas(windowWidth, windowHeight); // canvas quadrato
+  p5 = createCanvas(windowWidth, windowHeight, WEBGL); // canvas quadrato
   pixelDensity(1);
   canvas = p5.canvas;
   container.appendChild(canvas);
@@ -96,6 +78,7 @@ window.setup = async () => {
   handsData = [handsDataA, handsDataB];
 
   video = createCapture(VIDEO);
+  video.hide();
 
   createHandLandmarker(); // Avvia il riconoscimento delle mani
 };
@@ -103,12 +86,36 @@ window.setup = async () => {
 window.draw = () => {
   if (!video) return;
 
+  background("#F5F5F5");
+
   videoSize = {
-    w: width > height ? width : (height / video.height) * video.width,
-    h: height > width ? height : (width / video.width) * video.height,
+    h: height / 4.5,
+    w: (height / 4.5 / video.height) * video.width,
   };
 
+  scale(-1, 1);
+
+  image(video, -videoSize.w / 2, -videoSize.h / 2, videoSize.w, videoSize.h);
+
+  scale(-1, 1);
   drawHands();
+
+  if (hands[0]?.points) {
+    let cursor = hands[0].points[9].pos;
+
+    const scale =
+      videoSize.w / videoSize.h > width / height
+        ? height / videoSize.h
+        : width / videoSize.w;
+
+    cursor.x *= scale;
+    cursor.y *= scale;
+
+    fill("red");
+    strokeWeight(2);
+    stroke(1);
+    ellipse(cursor.x, cursor.y, 20);
+  }
 };
 
 const drawHands = () => {
@@ -119,7 +126,6 @@ const drawHands = () => {
 
     if (video.currentTime !== lastVideoTime && video.currentTime) {
       //aggiorna solo quando sono differenti
-      clear();
 
       const handLandmarkerResult = handLandmarker.detectForVideo(
         video,
@@ -165,7 +171,9 @@ const drawHands = () => {
                 videoSize
               );
 
-              if (isNearLandmarks(coords.x, coords.y, points, 70)) {
+              if (
+                isNearLandmarks(coords.x, coords.y, points, videoSize.h / 9)
+              ) {
                 shapePoints.push(coords);
               }
             }
@@ -179,13 +187,13 @@ const drawHands = () => {
         // Disegna la forma
         if (orderedPoints.length > 0) {
           stroke("white");
-          strokeWeight(12);
+          strokeWeight(5);
 
           for (let i = 0; i < orderedPoints.length; i++) {
             const curr = orderedPoints[i];
             const next = orderedPoints[(i + 10) % orderedPoints.length]; // Punto successivo
 
-            if (dist(curr.x, curr.y, next.x, next.y) < 30) {
+            if (dist(curr.x, curr.y, next.x, next.y) < videoSize.h / 18) {
               // Disegna solo se la distanza è minore di 20
 
               line(curr.x, curr.y, next.x, next.y);

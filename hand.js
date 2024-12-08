@@ -21,7 +21,6 @@ const Point = class {
     );
 
     stroke(this.selected ? "red" : 255);
-
     // ellipse(this.pos.x, this.pos.y, this.size, this.size);
 
     // noStroke();
@@ -140,26 +139,6 @@ export const Hand = class {
 
   calculateAngles() {
     let angles = [
-      // [17, 0, 1],
-      // [0, 1, 2],
-      // [1, 2, 3],
-      // [2, 3, 4],
-      // [17, 0, 5],
-      // [0, 5, 6],
-      // [5, 6, 7],
-      // [5, 9, 13],
-      // [6, 7, 8],
-      // [0, 9, 10],
-      // [9, 10, 11],
-      // [9, 13, 17],
-      // [10, 11, 12],
-      // [0, 13, 14],
-      // [13, 14, 15],
-      // [14, 15, 16],
-      // [0, 17, 18],
-      // [17, 18, 19],
-      // [18, 19, 20],
-
       [2, 0, 5], //angolo del palmo
       [5, 0, 17], //angolo del palmo
       [0, 1, 4], //pollice

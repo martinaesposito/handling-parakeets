@@ -13,7 +13,7 @@ export class Dot {
   //CONTSTRUCTOR
   constructor(branch, index, radius, itemData, imageMap) {
     //POSITIONING
-    const t = random(0.5, 0.9); //percentuale di tutto il ramo occupata dai punti
+    const t = random(0.6, 1); //percentuale di tutto il ramo occupata dai punti
     const branchAngle = atan2(
       branch.end.y - branch.start.y,
       branch.end.x - branch.start.x
@@ -50,7 +50,7 @@ export class Dot {
     // properties of the forces add to the posiiton
     this.config = {
       maxSpeed: 6,
-      attractionForce: 0.005,
+      attractionForce: 0.0075,
       separationForce: 0.1,
       damping: 0.45,
       noiseStrength: 0.5,
@@ -105,7 +105,7 @@ export class Dot {
       if (other !== this) {
         let diff = p5.Vector.sub(this.pos, other.pos);
         let distance = diff.mag();
-        let minDistance = this.radius + other.radius;
+        let minDistance = this.radius + other.radius + 1.5;
 
         if (this.shouldHighlight(currentPose)) {
           minDistance += this.randomC * 3; //se sono tra i punti con la posa selezionata impongo una minimum distance maggiore
@@ -144,8 +144,9 @@ export class Dot {
     //POSA
     // calcolo delle forze e dei limiti di posizionamento specifico per i punti della posa
     if (this.shouldHighlight(currentPose)) {
-      const halfWidth = 150 / 4 + this.baseRadius;
-      const halfHeight = ((150 / 4) * 3) / 4 + this.baseRadius;
+      let h = windowHeight / 4.5;
+      const halfWidth = ((h / 3) * 4) / 4 + this.baseRadius;
+      const halfHeight = h / 4 + this.baseRadius;
 
       const center = createVector(0, 0);
       const centerAttraction = p5.Vector.sub(center, this.pos);

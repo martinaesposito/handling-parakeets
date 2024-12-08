@@ -19,19 +19,19 @@ const branchPlatform = [
   { value: 149, start: 0.3, end: 0.7, name: "usato.it" },
   { value: 14, start: 0.6, end: 0.8, name: "TrovaPet" },
   { value: 3, start: 0.9, end: 1, name: "petpappagalli" },
-  { value: 44, start: 0.45, end: 0.55, name: "Telegram" },
+  { value: 44, start: 0.5, end: 0.6, name: "Telegram" },
   { value: 7, start: 0.9, end: 1, name: "animalissimo" },
   { value: 12, start: 0.6, end: 0.7, name: "Trovalosubito" },
   { value: 11, start: 0.85, end: 0.9, name: "likesx" },
-  { value: 149, start: 0.5, end: 1, name: "FB pages" },
+  { value: 149, start: 0.6, end: 0.9, name: "FB pages" },
   { value: 10, start: 0.6, end: 0.7, name: "Secondamano" },
   { value: 18, start: 0.9, end: 1, name: "AnimaleAmico" },
   { value: 14, start: 0.4, end: 0.6, name: "FB marketplace" },
-  { value: 177, start: 0.2, end: 0.9, name: "FB groups" },
+  { value: 177, start: 0.7, end: 0.8, name: "FB groups" },
   { value: 19, start: 0.8, end: 0.9, name: "AAAnnunci" },
   { value: 11, start: 0.5, end: 0.6, name: "trovacuccioli" },
   { value: 3, start: 0.9, end: 1, name: "petfocus" },
-  { value: 94, start: 0.8, end: 1, name: "Clasf.it" },
+  { value: 94, start: 0.9, end: 1, name: "Clasf.it" },
 ];
 
 let pose;
@@ -57,7 +57,7 @@ let targetZ = 800;
 
 ///PRELOAD
 window.preload = async () => {
-  font = loadFont("assets/fonts/HelveticaLTStd-Roman.otf"); //font
+  font = loadFont("assets/fonts/IBM_Plex_Sans/IBMPlexSans-Regular.ttf"); //font
 
   const imagePromises = [];
 
@@ -164,7 +164,7 @@ window.setup = async () => {
     };
 
     const branch = Object.fromEntries(
-      // Convert bounds object to an array of entries of (x, y)
+      // Convert bounds object to an array of array of (x, y)
       Object.entries(bounds).map(([key, value]) => [
         key,
         Object.fromEntries(
@@ -193,7 +193,6 @@ window.setup = async () => {
 ///DRAW
 window.draw = () => {
   // Reset completo del background ad ogni frame
-  clear();
   background(bg);
   textFont(font);
 
@@ -217,8 +216,8 @@ window.draw = () => {
     dot.move(dots, pose, z); // Single iteration per frame for smooth animation
   });
 
-  let cW = 150;
-  let cH = (150 / 4) * 3;
+  let cH = height / 4.5;
+  let cW = (cH / 3) * 4;
 
   push();
   strokeWeight(1);
@@ -228,7 +227,9 @@ window.draw = () => {
   pop();
 
   if (pose) {
+    //console.log(pose);
     textAlign(CENTER);
+    fill("black");
     text(pose, 0, cH / 2 + 25);
   }
 };
@@ -265,6 +266,6 @@ window.keyPressed = () => {
 
     const matchingDots = dots.filter((dot) => dot.shouldHighlight(pose));
     console.log(`Found ${matchingDots.length} dots matching pose: ${pose}`);
-    targetZ = 400; //camera zoom in
+    targetZ = 450; //camera zoom in
   } else targetZ = 800;
 };

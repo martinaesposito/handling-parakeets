@@ -1,7 +1,7 @@
 let font;
 let imagePromises=[]
 function preload() {
-    font = loadFont("assets/fonts/HelveticaLTStd-Roman.otf"); //font
+    font = loadFont("assets/fonts/IBM_Plex_Sans/IBMPlexSans-Regular.ttf"); //font
 
     for (let i = 2; i < 887; i++) {
       //carico tutte le immagini di tutti i listings
