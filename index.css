@@ -95,3 +95,18 @@ img {
   height: 30vh;
   width: auto;
 }
+
+#hands-legend {
+  position: fixed;
+  top: 0;
+  right: 0;
+  padding: 1vh;
+  display: flex;
+  flex-direction: row;
+  z-index: 5;
+  gap: 1vh;
+}
+.hand {
+  width: auto;
+  height: 5vh;
+}

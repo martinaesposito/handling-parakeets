@@ -3,12 +3,17 @@ let loading = document.getElementById("loading");
 let imgLoading = (document.getElementById("loading-img").src =
   "assets/loading/" + Math.floor(Math.random() * 8 + 1).toString() + ".gif");
 
+//LEGEND
+let handLegend = document.getElementById("hands-legend");
+
 //P5
 let p5, canvas, font;
 let container = document.querySelector(".container");
+let bg = "#F5F5F5";
+let canvasReady = false;
 
+//BRANCHES
 let branchesss = [];
-let dotsxBranch;
 
 const branchPlatform = [
   { value: 149, start: 0.3, end: 0.7, name: "usato.it" },
@@ -29,6 +34,7 @@ const branchPlatform = [
   { value: 94, start: 0.8, end: 1, name: "Clasf.it" },
 ];
 
+let pose;
 const handPoses = [
   "Finger perch",
   "Grip",
@@ -38,70 +44,62 @@ const handPoses = [
   "Shell",
   "Touching tips",
 ];
-let pose;
 
-let images = [];
-const imagePromises = [];
+let imageMap = {}; // Map images by their filename
 
 let dots = [];
 import { Dot } from "./listings.js";
-
 let listingsDataReady = false;
 
 let meCamera;
+let z = 800;
+let targetZ = 800;
 
-function processData(jsonData) {
-  // Group data by platform
-  const platformGroups = {};
-  jsonData.forEach((item) => {
-    if (!platformGroups[item.Platform]) {
-      platformGroups[item.Platform] = [];
-    }
-    platformGroups[item.Platform].push(item);
-  });
-
-  // Create combined data structure maintaining original branch config
-  return branchPlatform.map((config) => ({
-    value: platformGroups[config.name]?.length || config.value, // Use original value if no data
-    start: config.start,
-    end: config.end,
-    name: config.name,
-    items: platformGroups[config.name] || [], // Store platform items
-  }));
-}
-
+///PRELOAD
 window.preload = async () => {
-  font = loadFont("assets/fonts/HelveticaLTStd-Roman.otf");
+  font = loadFont("assets/fonts/HelveticaLTStd-Roman.otf"); //font
 
-  for (let i = 2; i < 886; i++) {
+  const imagePromises = [];
+
+  for (let i = 2; i < 887; i++) {
     const imagePromise = new Promise((resolve) => {
       const img = loadImage(
-        "assets/immagini/" + i + ".png",
+        `assets/immagini/${i}.png`,
         () => {
-          images.push(img);
-          resolve(img);
+          imageMap[Number(i)] = img; // Store with numeric keys
+          resolve();
         },
         () => {
-          console.log(`Skipping image ${i}.png`);
-          resolve(null); // Resolve with null if image fails to load
+          console.warn(`Failed to load image: ${i}.png`);
+          resolve(); // Resolve even if the image fails
         }
       );
     });
-
     imagePromises.push(imagePromise);
   }
 
-  // Wait for all image loading attempts to complete
   await Promise.all(imagePromises);
-  console.log(images);
+  // console.log("Loaded image keys:", Object.keys(imageMap).map(Number));
+  // console.log(imageMap); //controllo che ci siano tutte e che siano corrette
 
+  ///
+  // prendo tutti i listings dal json
   try {
-    const response = await fetch("listings.json");
+    const response = await fetch("listings.json"); //carico tutti i listings
     const jsonData = await response.json();
 
-    window.listingsData = processData(jsonData);
+    window.listingsData = branchPlatform.map((config) => ({
+      ...config, //crea un array che a partire dai dati originali di config aggiunge the number of items in jsonData matching the platform
+      //se non viene trovato prende il valore di elementi di config
+      value:
+        jsonData.filter((item) => item.Platform === config.name).length ||
+        config.value,
+      items: jsonData.filter((item) => item.Platform === config.name),
+    }));
+
     listingsDataReady = true;
   } catch (error) {
+    // If it fails, create a fallback listingsData that uses original branch configuration but with empty items
     console.error("Failed to load listings data", error);
     window.listingsData = branchPlatform.map((config) => ({
       ...config,
@@ -111,40 +109,50 @@ window.preload = async () => {
   }
 };
 
+//SETUP
 window.setup = async () => {
-  // Fetch your JSON data (replace with your actual data source)
-
   if (!listingsDataReady) {
+    //aspetta il json e continua a cercare di disegnare la funzione finchè non è pronto
     setTimeout(window.setup, 10);
     return;
   }
-  loading.style.display = "none";
-  // Process the data
-  dotsxBranch = window.listingsData;
 
+  loading.style.display = "none"; //nascondo il loading
+
+  //legenda
+  for (let i = 1; i < handPoses.length; i++) {
+    let hand = document.createElement("img");
+    hand.src = "assets/legend/" + i + ".svg";
+    hand.className = "hand";
+    handLegend.appendChild(hand);
+  }
+
+  //disegno la canvas
   p5 = createCanvas(windowWidth, windowHeight, WEBGL);
+  console.log("Renderer:", _renderer.drawingContext.constructor.name);
   pixelDensity(1);
   rectMode(CENTER);
   imageMode(CENTER);
 
   canvas = p5.canvas;
   container.appendChild(canvas);
-  background("#F5F5F5");
   textFont(font);
 
   // ANGLES
-  const totalDots = dotsxBranch.reduce((acc, { value }) => acc + value, 0);
-  const angles = dotsxBranch.map(({ value }) =>
-    Math.max(0.15, 2 * PI * (value / totalDots))
+  const totalDots = window.listingsData.reduce(
+    (acc, { value }) => acc + value,
+    0
   );
-
+  const angles = window.listingsData.map(
+    ({ value }) => Math.max(0.15, 2 * PI * (value / totalDots)) //distribuisco i rami in maniera proporzionale rispetto al totale, imponendo un angolo minimo di 0.15
+  );
   let total = 0;
-  console.log(angles);
 
   angles.forEach((a, index) => {
     const angle = total + a / 2 + (index > 0 ? angles[index - 1] / 2 : 0);
 
     const bounds = {
+      //punti di partenza e arrivo del ramo, calcolato a partire dal seno e coseno dell'angolo corrispondente
       start: {
         x: 0,
         y: 0,
@@ -156,35 +164,38 @@ window.setup = async () => {
     };
 
     const branch = Object.fromEntries(
+      // Convert bounds object to an array of entries of (x, y)
       Object.entries(bounds).map(([key, value]) => [
         key,
         Object.fromEntries(
           Object.entries(value).map(([k, v]) => [
             k,
-            map(dotsxBranch[index][key], 0, 1, bounds.start[k], bounds.end[k]),
+            map(
+              window.listingsData[index][key], //and then map the value from listingsData (expressed in 0,1) for the specific branch/key (start/end)
+              0,
+              1,
+              bounds.start[k],
+              bounds.end[k]
+            ),
           ])
         ),
       ])
     );
-
     total = angle;
-
     branchesss.push({ bounds, ...branch, angleWidth: a });
   });
 
   dots = generateBranchDots(branchesss);
+
+  canvasReady = true;
 };
 
-let z = 800;
-let targetZ = 800;
+///DRAW
 window.draw = () => {
   // Reset completo del background ad ogni frame
   clear();
-  background("#F5F5F5");
+  background(bg);
   textFont(font);
-
-  z += (targetZ - z) * 0.1; // Adjust 0.1 to control zoom speed
-  camera(0, 0, z);
 
   branchesss.forEach(({ bounds: { start, end } }, index) => {
     stroke("lightgray");
@@ -192,14 +203,18 @@ window.draw = () => {
     line(start.x, start.y, end.x, end.y);
     noStroke();
     fill("black");
-    //text(`${index} - ${dotsxBranch[index].name}`, end.x, end.y);
-    text(`${dotsxBranch[index].name}`, end.x, end.y);
+    text(`${window.listingsData[index].name}`, end.x, end.y);
   });
 
+  z += (targetZ - z) * 0.1;
+  if (canvasReady) {
+    camera(0, 0, z); // Adjust z as needed
+  }
+
   // Update and draw dots
-  dots.forEach((dot) => {
-    dot.move(dots, pose); // Single iteration per frame for smooth animation
-    dot.draw(pose, images);
+  dots.forEach((dot, index) => {
+    dot.draw(imageMap); //passo l'immagine corrispondente
+    dot.move(dots, pose, z); // Single iteration per frame for smooth animation
   });
 
   let cW = 150;
@@ -223,42 +238,33 @@ function generateBranchDots(branches) {
 
   branches.forEach((branch, bIndex) => {
     const branchDots = [];
-    const items = dotsxBranch[bIndex].items;
+    const items = window.listingsData[bIndex].items;
 
     items.forEach((item, i) => {
       const dot = new Dot(
         branch,
         allDots.length + branchDots.length,
         random(12.5, 15),
-        "image",
-        item // Pass the full item data
+        item, // Pass the full item data
+        imageMap
       );
       branchDots.push(dot);
     });
 
     allDots.push(...branchDots);
   });
-
-  // Initial overlap resolution
-  for (let i = 0; i < 50; i++) {
-    allDots.forEach((dot) => {
-      dot.move(allDots);
-    });
-  }
-
   return allDots;
 }
 
 window.keyPressed = () => {
   pose = null;
 
-  const keyNum = parseInt(key); // Convert key to number and check if it's within valid range
+  const keyNum = parseInt(key); // Convert key to number and check if it's one of the poses
   if (keyNum >= 1 && keyNum <= handPoses.length) {
     pose = handPoses[keyNum - 1];
-    let poseIndex = keyNum;
 
     const matchingDots = dots.filter((dot) => dot.shouldHighlight(pose));
     console.log(`Found ${matchingDots.length} dots matching pose: ${pose}`);
-    targetZ = 400;
+    targetZ = 400; //camera zoom in
   } else targetZ = 800;
 };
