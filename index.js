@@ -49,7 +49,7 @@ const createHandLandmarker = async () => {
 
 const processImage = () => {
   // img.src = `assets/training/${currentImage + 1}a.png`;
-  img.src = `assets/training/${currentImage + 1}a.png`;
+  img.src = `assets/training/${currentImage + 1}.png`;
 
   img.onload = async () => {
     resizeCanvas(((windowHeight - 200) / 16) * 9 + 200, windowHeight);
@@ -66,7 +66,7 @@ window.setup = async () => {
   container.appendChild(canvas);
 
   // handsData = await importJSON("json/training.json");
-  handsData = await importJSON("json/training-a.json");
+  handsData = await importJSON("json/training.json");
   newHandsData = handsData;
 
   createHandLandmarker(); // Avvia il riconoscimento delle mani
@@ -97,7 +97,7 @@ const drawHands = async (target) => {
   }
 
   newHandsData[currentImage] = {
-    name: `${currentImage + 1}a.png`,
+    name: `${currentImage + 1}.png`,
     points,
     angles: hands[0].angles,
   };
@@ -113,7 +113,7 @@ window.mouseDragged = () => {
     h.movePoint({ x: mouseX, y: mouseY });
 
     newHandsData[currentImage] = {
-      name: `${currentImage + 1}a.png`,
+      name: `${currentImage + 1}.png`,
       points: h.points.map((p) => p.pos),
       angles: hands[0].angles,
     };
@@ -125,7 +125,7 @@ window.mousePressed = () => {
     h.toggleSelectedPoint({ x: mouseX, y: mouseY });
 
     newHandsData[currentImage] = {
-      name: `${currentImage + 1}a.png`,
+      name: `${currentImage + 1}.png`,
       points: h.points.map((p) => p.pos),
       angles: hands[0].angles,
     };
@@ -135,7 +135,7 @@ window.mousePressed = () => {
 window.mouseReleased = () => {
   hands.forEach((h) => h.deselect());
   newHandsData[currentImage] = {
-    name: `${currentImage + 1}a.png`,
+    name: `${currentImage + 1}.png`,
     points: hands[0].points.map((p) => p.pos),
     angles: hands[0].angles,
   };
@@ -151,7 +151,7 @@ document.addEventListener("keydown", (e) => {
   } else if (e.code === "Space") {
     console.log("s");
     //S
-    window.saveCanvas(`${currentImage + 1}a.png`);
+    window.saveCanvas(`${currentImage + 1}.png`);
   }
 });
 
@@ -160,7 +160,7 @@ function saveJSON() {
   const blob = new Blob([jsonString], { type: "application/json" });
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
-  a.download = "training-a.json";
+  a.download = "training.json";
   // a.download = "json/hands.json";
   a.click();
   URL.revokeObjectURL(a.href);

@@ -52,7 +52,7 @@ export class Dot {
       maxSpeed: 6,
       attractionForce: 0.0075,
       separationForce: 0.1,
-      damping: 0.45,
+      damping: 0.5,
       noiseStrength: 0.5,
       noiseStep: 0.005,
     };
