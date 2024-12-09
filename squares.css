@@ -7,7 +7,8 @@
     position: absolute;
     max-width: 400px;
     padding: 10px;
-    background: #cccccc;
+    background: #eeeeee;
+    color: #818181;
 }
 
 @keyframes appear {
