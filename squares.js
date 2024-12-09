@@ -8,29 +8,9 @@ let current_pose = "start";
 
 let debugmenu;
 
-var Narrator = new p5.Speech();
-var Shell = new p5.Speech();
-var Grip = new p5.Speech();
-var Open = new p5.Speech();
-var HalfClosed = new p5.Speech();
-var TouchingTips = new p5.Speech();
-var FingerPerch = new p5.Speech();
-var Relaxed = new p5.Speech();
-
-Narrator.setLang("it")
-Shell.setLang("it")
-Grip.setLang("it")
-Open.setLang("it")
-HalfClosed.setLang("it")
-TouchingTips.setLang("it")
-FingerPerch.setLang("it")
-Relaxed.setLang("it")
-
-
 function preload() {
 
-    myJSON = loadJSON("./listings.json", createObjects);
-    
+    myJSON = loadJSON("./listings.json", createObjects);  
 }
 
 function createObjects(Json) {
@@ -163,7 +143,6 @@ class rects {
 
                 // narration
 
-                
             } else {
 
                 this.div.style("animation", "disappear 0.25s forwards");
