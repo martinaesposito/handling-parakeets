@@ -51,6 +51,15 @@ let handimages = [];
 let similarHand;
 let font;
 
+let cursor;
+
+// instructions
+let instructions = document.getElementById("instructions");
+let ita = document.getElementById("ita");
+let eng = document.getElementById("eng");
+let itaO = "Muovi la mano per esplorare";
+let engO = "Move your hand to explore";
+
 /////////////////////////////////////////////
 
 //MEDIAPIPE
@@ -144,8 +153,11 @@ window.draw = () => {
 
   //CURSOR
   if (hands.length > 0 && hands[0]?.points) {
-    let cursor = hands[0].points[9]?.pos;
+    cursor = hands[0].points[9]?.pos;
     if (!cursor) return;
+
+    ita.innerHTML = itaO;
+    eng.innerHTML = engO;
 
     const scale =
       videoSize.w / videoSize.h > width / height
@@ -158,6 +170,7 @@ window.draw = () => {
     push();
     imageMode(CENTER);
     if (typeof similarHand !== "undefined" && handimages[similarHand + 1]) {
+      handCounter(similarHand);
       image(handimages[similarHand + 1], cursor.x, cursor.y);
     }
     pop();
@@ -165,6 +178,9 @@ window.draw = () => {
     fill("red");
     noStroke();
     ellipse(cursor.x, cursor.y, 10);
+  } else {
+    ita.innerHTML = "Dov'è andata la tua mano?";
+    eng.innerHTML = "Where did your hand go?";
   }
 };
 
@@ -257,23 +273,68 @@ const drawHands = () => {
 
       imgSCH.src = `assets/detection/${similarHand + 1}.png`;
       differenceElC.innerHTML = Math.round(minDifference);
-
-      handCounter(similarHand);
     }
   }
 };
 
 function handCounter(detectedHand) {
+  const maxCounter = 80; // Maximum counter value
+  const loadingRadius = 75; // Radius of the loading circle
+  const angleOffset = -HALF_PI; // Start from the top
+
   counters.forEach((e, i) => {
     if (detectedHand == i) {
-      counters[detectedHand]++;
+      // Only increment if not already at max
+      if (counters[detectedHand] < maxCounter) {
+        counters[detectedHand]++;
+      }
+
+      // Always draw full arc if max is reached
+      const arcAngle =
+        counters[detectedHand] >= maxCounter
+          ? TWO_PI
+          : map(counters[detectedHand], 0, maxCounter, 0, TWO_PI);
+
+      // Outer arc
+      push();
+      noFill();
+      strokeWeight(8);
+      stroke("#C9FF4C");
+      arc(
+        cursor.x,
+        cursor.y,
+        loadingRadius * 2,
+        loadingRadius * 2,
+        angleOffset,
+        angleOffset + arcAngle
+      );
+      pop();
+
+      // Inner arc
+      push();
+      noFill();
+      strokeWeight(1);
+      stroke("black");
+      arc(
+        cursor.x,
+        cursor.y,
+        loadingRadius * 2 - 7,
+        loadingRadius * 2 - 7,
+        angleOffset,
+        angleOffset + arcAngle
+      );
+      pop();
+
+      if (counters[detectedHand] >= maxCounter) {
+        push();
+        textFont(font);
+        textSize(18);
+        textAlign(CENTER);
+        text("HURRAY! You have selected " + handPoses[i], 0, videoSize.h);
+        pop();
+      }
     } else if (counters[i] > 0) {
       counters[i]--;
-    }
-
-    if (e == 60) {
-      console.log("URRAY! You have selected " + e);
-      counters[detectedHand] = 60;
     }
   });
   console.log(counters);
