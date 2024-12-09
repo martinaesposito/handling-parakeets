@@ -143,10 +143,11 @@ window.draw = () => {
   drawHands();
 
   //CURSOR
-  if (hands[0]?.points) {
-    let cursor = hands[0].points[9].pos; //disegno il cursore in corrispondenza del punto centrale della mano
+  if (hands.length > 0 && hands[0]?.points) {
+    let cursor = hands[0].points[9]?.pos;
+    if (!cursor) return;
 
-    const scale = //scalo le coordinate in modo che le coordinate della mano siano rimappate sulla dimensione dello schermo
+    const scale =
       videoSize.w / videoSize.h > width / height
         ? height / videoSize.h
         : width / videoSize.w;
@@ -155,12 +156,13 @@ window.draw = () => {
     cursor.y *= scale;
 
     push();
-    imageMode(CENTER); //mano cursore che cambia dinamicamente in base alla mano riconosciuta
-    console.log(similarHand + 1, handPoses[similarHand]);
-    image(handimages[similarHand + 1], cursor.x, cursor.y);
+    imageMode(CENTER);
+    if (typeof similarHand !== "undefined" && handimages[similarHand + 1]) {
+      image(handimages[similarHand + 1], cursor.x, cursor.y);
+    }
     pop();
 
-    fill("red"); //puntino al centro
+    fill("red");
     noStroke();
     ellipse(cursor.x, cursor.y, 10);
   }
@@ -177,9 +179,13 @@ const drawHands = () => {
         video,
         startTimeMs
       );
+
       //landmarks
       const landmarks = handLandmarkerResult.landmarks[0];
-      if (!landmarks) return;
+      if (!landmarks) {
+        hands = [];
+        return;
+      }
       let points = landmarks?.map((p) => mapCoords(p, videoSize)); //prende i punti della mano e li rimappa
 
       if (!hands[0]) {
@@ -251,9 +257,27 @@ const drawHands = () => {
 
       imgSCH.src = `assets/detection/${similarHand + 1}.png`;
       differenceElC.innerHTML = Math.round(minDifference);
+
+      handCounter(similarHand);
     }
   }
 };
+
+function handCounter(detectedHand) {
+  counters.forEach((e, i) => {
+    if (detectedHand == i) {
+      counters[detectedHand]++;
+    } else if (counters[i] > 0) {
+      counters[i]--;
+    }
+
+    if (e == 60) {
+      console.log("URRAY! You have selected " + e);
+      counters[detectedHand] = 60;
+    }
+  });
+  console.log(counters);
+}
 
 //confronto con i LANDMARKS usando gli angoli
 function calculateDifferences(dataSet) {
