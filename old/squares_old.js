@@ -53,7 +53,7 @@ function setup() {
     debugmenu.option("Shell");
     debugmenu.option("Grip");
     debugmenu.option("Open");
-    debugmenu.option("Half-closed");
+    debugmenu.option("HalfClosed");
 }
 
 function draw() {

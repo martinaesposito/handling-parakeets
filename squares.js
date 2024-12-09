@@ -8,6 +8,25 @@ let current_pose = "start";
 
 let debugmenu;
 
+var Narrator = new p5.Speech();
+var Shell = new p5.Speech();
+var Grip = new p5.Speech();
+var Open = new p5.Speech();
+var HalfClosed = new p5.Speech();
+var TouchingTips = new p5.Speech();
+var FingerPerch = new p5.Speech();
+var Relaxed = new p5.Speech();
+
+Narrator.setLang("it")
+Shell.setLang("it")
+Grip.setLang("it")
+Open.setLang("it")
+HalfClosed.setLang("it")
+TouchingTips.setLang("it")
+FingerPerch.setLang("it")
+Relaxed.setLang("it")
+
+
 function preload() {
 
     myJSON = loadJSON("./listings.json", createObjects);
@@ -50,9 +69,9 @@ function setup() {
     debugmenu.option("Shell");
     debugmenu.option("Grip");
     debugmenu.option("Open");
-    debugmenu.option("Half-closed");
-    debugmenu.option("Touching tips");
-    debugmenu.option("Finger perch");
+    debugmenu.option("HalfClosed");
+    debugmenu.option("TouchingTips");
+    debugmenu.option("FingerPerch");
     debugmenu.option("Relaxed");
 }
 
@@ -111,7 +130,7 @@ class rects {
 
     draw() {
         
-        // positioning the divs relating to the screen
+        // positioning the divs relating to the screen (needs to be here for some reason)
 
         let xpos = 0;
 
@@ -141,6 +160,10 @@ class rects {
 
                 this.div.style("display", "block");
                 this.div.style("animation", "appear 0.5s forwards");
+
+                // narration
+
+                
             } else {
 
                 this.div.style("animation", "disappear 0.25s forwards");
