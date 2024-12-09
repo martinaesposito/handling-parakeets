@@ -150,7 +150,7 @@
     "Description": "Parrocchetto dal collare\nEsce spesso dalla gabbia e gli piace molto mangiare, non parla ma sta dovunque si mette, colore abbastanza raro, ha un anno e quasi 2 mesi, per maggiori informazioni contattatemi.",
     "Image_num": "14",
     "Hand": "Hand",
-    "Pose": "Touching tips",
+    "Pose": "TouchingTips",
     "Content_pose": "Image_and_text",
     "Audio_track": "14",
     "Highlights": "gli piace molto mangiare"
@@ -906,7 +906,7 @@
     "Description": "Disponibile parrocchetto dal collare blu",
     "Image_num": "77",
     "Hand": "Hand",
-    "Pose": "Finger perch",
+    "Pose": "FingerPerch",
     "Content_pose": "Image",
     "Audio_track": null,
     "Highlights": null
@@ -1290,7 +1290,7 @@
     "Description": "Parrocchetto dal collare allevato a mano, nato il 9 giugno non so il sesso",
     "Image_num": "109",
     "Hand": "Hand",
-    "Pose": "Half-closed",
+    "Pose": "HalfClosed",
     "Content_pose": "Image_and_text",
     "Audio_track": "109",
     "Highlights": "nato il 9 giugno non so il sesso"
@@ -1506,7 +1506,7 @@
     "Description": "Vendo parrocchetto dal collare Femmina allevato a mano. Ha 7 mesi. Possibilità di acquisto della gabbia a parte.",
     "Image_num": "127",
     "Hand": "Hand",
-    "Pose": "Finger perch",
+    "Pose": "FingerPerch",
     "Content_pose": "Image_and_text",
     "Audio_track": "127",
     "Highlights": "Possibilità di acquisto della gabbia a parte"
@@ -1602,7 +1602,7 @@
     "Description": "Parrocchetto dal collare, azzurro, di 6 mesi, molto affettuoso. Anellato, non soggetto a CITES.",
     "Image_num": "135",
     "Hand": "Hand",
-    "Pose": "Touching tips",
+    "Pose": "TouchingTips",
     "Content_pose": "Image_and_text",
     "Audio_track": "135",
     "Highlights": "molto affettuoso"
@@ -1674,7 +1674,7 @@
     "Description": "vendo parrocchetto dal collare verde ancestrale (probabilmente femmina) allevato a mano di 20 mesi con voliera (dimensioni: l 85 cm-h 145 cm-p 55 cm ) e trespolo artigianale € 180",
     "Image_num": "141",
     "Hand": "no_hand",
-    "Pose": "Finger perch",
+    "Pose": "FingerPerch",
     "Content_pose": "Text",
     "Audio_track": "141",
     "Highlights": "con voliera (dimensioni: l 85 cm-h 145 cm-p 55 cm ) e trespolo artigianale"
@@ -1686,7 +1686,7 @@
     "Description": "Disponibili pulli di parrocchetto monaco mutazione blu da allevare a mano o svezzati, solo persone decise e serie, No perditempo!! No curiosi!! contatto whatsapp 3802677668.",
     "Image_num": "142",
     "Hand": "Hand",
-    "Pose": "Half-closed",
+    "Pose": "HalfClosed",
     "Content_pose": "Image",
     "Audio_track": null,
     "Highlights": null
@@ -1758,7 +1758,7 @@
     "Description": "Gabbia per pappagalli e un pappagallo parlante e addomesticato",
     "Image_num": "148",
     "Hand": "no_hand",
-    "Pose": "Finger perch",
+    "Pose": "FingerPerch",
     "Content_pose": "Image_and_text",
     "Audio_track": "148",
     "Highlights": "Gabbia per pappagalli e un pappagallo parlante"
@@ -2034,7 +2034,7 @@
     "Description": "Allevato a mano",
     "Image_num": "171",
     "Hand": "Hand",
-    "Pose": "Half-closed",
+    "Pose": "HalfClosed",
     "Content_pose": "Image",
     "Audio_track": null,
     "Highlights": null
@@ -2238,7 +2238,7 @@
     "Description": "Allevato a mano",
     "Image_num": "188",
     "Hand": "no_hand",
-    "Pose": "Touching tips",
+    "Pose": "TouchingTips",
     "Content_pose": "Image",
     "Audio_track": null,
     "Highlights": null
@@ -2274,7 +2274,7 @@
     "Description": "Imbecco da finire",
     "Image_num": "191",
     "Hand": "no_hand",
-    "Pose": "Half-closed",
+    "Pose": "HalfClosed",
     "Content_pose": "Image",
     "Audio_track": null,
     "Highlights": null
@@ -2322,7 +2322,7 @@
     "Description": "Domestico",
     "Image_num": "195",
     "Hand": "Hand",
-    "Pose": "Finger perch",
+    "Pose": "FingerPerch",
     "Content_pose": "Image",
     "Audio_track": null,
     "Highlights": null
@@ -2538,7 +2538,7 @@
     "Description": "Cedo calopsiti, parrocchetto Monaco verde oliva allevate a mano con sessagio e doc. Cities molto docili e abituati ai bambini.\nPer il conuro del sole accetto prenotazione con una piccola caparra come acconto",
     "Image_num": "213",
     "Hand": "Hand",
-    "Pose": "Finger perch",
+    "Pose": "FingerPerch",
     "Content_pose": "Image",
     "Audio_track": null,
     "Highlights": null
@@ -2610,7 +2610,7 @@
     "Description": "Parrocchetto Monaco giallo dieci mesi allevato a mano. Maschio. vendo gabbia e giochi insieme.",
     "Image_num": "219",
     "Hand": "no_hand",
-    "Pose": "Finger perch",
+    "Pose": "FingerPerch",
     "Content_pose": "Text",
     "Audio_track": "219",
     "Highlights": "vendo gabbia e giochi insieme."
@@ -2742,7 +2742,7 @@
     "Description": "Disponibili pulli di parrocchetto Monaco mutazione blu da allevare a mano o svezzati, solo persone decise e serie, No perditempo ...",
     "Image_num": "230",
     "Hand": "Hand",
-    "Pose": "Half-closed",
+    "Pose": "HalfClosed",
     "Content_pose": "Image",
     "Audio_track": null,
     "Highlights": null
@@ -2754,7 +2754,7 @@
     "Description": "Disponibili Pulli di parrocchetto dal collare Pallid green, blu e azzurri.",
     "Image_num": "231",
     "Hand": "Hand",
-    "Pose": "Half-closed",
+    "Pose": "HalfClosed",
     "Content_pose": "Image",
     "Audio_track": null,
     "Highlights": null
@@ -2790,7 +2790,7 @@
     "Description": "Pulli di parrocchetto monaco ancestrale (circa 30 giorni) con protocollo italiano ...",
     "Image_num": "234",
     "Hand": "no_hand",
-    "Pose": "Half-closed",
+    "Pose": "HalfClosed",
     "Content_pose": "Image_and_text",
     "Audio_track": "234",
     "Highlights": null
@@ -3030,7 +3030,7 @@
     "Description": "Ho perduto il mio pappagallo parrocchetto monaco a Roma in zona borghesiana/ponte di nona, Vi prego di contattarmi al 328 62 60 044",
     "Image_num": "254",
     "Hand": "no_hand",
-    "Pose": "Touching tips",
+    "Pose": "TouchingTips",
     "Content_pose": "Image",
     "Audio_track": null,
     "Highlights": null
@@ -3090,7 +3090,7 @@
     "Description": "Cedo calopsiti, parrocchetto monaco verde oliva allevate a mano con sessagio e doc. Cities molto docili e abituati ai bambini. Per il conuro del sole accetto prenotazione con una piccola caparra come acconto",
     "Image_num": "259",
     "Hand": "Hand",
-    "Pose": "Finger perch",
+    "Pose": "FingerPerch",
     "Content_pose": "Image",
     "Audio_track": null,
     "Highlights": null
@@ -3150,7 +3150,7 @@
     "Description": "Cedo coppia riproduttiva di parrocchetti monaci anellati e con cites in regola. Anno 2017/2019 Non accetto scambi Possibilità di prenderli anche con una gabbia",
     "Image_num": "264",
     "Hand": "no_hand",
-    "Pose": "Finger perch",
+    "Pose": "FingerPerch",
     "Content_pose": "Image_and_text",
     "Audio_track": "264",
     "Highlights": "possibilità di prenderli anche con una gabbia"
@@ -3354,7 +3354,7 @@
     "Description": "Vendo giovane esemplare di 6 mesi di pappagallo parrocchetto dal collare giallo molto intelligente simpatico giocherellone semi addomesticato prende il cibo dalle mani esce dalla gabbia si fa un voletto e poi rientra da solo può imparare ancora molto. Se vi interessa vendo anche la gabbia che è in foto semi nuova un anno di vita.",
     "Image_num": "281",
     "Hand": "no_hand",
-    "Pose": "Touching tips",
+    "Pose": "TouchingTips",
     "Content_pose": "Text",
     "Audio_track": "281",
     "Highlights": "prende il cibo dalle mani esce dalla gabbia si fa un voletto e poi rientra da solo può imparare ancora molto"
@@ -3366,7 +3366,7 @@
     "Description": "Disponibile bellissimo pappagallo parrocchetto monaco parlante allevato a mano. Lo vendo compreso di gabbia e accessori e con i relativi documenti. Il suo nome è Rio ed è un pappagallo molto affettuoso, è affidabile e molto giocherellone con le persone. Ripete il suo nome, dice ciao è tante altre cose. Per qualsiasi informazione contattatemi.",
     "Image_num": "282",
     "Hand": "Hand",
-    "Pose": "Finger perch",
+    "Pose": "FingerPerch",
     "Content_pose": "Image_and_text",
     "Audio_track": "282",
     "Highlights": "Lo vendo compreso di gabbia e accessori e con i relativi documenti."
@@ -3438,7 +3438,7 @@
     "Description": "Disponibile pulli di parrocchetto monaco mutazione blu, i pulli godono di ottima salute, sono disponibili sia da allevare a mano o già svezzati, prezzo impegnativo, non accetto prenotazioni senza acconto se lo volete già svezzato, solo persone decise e serie, No perditempo! No rivenditori! No improvvisati! No indecisi cronici! No curiosi!",
     "Image_num": "288",
     "Hand": "Hand",
-    "Pose": "Half-closed",
+    "Pose": "HalfClosed",
     "Content_pose": "Image_and_text",
     "Audio_track": "288",
     "Highlights": "i pulli godono di ottima salute, sono disponibili sia da allevare a mano o già svezzati, non accetto prenotazioni senza acconto"
@@ -3474,7 +3474,7 @@
     "Description": "Parrocchetto dal collare, allevato a mano maschio, completo di gabbia ¤ 290",
     "Image_num": "291",
     "Hand": "Hand",
-    "Pose": "Finger perch",
+    "Pose": "FingerPerch",
     "Content_pose": "Image_and_text",
     "Audio_track": "291",
     "Highlights": "completo di gabbia"
@@ -3594,7 +3594,7 @@
     "Description": "Offro 3parrocchetti dal collare allevati a mano.un Albino un lutino ed un blup",
     "Image_num": "301",
     "Hand": "Hand",
-    "Pose": "Finger perch",
+    "Pose": "FingerPerch",
     "Content_pose": "Image",
     "Audio_track": null,
     "Highlights": null
@@ -3630,7 +3630,7 @@
     "Description": "Vendo parrocchetto dal collare allevato a mano femmina tre anni",
     "Image_num": "304",
     "Hand": "Hand",
-    "Pose": "Finger perch",
+    "Pose": "FingerPerch",
     "Content_pose": "Image",
     "Audio_track": null,
     "Highlights": null
@@ -3738,7 +3738,7 @@
     "Description": "Possibilità di prenotate partocchetto dal collare lutino allevato a mano. Cedo a fine svezzamento. In foto i genitori, e i due pulli prenotabili. Per info contattatemi.",
     "Image_num": "313",
     "Hand": "no_hand",
-    "Pose": "Half-closed",
+    "Pose": "HalfClosed",
     "Content_pose": "Text",
     "Audio_track": "313",
     "Highlights": null
@@ -3750,7 +3750,7 @@
     "Description": "Vendo Parrocchetto dal collare di 2 anni e mezzo bellissimo esemplare",
     "Image_num": "314",
     "Hand": "no_hand",
-    "Pose": "Finger perch",
+    "Pose": "FingerPerch",
     "Content_pose": "Image",
     "Audio_track": null,
     "Highlights": null
@@ -3870,7 +3870,7 @@
     "Description": "Pulli di parrocchetto monaco mutazione blu e lutino allevati a mano. Blu euro 160- Lutino 180 euro",
     "Image_num": "324",
     "Hand": "Hand",
-    "Pose": "Half-closed",
+    "Pose": "HalfClosed",
     "Content_pose": "Image",
     "Audio_track": null,
     "Highlights": null
@@ -3942,7 +3942,7 @@
     "Description": "Disponibile pullo di parrocchetto monaco mutazione blu, il pullo gode di ottima salute è disponibile sia da allevare a mano o già svezzato, prezzo impegnativo, non accetto prenotazioni senza acconto se lo volete già svezzato, solo persone decise e serie, No perditempo! No rivenditori! No improvvisati! No indecisi cronici! No curiosi!,solo contatto watsapp! 3802677668.",
     "Image_num": "330",
     "Hand": "Hand",
-    "Pose": "Half-closed",
+    "Pose": "HalfClosed",
     "Content_pose": "Image",
     "Audio_track": null,
     "Highlights": null
@@ -3954,7 +3954,7 @@
     "Description": "Cedo coppia di parrocchetti riproduttori con cites, anello inamovibile e sessaggio.",
     "Image_num": "331",
     "Hand": "Hand",
-    "Pose": "Half-closed",
+    "Pose": "HalfClosed",
     "Content_pose": "Image",
     "Audio_track": null,
     "Highlights": null
@@ -3990,7 +3990,7 @@
     "Description": "Disponibili pulli di parrocchetto monaco mutazione blu allevati a mano, con sessaggio molecolare e regolare denuncia ai fini cites, i pulli godono di ottima salute, solo persone decise e serie, No perditempo! No curiosi!, contatto watsapp 3802677668.",
     "Image_num": "334",
     "Hand": "no_hand",
-    "Pose": "Half-closed",
+    "Pose": "HalfClosed",
     "Content_pose": "Image_and_text",
     "Audio_track": "334",
     "Highlights": null
@@ -4002,7 +4002,7 @@
     "Description": "Disponibili a prenotazione pulli di parrocchetto monaco mutazione blu da allevare a mano, i pulli godono di ottima salute, solo persone decise e serie, No perditempo! No curiosi!, contatto watsapp 3802677668.",
     "Image_num": "335",
     "Hand": "Hand",
-    "Pose": "Half-closed",
+    "Pose": "HalfClosed",
     "Content_pose": "Image",
     "Audio_track": null,
     "Highlights": null
@@ -4014,7 +4014,7 @@
     "Description": "Disponibili pulli di parrocchetto monaco mutazione blu, i pulli godono di ottima salute sono disponibili sia da allevare a mano o già svezzati, prezzo impegnativo, non accetto prenotazioni senza acconto se lo volete già svezzato, solo persone decise e serie, No perditempo! No rivenditori! No improvvisati! No indecisi cronici! No curiosi!,solo contatto watsapp! 3802677668.",
     "Image_num": "336",
     "Hand": "Hand",
-    "Pose": "Half-closed",
+    "Pose": "HalfClosed",
     "Content_pose": "Image",
     "Audio_track": null,
     "Highlights": null
@@ -4038,7 +4038,7 @@
     "Description": "Parrocchetto monaco chiacchierone e molto docile con anelo e documenti cites",
     "Image_num": "338",
     "Hand": "Hand",
-    "Pose": "Half-closed",
+    "Pose": "HalfClosed",
     "Content_pose": "Image",
     "Audio_track": null,
     "Highlights": null
@@ -4206,7 +4206,7 @@
     "Description": "Disponibili pulli do parrocchetto dal collare  imbeccato a mano",
     "Image_num": "352",
     "Hand": "no_hand",
-    "Pose": "Half-closed",
+    "Pose": "HalfClosed",
     "Content_pose": "Image_and_text",
     "Audio_track": "352",
     "Highlights": null
@@ -4254,7 +4254,7 @@
     "Description": "Disponibili pullo da imbecco sia verdi che blu , disponibile anche pullo di grande alessandrino , contatti solo privatamente",
     "Image_num": "356",
     "Hand": "no_hand",
-    "Pose": "Half-closed",
+    "Pose": "HalfClosed",
     "Content_pose": "Image_and_text",
     "Audio_track": "356",
     "Highlights": null
@@ -4302,7 +4302,7 @@
     "Description": "Disponibile pullo  di parrocchetto allevato a mano   Foto reali anni 2016 prezzo in privato",
     "Image_num": "360",
     "Hand": "Hand",
-    "Pose": "Touching tips",
+    "Pose": "TouchingTips",
     "Content_pose": "Image",
     "Audio_track": null,
     "Highlights": null
@@ -4314,7 +4314,7 @@
     "Description": "Piccoli disponibili",
     "Image_num": "361",
     "Hand": "no_hand",
-    "Pose": "Half-closed",
+    "Pose": "HalfClosed",
     "Content_pose": "Image_and_text",
     "Audio_track": "361",
     "Highlights": null
@@ -5106,7 +5106,7 @@
     "Description": "Piccola meraviglia!!\nPullo di parrocchetto dal collare cobalto in fase di svezzamento. \nSarà ceduto allevato a mano, solo a fine svezzamento. \nA breve ne saranno disponibili altri di colori e mutazioni differenti. \nNon spediamo e non cediamo pulli.",
     "Image_num": "427",
     "Hand": "Hand",
-    "Pose": "Half-closed",
+    "Pose": "HalfClosed",
     "Content_pose": "Image_and_text",
     "Audio_track": "427",
     "Highlights": "Piccola meraviglia!!\nPullo di parrocchetto dal collare cobalto in fase di svezzamento"
@@ -5274,7 +5274,7 @@
     "Description": "Ciao a tutti ho perso questo pappagallo a Brindisi nei pressi di via martiri delle fosse ardeatine è un parrocchetto monaco di nome giulio, in caso lo abbiate trovato contattatemi al 338 821 1275",
     "Image_num": "441",
     "Hand": "no_hand",
-    "Pose": "Touching tips",
+    "Pose": "TouchingTips",
     "Content_pose": "Image",
     "Audio_track": null,
     "Highlights": null
@@ -5370,7 +5370,7 @@
     "Description": "Smarrito a CAGNO in provincia di Como venerdì 9 agosto nel pomeriggio LEO\nParrocchetto Monaco di 16 anni allevato a mano. Chiunque lo abbia visto mi contatti. Grazie",
     "Image_num": "449",
     "Hand": "Hand",
-    "Pose": "Finger perch",
+    "Pose": "FingerPerch",
     "Content_pose": "Image",
     "Audio_track": null,
     "Highlights": null
@@ -5502,7 +5502,7 @@
     "Description": "Parrocchetto dal collare grigio pezzato",
     "Image_num": "460",
     "Hand": "Hand",
-    "Pose": "Half-closed",
+    "Pose": "HalfClosed",
     "Content_pose": "Image",
     "Audio_track": null,
     "Highlights": null
@@ -5622,7 +5622,7 @@
     "Description": "Buongiorno a tutti \nHo allevato questo pappagallo parrocchetto che era caduto dal nido, l’ho nutrito da quando era senza piume per cui non è in grado di nutrirsi da solo…purtroppo mi è volato via ma magari potrebbe entrare in qualche appartamento in cerca di cibo…se qualcuno lo avesse in custodia vi sarei profondamente grata di comunicarmelo… ci sono molto affezionata… si chiama Paco…\nGrazie 🙏",
     "Image_num": "470",
     "Hand": "no_hand",
-    "Pose": "Touching tips",
+    "Pose": "TouchingTips",
     "Content_pose": "Text",
     "Audio_track": "470",
     "Highlights": "l’ho nutrito da quando era senza piume per cui non è in grado di nutrirsi da solo"
@@ -5754,7 +5754,7 @@
     "Description": "La stiamo cercando ovunque aiutateci a diffondere vi prego!Grazie",
     "Image_num": "481",
     "Hand": "Hand",
-    "Pose": "Finger perch",
+    "Pose": "FingerPerch",
     "Content_pose": "Image",
     "Audio_track": null,
     "Highlights": null
@@ -5766,7 +5766,7 @@
     "Description": "Parrocchetto  Femminuccia allevata a mano ..già svezzata anelata e registrata cites con certificato .anche certificato del sesso Molecolare. affettuosa e giocherellona.. zona Aprilia LT ma posso spostarmi ?",
     "Image_num": "482",
     "Hand": "no_hand",
-    "Pose": "Touching tips",
+    "Pose": "TouchingTips",
     "Content_pose": "Image",
     "Audio_track": null,
     "Highlights": null
@@ -6078,7 +6078,7 @@
     "Description": "AGGIORNAMENTO ‼️‼️‼️ ROMA - dragona / CASALPALOCCO . . Forse abbiamo ritrovato la sua famiglia… nel frattempo… il pestifero sta sempre appiccicato a noi e il suo piumaggio è nettamente migliorato!!! ❤️ È con noi e attende la sua famiglia. Contattateci!!",
     "Image_num": "508",
     "Hand": "no_hand",
-    "Pose": "Touching tips",
+    "Pose": "TouchingTips",
     "Content_pose": "Image_and_text",
     "Audio_track": "508",
     "Highlights": "il pestifero sta sempre appiccicato a noi"
@@ -6342,7 +6342,7 @@
     "Description": "Smarrito parrocchetto monaco allevato a mano in zona via Pio Selvini. Anellato cites, chi lo avvistasse per cortesia mi contatti, vi saremmo immensamente grati. Se delle volte si lasciasse prendere non date cibo di noi umani, solo frutta secca. No semi di mela perché tossici. Frutta o verdura sì. Grazieee",
     "Image_num": "530",
     "Hand": "Hand",
-    "Pose": "Touching tips",
+    "Pose": "TouchingTips",
     "Content_pose": "Text",
     "Audio_track": "530",
     "Highlights": "non date cibo di noi umani, solo frutta secca. No semi di mela perché tossici. Frutta o verdura sì"
@@ -6366,7 +6366,7 @@
     "Description": "Oggi abbiamo trovato in via Baracca un parrocchetto monaco azzurro. Come potete vedere dal video è buonissimo ed alla zampa ha un anellino rosso con codice T2112. Se sapete chi può averlo smarrito contattatemi.",
     "Image_num": "532",
     "Hand": "Hand",
-    "Pose": "Touching tips",
+    "Pose": "TouchingTips",
     "Content_pose": "Image_and_text",
     "Audio_track": "532",
     "Highlights": "Come potete vedere dal video è buonissimo"
@@ -6462,7 +6462,7 @@
     "Description": "Disponibile femmina di parrocchetto monaco ancestrale allevato a mano\nCoccolone e socievole 🦜🥰",
     "Image_num": "540",
     "Hand": "Hand",
-    "Pose": "Touching tips",
+    "Pose": "TouchingTips",
     "Content_pose": "Image_and_text",
     "Audio_track": "540",
     "Highlights": "Coccolone e socievole"
@@ -6666,7 +6666,7 @@
     "Description": "FATTORIA ARCHI DI LUCE ( 3899304611, AGRIGENTO) Parrocchetto dal collare anno 2017 maschio adulto VIOLA CLEARTAIL Seguite la nostra nuova pagina su face e INSTAGRAM ( FATTORIA ARCHI DI LUCE).",
     "Image_num": "557",
     "Hand": "no_hand",
-    "Pose": "Finger perch",
+    "Pose": "FingerPerch",
     "Content_pose": "Image",
     "Audio_track": null,
     "Highlights": null
@@ -6750,7 +6750,7 @@
     "Description": "Vedo gabbia con pappagalli un parrocchetto monaco verde uno blu e un parrocchetto dal collare bianco con tutti gli accessori (mangiatoie, ciotola per acqua e tutti i rami fatti in casa) incluso anche il mangime. Misure gabbia: 150×65×53. Prezzo poco trattabile",
     "Image_num": "564",
     "Hand": "no_hand",
-    "Pose": "Finger perch",
+    "Pose": "FingerPerch",
     "Content_pose": "Text",
     "Audio_track": "564",
     "Highlights": "gabbia con pappagalli con tutti gli accessori (mangiatoie, ciotola per acqua e tutti i rami fatti in casa)"
@@ -6870,7 +6870,7 @@
     "Description": "Cedo dolcissimo parrocchetto dal collare a malincuore per problemi personali, sessato maschio, allevato a mano, anellato con sei mesi di vita, svezzato, compreso di gabbia nuova, grande e tutti i suoi accessori e giochi più pettorina mai utilizzata. Il tutto costato molto di più. Ovviamente non ha paura dell'uomo",
     "Image_num": "574",
     "Hand": "no_hand",
-    "Pose": "Finger perch",
+    "Pose": "FingerPerch",
     "Content_pose": "Text",
     "Audio_track": "574",
     "Highlights": "compreso di gabbia nuova, grande e tutti i suoi accessori e giochi più pettorina mai utilizzata. Il tutto costato molto di più"
@@ -8022,7 +8022,7 @@
     "Description": "Cleartail viola",
     "Image_num": "670",
     "Hand": "no_hand",
-    "Pose": "Half-closed",
+    "Pose": "HalfClosed",
     "Content_pose": "Image",
     "Audio_track": null,
     "Highlights": null
@@ -8106,7 +8106,7 @@
     "Description": "Maschio pallidino viola  turchese 😍",
     "Image_num": "677",
     "Hand": "Hand",
-    "Pose": "Half-closed",
+    "Pose": "HalfClosed",
     "Content_pose": "Image",
     "Audio_track": null,
     "Highlights": null
@@ -8214,7 +8214,7 @@
     "Description": "Viola cleartail",
     "Image_num": "686",
     "Hand": "Hand",
-    "Pose": "Half-closed",
+    "Pose": "HalfClosed",
     "Content_pose": "Image",
     "Audio_track": null,
     "Highlights": null
@@ -8646,7 +8646,7 @@
     "Description": "Vendo bellissima coppia riproduttrice di parrocchetto Monaco non allevata a mano fanno due covate l'anno in gabbia da 120 anellata foi vendo a 180 euro non trattabile per chi fosse realmente interessato mi può lasciare il proprio numero di telefono",
     "Image_num": "722",
     "Hand": "no_hand",
-    "Pose": "Finger perch",
+    "Pose": "FingerPerch",
     "Content_pose": "Image",
     "Audio_track": null,
     "Highlights": null
@@ -8706,7 +8706,7 @@
     "Description": "Scambio un parrocchetto monaco in cambio di un Ararauna ancora piccola da imbecco.",
     "Image_num": "727",
     "Hand": "no_hand",
-    "Pose": "Touching tips",
+    "Pose": "TouchingTips",
     "Content_pose": "Image",
     "Audio_track": null,
     "Highlights": null
@@ -9282,7 +9282,7 @@
     "Description": "Splendida coppia di parrocchetti già riproduttivi. Per info, in privato.",
     "Image_num": "775",
     "Hand": "no_hand",
-    "Pose": "Touching tips",
+    "Pose": "TouchingTips",
     "Content_pose": "Image",
     "Audio_track": null,
     "Highlights": null
@@ -9474,7 +9474,7 @@
     "Description": "Vendo bellissimi parrocchetti monaci e dal collare da imbecco Per qualsiasi informazione contattare al numero 333 367 1673",
     "Image_num": "791",
     "Hand": "no_hand",
-    "Pose": "Half-closed",
+    "Pose": "HalfClosed",
     "Content_pose": "Image",
     "Audio_track": null,
     "Highlights": null
@@ -9690,7 +9690,7 @@
     "Description": "Cucciolo di tre mesi ottimo carattere appena svezzato, per info no messaggi solo chiamate grazie, euro 290",
     "Image_num": "809",
     "Hand": "Hand",
-    "Pose": "Finger perch",
+    "Pose": "FingerPerch",
     "Content_pose": "Image_and_text",
     "Audio_track": "809",
     "Highlights": "Cucciolo di tre mesi ottimo carattere appena svezzato"
@@ -9954,7 +9954,7 @@
     "Description": "Vendo stupendo parrocchetto dal collare viola. Ha 7 mesi ed è femmina. Allevato a mano. Davvero bello, lo cedo a malincuore per mancanza tempo da dedicargli.",
     "Image_num": "831",
     "Hand": "Hand",
-    "Pose": "Touching tips",
+    "Pose": "TouchingTips",
     "Content_pose": "Image_and_text",
     "Audio_track": "831",
     "Highlights": "lo cedo a malincuore per mancanza tempo da dedicargli"
@@ -10038,7 +10038,7 @@
     "Description": "Vendo parrocchetto monaco e parrocchetto dal collare maschi entrambi compreso di gabbia.. i pappagalli dicono qualche parolina vendo per mancanza di tempo e spazio.. prezzo trattabile..",
     "Image_num": "838",
     "Hand": "no_hand",
-    "Pose": "Finger perch",
+    "Pose": "FingerPerch",
     "Content_pose": "Image_and_text",
     "Audio_track": "838",
     "Highlights": "compreso di gabbi"
@@ -10194,7 +10194,7 @@
     "Description": "Vendo un pullo di parrocchetto Monaco parlante allevato a mano di quasi 3 mesi e mezzo con anello innamovibile completamente autonomo mangia semi e frutta al prezzo di 60 euro per chi fosse realmente interessato può lasciare il proprio numero di telefono",
     "Image_num": "851",
     "Hand": "Hand",
-    "Pose": "Finger perch",
+    "Pose": "FingerPerch",
     "Content_pose": "Image_and_text",
     "Audio_track": "851",
     "Highlights": "parrocchetto Monaco parlante allevato a mano di quasi 3 mesi e mezzo con anello innamovibile completamente autonomo"
@@ -10314,7 +10314,7 @@
     "Description": "Disponibili pulli di parrocchetto monaco mutazione blu da allevare a mano o svezzati, solo persone decise e serie, No perditempo!! No curiosi!! contatto whatsapp 3802677668.",
     "Image_num": "861",
     "Hand": "Hand",
-    "Pose": "Half-closed",
+    "Pose": "HalfClosed",
     "Content_pose": "Image",
     "Audio_track": null,
     "Highlights": null
@@ -10482,7 +10482,7 @@
     "Description": "Disponibili pulli di parrocchetto monaco mutazione blu da allevare a mano o svezzati, solo persone decise e serie, No perditempo!! No curiosi!! contatto whatsapp 3802677668.",
     "Image_num": "875",
     "Hand": "Hand",
-    "Pose": "Half-closed",
+    "Pose": "HalfClosed",
     "Content_pose": "Image",
     "Audio_track": null,
     "Highlights": null

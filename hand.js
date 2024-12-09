@@ -31,7 +31,7 @@ const Point = class {
     // textSize(9);
     // textAlign(CENTER);
     // text(this.index, this.pos.x, this.pos.y);
-    circle(this.pos.x, this.pos.y, 8);
+    circle(this.pos.x, this.pos.y, 4);
   }
 
   update(coords) {
@@ -175,7 +175,7 @@ export const Hand = class {
 
       stroke("red");
       stroke(colors[index]);
-      strokeWeight(2);
+      strokeWeight(1);
 
       line(p1.x, p1.y, p2.x, p2.y);
       line(p2.x, p2.y, p3.x, p3.y);

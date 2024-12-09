@@ -32,13 +32,13 @@ let lastVideoTime = -1;
 let videoSize;
 
 const handPoses = [
-  "Finger perch",
+  "FingerPerch",
   "Grip",
-  "Half-closed",
+  "HalfClosed",
   "Open",
   "Relaxed",
   "Shell",
-  "Touching tips",
+  "TouchingTips",
 ];
 let handimages = [];
 let similarHandC;
