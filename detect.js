@@ -51,6 +51,15 @@ let handimages = [];
 let similarHand;
 let font;
 
+let cursor;
+
+// instructions
+let instructions = document.getElementById("instructions");
+let ita = document.getElementById("ita");
+let eng = document.getElementById("eng");
+let itaO = "Muovi la mano per esplorare";
+let engO = "Move your hand to explore";
+
 /////////////////////////////////////////////
 
 //MEDIAPIPE
@@ -143,10 +152,14 @@ window.draw = () => {
   drawHands();
 
   //CURSOR
-  if (hands[0]?.points) {
-    let cursor = hands[0].points[9].pos; //disegno il cursore in corrispondenza del punto centrale della mano
+  if (hands.length > 0 && hands[0]?.points) {
+    cursor = hands[0].points[9]?.pos;
+    if (!cursor) return;
 
-    const scale = //scalo le coordinate in modo che le coordinate della mano siano rimappate sulla dimensione dello schermo
+    ita.innerHTML = itaO;
+    eng.innerHTML = engO;
+
+    const scale =
       videoSize.w / videoSize.h > width / height
         ? height / videoSize.h
         : width / videoSize.w;
@@ -155,14 +168,19 @@ window.draw = () => {
     cursor.y *= scale;
 
     push();
-    imageMode(CENTER); //mano cursore che cambia dinamicamente in base alla mano riconosciuta
-    console.log(similarHand + 1, handPoses[similarHand]);
-    image(handimages[similarHand + 1], cursor.x, cursor.y);
+    imageMode(CENTER);
+    if (typeof similarHand !== "undefined" && handimages[similarHand + 1]) {
+      handCounter(similarHand);
+      image(handimages[similarHand + 1], cursor.x, cursor.y);
+    }
     pop();
 
-    fill("red"); //puntino al centro
+    fill("red");
     noStroke();
     ellipse(cursor.x, cursor.y, 10);
+  } else {
+    ita.innerHTML = "Dov'è andata la tua mano?";
+    eng.innerHTML = "Where did your hand go?";
   }
 };
 
@@ -177,9 +195,13 @@ const drawHands = () => {
         video,
         startTimeMs
       );
+
       //landmarks
       const landmarks = handLandmarkerResult.landmarks[0];
-      if (!landmarks) return;
+      if (!landmarks) {
+        hands = [];
+        return;
+      }
       let points = landmarks?.map((p) => mapCoords(p, videoSize)); //prende i punti della mano e li rimappa
 
       if (!hands[0]) {
@@ -254,6 +276,69 @@ const drawHands = () => {
     }
   }
 };
+
+function handCounter(detectedHand) {
+  const maxCounter = 80; // Maximum counter value
+  const loadingRadius = 75; // Radius of the loading circle
+  const angleOffset = -HALF_PI; // Start from the top
+
+  counters.forEach((e, i) => {
+    if (detectedHand == i) {
+      // Only increment if not already at max
+      if (counters[detectedHand] < maxCounter) {
+        counters[detectedHand]++;
+      }
+
+      // Always draw full arc if max is reached
+      const arcAngle =
+        counters[detectedHand] >= maxCounter
+          ? TWO_PI
+          : map(counters[detectedHand], 0, maxCounter, 0, TWO_PI);
+
+      // Outer arc
+      push();
+      noFill();
+      strokeWeight(8);
+      stroke("#C9FF4C");
+      arc(
+        cursor.x,
+        cursor.y,
+        loadingRadius * 2,
+        loadingRadius * 2,
+        angleOffset,
+        angleOffset + arcAngle
+      );
+      pop();
+
+      // Inner arc
+      push();
+      noFill();
+      strokeWeight(1);
+      stroke("black");
+      arc(
+        cursor.x,
+        cursor.y,
+        loadingRadius * 2 - 7,
+        loadingRadius * 2 - 7,
+        angleOffset,
+        angleOffset + arcAngle
+      );
+      pop();
+
+      if (counters[detectedHand] >= maxCounter) {
+        push();
+        textFont(font);
+        textSize(18);
+        textAlign(CENTER);
+        text("HURRAY! You have selected " + handPoses[i], 0, videoSize.h);
+        pop();
+      }
+    } else if (counters[i] > 0) {
+      counters[i]--;
+    }
+  });
+  console.log(counters);
+}
 
 //confronto con i LANDMARKS usando gli angoli
 function calculateDifferences(dataSet) {

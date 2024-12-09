@@ -1,15 +1,30 @@
+/* fonts */
+@font-face {
+  font-family: "IBMplex-mono";
+  src: url("assets/fonts/IBM_Plex_Mono/IBMPlexMono-Regular.ttf")
+    format("truetype");
+}
+
+@font-face {
+  font-family: "IBMplex-sans";
+  src: url("assets/fonts/IBM_Plex_Sans/IBMPlexSans-Regular.ttf")
+    format("truetype");
+}
+/* general */
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
-
+img {
+  height: 100%;
+  width: fit-content;
+}
 .wrapper {
   height: 100vh;
   display: flex;
   justify-content: center;
 }
-
 .container {
   position: relative;
   height: 100vh;
@@ -17,20 +32,11 @@
   width: fit-content;
   padding: 100px;
 }
-
 .container.full {
   width: 100%;
 }
 
-video {
-  position: fixed;
-  top: 0;
-  height: 100vh;
-  width: 100%;
-  object-fit: cover;
-  transform: scaleX(-1);
-}
-
+/* CANVAS */
 canvas {
   position: absolute;
   top: 0;
@@ -38,48 +44,34 @@ canvas {
   width: 100vh;
   height: 100vh;
   z-index: 2;
-  border: 1px solid lightgray;
 }
 
-img {
-  height: 100%;
-  width: fit-content;
-}
-
+/* PREVIEW della posa */
 .imgcontainer {
   position: fixed;
   display: flex;
-  flex-direction: row;
-  top: 0;
-  right: 0;
-  height: 30vh;
-  width: auto;
-  z-index: 3;
-}
-
-.container.full .img {
+  flex-direction: column;
+  align-items: center;
+  gap: 1vh;
+  top: 2vh;
+  right: 2vh;
   height: 20vh;
   width: auto;
-  background-color: #b1e644;
-}
-
-.diff-c {
-  position: absolute;
-  font-family: monospace;
-  bottom: -10;
   color: black;
-  background-color: white;
-  padding: 4px;
-  border-radius: 2px;
-  stroke: #b1e644;
+  z-index: 3;
+}
+.diff {
+  font-family: IBMplex-mono, monospace;
+  font-size: 12px;
   width: 100%;
   text-align: center;
 }
 
+/* LOADING */
 #loading {
   position: fixed;
   gap: 2vh;
-  font-family: sans-serif;
+  font-family: IBMplex-sans;
   top: 0;
   left: 0;
   width: 100%;
@@ -96,6 +88,7 @@ img {
   width: auto;
 }
 
+/* LEGENDA  delle mani */
 #hands-legend {
   position: fixed;
   top: 0;
@@ -109,4 +102,23 @@ img {
 .hand {
   width: auto;
   height: 5vh;
+}
+
+/* INSTRUCTIONS */
+#instructions {
+  position: fixed;
+  width: 100%;
+  left: 0;
+  bottom: 3vh;
+  gap: 0.5vw;
+  justify-content: center;
+  font-family: IBMplex-sans;
+  color: black;
+  display: flex;
+  flex-direction: row;
+  z-index: 3;
+}
+
+#instructions .eng {
+  opacity: 0.4;
 }
