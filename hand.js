@@ -187,9 +187,10 @@ export const Hand = class {
       let relativeAangle = calculateAngle(p1, p2, p3);
       let absoluteAngle = calculateAngle(p1, p2, base);
 
-      textSize(12);
-      textAlign(CENTER);
-      text(Math.round(relativeAangle), p3.x, p3.y);
+      // textFont(font);
+      // textSize(12);
+      // textAlign(CENTER);
+      // text(Math.round(relativeAangle), p3.x, p3.y);
 
       return { relative: relativeAangle, absolute: absoluteAngle };
     });

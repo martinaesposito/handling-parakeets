@@ -4,7 +4,7 @@ import {
   FilesetResolver,
 } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.0";
 
-import { Hand } from "./hand.js"; //importa l'oggetto mano definito nel javascript precedente
+import { Hand } from "../hand.js"; //importa l'oggetto mano definito nel javascript precedente
 
 let handLandmarker,
   imageSegmenter,
@@ -292,6 +292,7 @@ const drawHands = () => {
       //prendo i due array di differenze risultanti e trovo quello la cui somma è la minore
       const minA = Math.min(...differences[0]);
       similarHandC = differences[0].indexOf(minA);
+      console.log(similarHandC);
       imgSCH.src = `assets/detection/${similarHandC + 1}.png`;
 
       differenceElC.innerHTML = Math.round(minA);
