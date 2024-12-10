@@ -1,10 +1,3 @@
-import {
-  preload as detectPreload,
-  setup as detectSetup,
-  draw as detectDraw,
-  selectedPose,
-} from "./detect.js";
-
 //LOADING
 let loading = document.getElementById("loading");
 let imgLoading = (document.getElementById("loading-img").src =
@@ -58,6 +51,7 @@ let dots = [];
 import { Dot } from "./listings.js";
 let listingsDataReady = false;
 
+let meCamera;
 let z = 800;
 let targetZ = 800;
 
@@ -113,8 +107,6 @@ window.preload = async () => {
     }));
     listingsDataReady = true;
   }
-
-  detectPreload();
 };
 
 //SETUP
@@ -196,19 +188,13 @@ window.setup = async () => {
   dots = generateBranchDots(branchesss);
 
   canvasReady = true;
-
-  textFont(font);
-
-  detectSetup();
 };
 
 ///DRAW
 window.draw = () => {
-  // console.log(Math.round(1000 / deltaTime));
-
   // Reset completo del background ad ogni frame
   background(bg);
-  targetZ = selectedPose ? 450 : 800;
+  textFont(font);
 
   branchesss.forEach(({ bounds: { start, end } }, index) => {
     stroke("lightgray");
@@ -226,21 +212,26 @@ window.draw = () => {
 
   // Update and draw dots
   dots.forEach((dot, index) => {
-    dot.move(dots, selectedPose, z); // Single iteration per frame for smooth animation
-    dot.draw(); //passo l'immagine corrispondente
+    dot.draw(imageMap); //passo l'immagine corrispondente
+    dot.move(dots, pose, z); // Single iteration per frame for smooth animation
   });
 
   let cH = height / 4.5;
   let cW = (cH / 3) * 4;
 
-  if (selectedPose) {
+  push();
+  strokeWeight(1);
+  stroke("black");
+  noFill();
+  meCamera = rect(0, 0, cW, cH);
+  pop();
+
+  if (pose) {
+    //console.log(pose);
     textAlign(CENTER);
     fill("black");
-    text(selectedPose, 0, cH / 2 + 25);
+    text(pose, 0, cH / 2 + 25);
   }
-
-  translate(0, 0, 1);
-  detectDraw();
 };
 
 function generateBranchDots(branches) {
@@ -252,7 +243,7 @@ function generateBranchDots(branches) {
 
     items.forEach((item, i) => {
       const dot = new Dot(
-        { ...branch, index: bIndex },
+        branch,
         allDots.length + branchDots.length,
         random(12.5, 15),
         item, // Pass the full item data

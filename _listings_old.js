@@ -1,5 +1,3 @@
-import { cursor } from "./detect.js";
-
 export class Dot {
   static colors = [
     //colors
@@ -14,8 +12,6 @@ export class Dot {
 
   //CONTSTRUCTOR
   constructor(branch, index, radius, itemData, imageMap) {
-    this.branch = branch.index;
-
     //POSITIONING
     const t = random(0.6, 1); //percentuale di tutto il ramo occupata dai punti
     const branchAngle = atan2(
@@ -50,7 +46,6 @@ export class Dot {
     this.baseRadius = radius;
     this.radius = radius;
     this.itemData = itemData;
-    this.isHovered = false;
 
     // properties of the forces add to the posiiton
     this.config = {
@@ -78,13 +73,9 @@ export class Dot {
     } else {
       noStroke(); //se non ce l'hanno niente
     }
-    // noFill();
-    // fill(this.color);
-    // rect(this.pos.x, this.pos.y, this.radius + 3); //rect per disegnare il bordo, + 3 per disegnarlo esterno
-
-    // if (this.isHovered) {
+    noFill();
+    rect(this.pos.x, this.pos.y, this.radius + 3); //rect per disegnare il bordo, + 3 per disegnarlo esterno
     image(this.image, this.pos.x, this.pos.y, this.radius, this.radius);
-    // }
   }
 
   //MOVE
@@ -109,45 +100,36 @@ export class Dot {
     // Separation
     let separation = createVector(0, 0);
 
-    const filteredDots = dots.filter((d) =>
-      this.shouldHighlight(currentPose)
-        ? d.shouldHighlight(currentPose)
-        : ((d.branch >= this.branch - 1 && d.branch <= this.branch + 1) ||
-            (this.branch === 0 && d.branch === 15) ||
-            (this.branch === 15 && d.branch === 0)) &&
-          d !== this
-    );
-
     // other DOTS
-    for (const other of filteredDots) {
-      let diff = p5.Vector.sub(this.pos, other.pos);
-      let distance = diff.mag();
-      let minDistance = this.radius + other.radius + 1.5;
+    for (const other of dots) {
+      if (other !== this) {
+        let diff = p5.Vector.sub(this.pos, other.pos);
+        let distance = diff.mag();
+        let minDistance = this.radius + other.radius + 1.5;
 
-      if (this.shouldHighlight(currentPose)) {
-        minDistance += this.randomC * 3; //se sono tra i punti con la posa selezionata impongo una minimum distance maggiore
-      }
+        if (this.shouldHighlight(currentPose)) {
+          minDistance += this.randomC * 3; //se sono tra i punti con la posa selezionata impongo una minimum distance maggiore
+        }
 
-      if (distance < minDistance) {
-        diff.normalize();
-        diff.mult(this.config.separationForce * (minDistance - distance));
-        separation.add(diff);
+        if (distance < minDistance) {
+          diff.normalize();
+          diff.mult(this.config.separationForce * (minDistance - distance));
+          separation.add(diff);
+        }
       }
     }
 
     // MOUSE INTERACTION
     // Scala le coordinate del mouse in base al fattore di zoom
-    // const zoomFactor = z / 800;
-    // const scaledMouseX = (cursor?.x - width / 2) * zoomFactor;
-    // const scaledMouseY = (cursor?.y - height / 2) * zoomFactor;
+    const zoomFactor = z / 800;
+    const scaledMouseX = (mouseX - width / 2) * zoomFactor;
+    const scaledMouseY = (mouseY - height / 2) * zoomFactor;
 
-    const d = dist(cursor?.x, cursor?.y, this.pos.x, this.pos.y);
+    const d = dist(scaledMouseX, scaledMouseY, this.pos.x, this.pos.y);
 
     const hoverThreshold = (this.baseRadius * 3) / 2;
-
-    this.isHovered = d < hoverThreshold;
-
-    const targetRadius = this.isHovered ? this.baseRadius * 5 : this.baseRadius;
+    const targetRadius =
+      d < hoverThreshold ? this.baseRadius * 3 : this.baseRadius;
     this.radius += (targetRadius - this.radius) * 0.1;
 
     mouseIsPressed && d < hoverThreshold && frameCount % 3 === 0 //impongo una treshold legata al framecount così da evitare un pochino click multipli

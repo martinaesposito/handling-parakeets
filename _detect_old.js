@@ -17,9 +17,12 @@ const legendColors = [
 ];
 
 let container = document.querySelector(".container");
+let p5, canvas;
 let hands = [];
 
 let handsData; //json
+let imgSCH = document.getElementById("scheletro");
+let differenceElC = document.querySelector(".diff");
 
 let video;
 let videoSize;
@@ -48,13 +51,20 @@ let handimages = [];
 let similarHand;
 let font;
 
-export let cursor;
-export let selectedPose;
+let cursor;
+const prak = "#C9FF4C";
+
+// instructions
+let instructions = document.getElementById("instructions");
+let ita = document.getElementById("ita");
+let eng = document.getElementById("eng");
+let itaO = "Muovi la mano per esplorare";
+let engO = "Move your hand to explore";
 
 /////////////////////////////////////////////
 
 //MEDIAPIPE
-async function createHandLandmarker() {
+const createHandLandmarker = async () => {
   const vision = await FilesetResolver.forVisionTasks(
     "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.0/wasm"
   );
@@ -66,13 +76,26 @@ async function createHandLandmarker() {
     runningMode: "VIDEO",
     numHands: 1,
   });
-}
+
+  imageSegmenter = await ImageSegmenter.createFromOptions(vision, {
+    baseOptions: {
+      modelAssetPath:
+        "https://storage.googleapis.com/mediapipe-models/image_segmenter/selfie_multiclass_256x256/float32/1/selfie_multiclass_256x256.tflite",
+      delegate: "GPU",
+    },
+    runningMode: "VIDEO",
+    outputCategoryMask: true,
+    outputConfidenceMasks: false,
+  });
+  labels = imageSegmenter.getLabels();
+};
 
 //PRELOAD
-export async function preload() {
+window.preload = async () => {
   //font
   font = loadFont("assets/fonts/IBM_Plex_Sans/IBMPlexSans-Regular.ttf");
 
+  //immagini
   for (let i = 1; i <= handPoses.length; i++) {
     const img = loadImage(
       `assets/legend/${i}.svg`,
@@ -85,8 +108,7 @@ export async function preload() {
 
   //json
   handsData = await importJSON("json/training.json");
-}
-
+};
 async function importJSON(path) {
   const response = await fetch(path);
   const data = await response.json();
@@ -94,17 +116,25 @@ async function importJSON(path) {
 }
 
 //SETUP
-export function setup() {
+window.setup = async () => {
+  //canva
+  p5 = createCanvas(windowWidth, windowHeight, WEBGL);
+  pixelDensity(1);
+  canvas = p5.canvas;
+  container.appendChild(canvas);
+
   //video
   video = createCapture(VIDEO);
   video.hide();
 
   createHandLandmarker(); //hand detector mediapipe
-}
+};
 
 //DRAW
-export function draw() {
+window.draw = () => {
   if (!video) return; //se non c'è il video non va
+
+  background("#F5F5F5");
 
   //VIDEO
   videoSize = {
@@ -112,12 +142,11 @@ export function draw() {
     h: height / 4.5,
     w: (height / 4.5 / video.height) * video.width,
   };
-
   scale(-1, 1); //rifletto il video in modo da vederlo correttamente
   stroke("black");
   strokeWeight(2);
-  rect(0, 0, videoSize.w, videoSize.h); //disegno un rettangolo in modo che abbia il bordo
-  image(video, 0, 0, videoSize.w, videoSize.h);
+  rect(-videoSize.w / 2, -videoSize.h / 2, videoSize.w, videoSize.h); //disegno un rettangolo in modo che abbia il bordo
+  image(video, -videoSize.w / 2, -videoSize.h / 2, videoSize.w, videoSize.h);
 
   //DISEGNO LE MANI
   scale(-1, 1); //riporto il riferimento del video non flippato così da effettuare il confronto
@@ -128,8 +157,8 @@ export function draw() {
     cursor = hands[0].points[9]?.pos;
     if (!cursor) return;
 
-    // ita.innerHTML = itaO;
-    // eng.innerHTML = engO;
+    ita.innerHTML = itaO;
+    eng.innerHTML = engO;
 
     const scale =
       videoSize.w / videoSize.h > width / height
@@ -147,26 +176,20 @@ export function draw() {
     }
     pop();
 
-    fill("red");
+    fill(prak);
     noStroke();
     ellipse(cursor.x, cursor.y, 10);
   } else {
-    // ita.innerHTML = "Dov'è andata la tua mano?";
-    // eng.innerHTML = "Where did your hand go?";
+    ita.innerHTML = "Dov'è andata la tua mano?";
+    eng.innerHTML = "Where did your hand go?";
   }
-
-  //se tutti i counter sono a 0 setta selectedPose a undefined
-  if (counters.every((c) => c === 0)) {
-    selectedPose = undefined;
-  }
-}
+};
 
 //DISEGNO LE MANI
 const drawHands = () => {
   if (handLandmarker && video) {
     //video
     const video = document.querySelector("video");
-
     let startTimeMs = performance.now(); //ritorna un timestamp del video che mi serve da mandare a mediapipe per il riconoscimento dell'immagine
     if (video.currentTime) {
       const handLandmarkerResult = handLandmarker.detectForVideo(
@@ -178,8 +201,6 @@ const drawHands = () => {
       const landmarks = handLandmarkerResult.landmarks[0];
       if (!landmarks) {
         hands = [];
-        //se non ci sono mani nello schermo i counter scendono
-        handCounter();
         return;
       }
       let points = landmarks?.map((p) => mapCoords(p, videoSize)); //prende i punti della mano e li rimappa
@@ -191,17 +212,75 @@ const drawHands = () => {
         hands[0].draw(points);
       }
 
+      //chiamo IMAGE SEGMENTER  per disegnare la sagoma
+      imageSegmenter.segmentForVideo(video, startTimeMs, callbackForVideo);
+
+      function callbackForVideo(result) {
+        const mask = result.categoryMask.getAsFloat32Array();
+
+        let shapePoints = []; // Raccolta dei punti della forma
+        let orderedPoints = []; // Punti ordinati
+        let j = 0;
+        for (let i = 0; i < mask.length; ++i) {
+          const maskVal = Math.round(mask[i] * 255.0);
+          const index = maskVal % legendColors.length;
+
+          if (index === 2) {
+            if (isEdgePixel(i, mask, video.width)) {
+              //se è un pixel al bordo della maschera
+              const pixelIndex = Math.floor(j / 4);
+
+              const coords = mapCoords(
+                {
+                  x: (pixelIndex % video.width) / video.width,
+                  y: Math.floor(pixelIndex / video.width) / video.height,
+                },
+                videoSize
+              );
+
+              if (
+                isNearLandmarks(coords.x, coords.y, points, videoSize.h / 9) //controllo che sia vicino ai landmarks della mano
+              ) {
+                shapePoints.push(coords); //allora li pusho nell'array dei punti che verranno disegnati
+              }
+            }
+          }
+          j += 4;
+        }
+
+        orderedPoints = orderShapePoints(shapePoints); // Ordina i punti prima di disegnare
+
+        // Disegna la forma
+        if (orderedPoints.length > 0) {
+          stroke("white");
+          strokeWeight(3);
+
+          for (let i = 0; i < orderedPoints.length; i++) {
+            const curr = orderedPoints[i];
+            const next = orderedPoints[(i + 10) % orderedPoints.length]; // Punto successivo
+
+            if (dist(curr.x, curr.y, next.x, next.y) < videoSize.h / 18) {
+              // Disegna solo se la distanza è minore di 18 - così da evitare congiungimenti tra punti non vicini
+              line(curr.x, curr.y, next.x, next.y);
+            }
+          }
+        }
+      }
+
       // chiamo funzione che confronta i LANDMARKS con quelli del json e mi restituisce la mano detectata
       const differences = calculateDifferences(handsData); //calcola la differenza tra gli angoli di riferimento e quelli
       const minDifference = Math.min(...differences);
       similarHand = differences.indexOf(minDifference);
+
+      imgSCH.src = `assets/detection/${similarHand + 1}.png`;
+      differenceElC.innerHTML = Math.round(minDifference);
     }
   }
 };
 
 function handCounter(detectedHand) {
-  const maxCounter = 150; // Maximum counter value
-  const loadingRadius = 60; // Radius of the loading circle
+  const maxCounter = 80; // Maximum counter value
+  const loadingRadius = 75; // Radius of the loading circle
   const angleOffset = -HALF_PI; // Start from the top
 
   counters.forEach((e, i) => {
@@ -221,7 +300,7 @@ function handCounter(detectedHand) {
       push();
       noFill();
       strokeWeight(8);
-      stroke("#C9FF4C");
+      stroke(prak);
       arc(
         cursor.x,
         cursor.y,
@@ -248,19 +327,18 @@ function handCounter(detectedHand) {
       pop();
 
       if (counters[detectedHand] >= maxCounter) {
-        selectedPose = handPoses[i];
-
-        // push();
-        // textFont(font);
-        // textSize(18);
-        // textAlign(CENTER);
-        // text("HURRAY! You have selected " + selectedPose, 0, videoSize.h);
-        // pop();
+        push();
+        textFont(font);
+        textSize(18);
+        textAlign(CENTER);
+        text("HURRAY! You have selected " + handPoses[i], 0, videoSize.h);
+        pop();
       }
     } else if (counters[i] > 0) {
       counters[i]--;
     }
   });
+  console.log(counters);
 }
 
 //confronto con i LANDMARKS usando gli angoli
@@ -303,4 +381,98 @@ function mapCoords(point, v) {
     y: point.y * v.h - (v.h - height) / 2 - height / 2,
     z: 0,
   };
+}
+
+function orderShapePoints(points) {
+  if (points.length === 0) return [];
+
+  const ordered = [points[0]]; // Inizia con il primo punto
+  const remaining = [...points.slice(1)]; // Copia i punti rimanenti
+
+  while (remaining.length > 0) {
+    let lastPoint = ordered[ordered.length - 1];
+    let closestIndex = 0;
+    let closestDistance = dist(
+      lastPoint.x,
+      lastPoint.y,
+      remaining[0].x,
+      remaining[0].y
+    );
+
+    // Trova il punto più vicino
+    for (let i = 1; i < remaining.length; i++) {
+      const d = dist(lastPoint.x, lastPoint.y, remaining[i].x, remaining[i].y);
+      if (d < closestDistance) {
+        closestDistance = d;
+        closestIndex = i;
+      }
+    }
+
+    // Aggiungi il punto più vicino all'array ordinato
+    ordered.push(remaining[closestIndex]);
+    remaining.splice(closestIndex, 1); // Rimuovi il punto selezionato dai rimanenti
+  }
+
+  return ordered;
+}
+function isEdgePixel(i, mask, videoWidth) {
+  // Convert mask value to the same scale as we use in the main loop
+  const currentMaskVal = Math.round(mask[i] * 255.0) % legendColors.length;
+  if (currentMaskVal !== 2) return false;
+
+  // Get row and column of current pixel
+  const row = Math.floor(i / videoWidth);
+  const col = i % videoWidth;
+
+  // Check all 8 surrounding pixels
+  const neighbors = [
+    [-1, -1],
+    [-1, 0],
+    [-1, 1], // Top row
+    [0, -1],
+    [0, 1], // Middle row
+    [1, -1],
+    [1, 0],
+    [1, 1], // Bottom row
+  ];
+
+  for (let [dx, dy] of neighbors) {
+    const newRow = row + dx;
+    const newCol = col + dy;
+
+    // Skip if outside image bounds
+    if (
+      newRow < 0 ||
+      newRow >= video.height ||
+      newCol < 0 ||
+      newCol >= videoWidth
+    ) {
+      continue;
+    }
+
+    // Get index in the mask array
+    const neighborIndex = newRow * videoWidth + newCol;
+    const neighborMaskVal =
+      Math.round(mask[neighborIndex] * 255.0) % legendColors.length;
+
+    // If any neighbor is not mask 2, this is an edge pixel
+    if (neighborMaskVal !== 2) {
+      return true;
+    }
+  }
+
+  // If all neighbors are mask 2, this is not an edge pixel
+  return false;
+}
+
+function isNearLandmarks(x, y, landmarks, threshold) {
+  for (let landmark of landmarks) {
+    const distance = Math.sqrt(
+      Math.pow(landmark.x - x, 2) + Math.pow(landmark.y - y, 2)
+    );
+    if (distance < threshold) {
+      return true;
+    }
+  }
+  return false;
 }
