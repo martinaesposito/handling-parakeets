@@ -22,7 +22,7 @@ img {
 }
 p {
   font-family: IBMplex-sans;
-  font-size: 14px;
+  font-size: 15px;
   line-height: 110%;
   margin: 0;
 }
@@ -94,34 +94,6 @@ canvas {
   width: auto;
 }
 
-/* LEGENDA  delle mani */
-#legend {
-  text-align: center;
-  position: fixed;
-  top: 1vh;
-  right: 1vh;
-  display: flex;
-  flex-direction: column;
-  background: #c9ff4c;
-  color: black;
-  z-index: 5;
-  padding: 0.5vh;
-}
-#legend p {
-  margin: 0;
-}
-#hands-legend {
-  padding-top: 1vh;
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  gap: 1vh;
-}
-.hand {
-  width: auto;
-  height: 5vh;
-}
-
 /* INSTRUCTIONS */
 #instructions {
   position: fixed;
@@ -140,7 +112,39 @@ canvas {
   background-color: #c9ff4c;
   margin: auto;
 }
+#instructions > p {
+  font-size: 15px;
+}
 
 .eng {
   opacity: 0.4;
+}
+
+/* LEGENDA  delle mani */
+#legend {
+  text-align: center;
+  position: fixed;
+  top: 1vh;
+  right: 1vh;
+
+  display: flex;
+  flex-direction: column;
+  background: #c9ff4c;
+  color: black;
+  z-index: 5;
+  padding: 0.5vh;
+}
+#legend > p {
+  font-size: 12px;
+}
+#hands-legend {
+  padding-top: 1vh;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  gap: 1vh;
+}
+.hand {
+  width: auto;
+  height: 5vh;
 }
