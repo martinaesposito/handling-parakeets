@@ -129,8 +129,9 @@ export function draw() {
   stroke("black");
   noFill();
   strokeWeight(2);
-  rect(0, 0, videoSize.w, videoSize.h); //disegno un rettangolo in modo che abbia il bordo
   image(video, 0, 0, videoSize.w, videoSize.h);
+
+  rect(0, 0, videoSize.w, videoSize.h); //disegno un rettangolo in modo che abbia il bordo
 
   //DISEGNO LE MANI
   scale(-1, 1); //riporto il riferimento del video non flippato così da effettuare il confronto

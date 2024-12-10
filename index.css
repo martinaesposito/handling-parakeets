@@ -20,6 +20,12 @@ img {
   height: 100%;
   width: fit-content;
 }
+p {
+  font-family: IBMplex-sans;
+  font-size: 14px;
+  line-height: 110%;
+  margin: 0;
+}
 .wrapper {
   height: 100vh;
   display: flex;
@@ -89,14 +95,26 @@ canvas {
 }
 
 /* LEGENDA  delle mani */
-#hands-legend {
+#legend {
+  text-align: center;
   position: fixed;
-  top: 0;
-  right: 0;
-  padding: 1vh;
+  top: 1vh;
+  right: 1vh;
+  display: flex;
+  flex-direction: column;
+  background: #c9ff4c;
+  color: black;
+  z-index: 5;
+  padding: 0.5vh;
+}
+#legend p {
+  margin: 0;
+}
+#hands-legend {
+  padding-top: 1vh;
   display: flex;
   flex-direction: row;
-  z-index: 5;
+  justify-content: center;
   gap: 1vh;
 }
 .hand {
@@ -113,6 +131,7 @@ canvas {
   bottom: 3vh;
   gap: 0.5vw;
   justify-content: center;
+  align-items: center;
   font-family: IBMplex-sans;
   color: black;
   display: flex;
@@ -122,6 +141,6 @@ canvas {
   margin: auto;
 }
 
-#instructions .eng {
+.eng {
   opacity: 0.4;
 }
