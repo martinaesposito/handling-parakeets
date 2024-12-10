@@ -149,7 +149,7 @@ window.draw = () => {
     }
 
     // Smooth movement towards target position
-    let easing = 0.4; // Adjust this value to control smoothness (lower = smoother)
+    let easing = 0.3; // Adjust this value to control smoothness (lower = smoother)
     let dx2 = targetPositions[i].x - currentPositions[i].x;
     let dy2 = targetPositions[i].y - currentPositions[i].y;
 
@@ -160,22 +160,6 @@ window.draw = () => {
     // Update current position with velocity
     currentPositions[i].x += velocities[i].x;
     currentPositions[i].y += velocities[i].y;
-
-    // Draw image at current position
-    // image(
-    //   imgPoints[i].img,
-    //   currentPositions[i].x + xOffset / 100,
-    //   currentPositions[i].y + yOffset / 100,
-    //   imgPoints[i].size,
-    //   imgPoints[i].size
-    // );
-    // noStroke();
-    // fill(imgPoints[i].c);
-    // rect(
-    //   currentPositions[i].x + xOffset / 100,
-    //   currentPositions[i].y + yOffset / 100,
-    //   imgPoints[i].size
-    // );
 
     noStroke();
     if (imgPoints[i].type == "image") {
@@ -197,5 +181,21 @@ window.draw = () => {
         imgPoints[i].size
       );
     }
+
+    // Draw image at current position
+    // image(
+    //   imgPoints[i].img,
+    //   currentPositions[i].x + xOffset / 100,
+    //   currentPositions[i].y + yOffset / 100,
+    //   imgPoints[i].size,
+    //   imgPoints[i].size
+    // );
+    // noStroke();
+    // fill(imgPoints[i].c);
+    // rect(
+    //   currentPositions[i].x + xOffset / 100,
+    //   currentPositions[i].y + yOffset / 100,
+    //   imgPoints[i].size
+    // );
   });
 };
