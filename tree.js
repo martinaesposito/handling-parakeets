@@ -58,7 +58,7 @@ let dots = [];
 import { Dot } from "./listings.js";
 let listingsDataReady = false;
 
-let z = 800;
+export let z = 800;
 let targetZ = 800;
 
 ////////////////////////////////////////////////////////////////

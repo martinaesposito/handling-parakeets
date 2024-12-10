@@ -4,6 +4,7 @@ import {
   FilesetResolver,
 } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.0";
 
+import { z } from "./tree.js";
 import { Hand } from "./hand.js"; //importa l'oggetto mano definito nel javascript precedente
 
 let handLandmarker, imageSegmenter, labels;
@@ -59,6 +60,8 @@ let engO = "Move your hand to explore";
 
 export let cursor;
 export let selectedPose;
+
+let zoomFactor;
 
 /////////////////////////////////////////////
 
@@ -134,6 +137,7 @@ export function draw() {
   drawHands();
 
   //CURSOR
+
   if (hands.length > 0 && hands[0]?.points) {
     cursor = hands[0].points[9]?.pos;
     if (!cursor) return;
@@ -146,14 +150,23 @@ export function draw() {
         ? height / videoSize.h
         : width / videoSize.w;
 
-    cursor.x *= scale;
-    cursor.y *= scale;
+    // Calculate zoom factor based on current z
+    zoomFactor = z / 800;
+
+    cursor.x *= scale * zoomFactor;
+    cursor.y *= scale * zoomFactor;
 
     push();
     imageMode(CENTER);
     if (typeof similarHand !== "undefined" && handimages[similarHand + 1]) {
       handCounter(similarHand);
-      image(handimages[similarHand + 1], cursor.x, cursor.y);
+      image(
+        handimages[similarHand + 1],
+        cursor.x,
+        cursor.y,
+        handimages[similarHand + 1].width * zoomFactor,
+        handimages[similarHand + 1].height * zoomFactor
+      );
     }
     pop();
 
@@ -211,7 +224,7 @@ const drawHands = () => {
 
 function handCounter(detectedHand) {
   const maxCounter = 150; // Maximum counter value
-  const loadingRadius = 60; // Radius of the loading circle
+  const loadingRadius = 60 * zoomFactor; // Radius of the loading circle
   const angleOffset = -HALF_PI; // Start from the top
 
   counters.forEach((e, i) => {
@@ -230,7 +243,7 @@ function handCounter(detectedHand) {
       // Outer arc
       push();
       noFill();
-      strokeWeight(8);
+      strokeWeight(8 * zoomFactor);
       stroke("#C9FF4C");
       arc(
         cursor.x,
