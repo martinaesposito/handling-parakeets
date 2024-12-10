@@ -142,6 +142,9 @@ export function draw() {
     cursor = hands[0].points[9]?.pos;
     if (!cursor) return;
 
+    // Calculate zoom factor based on current z
+    zoomFactor = z / 800;
+
     ita.innerHTML = itaO;
     eng.innerHTML = engO;
 
@@ -149,9 +152,6 @@ export function draw() {
       videoSize.w / videoSize.h > width / height
         ? height / videoSize.h
         : width / videoSize.w;
-
-    // Calculate zoom factor based on current z
-    zoomFactor = z / 800;
 
     cursor.x *= scale * zoomFactor;
     cursor.y *= scale * zoomFactor;
