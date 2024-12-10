@@ -52,6 +52,7 @@ let similarHand;
 let font;
 
 let cursor;
+const prak = "#C9FF4C";
 
 // instructions
 let instructions = document.getElementById("instructions");
@@ -175,7 +176,7 @@ window.draw = () => {
     }
     pop();
 
-    fill("red");
+    fill(prak);
     noStroke();
     ellipse(cursor.x, cursor.y, 10);
   } else {
@@ -299,7 +300,7 @@ function handCounter(detectedHand) {
       push();
       noFill();
       strokeWeight(8);
-      stroke("#C9FF4C");
+      stroke(prak);
       arc(
         cursor.x,
         cursor.y,

@@ -107,8 +107,9 @@ canvas {
 /* INSTRUCTIONS */
 #instructions {
   position: fixed;
-  width: 100%;
-  left: 0;
+  width: auto;
+  left: 50%;
+  transform: translate(-50%, 0%);
   bottom: 3vh;
   gap: 0.5vw;
   justify-content: center;
@@ -117,6 +118,8 @@ canvas {
   display: flex;
   flex-direction: row;
   z-index: 3;
+  background-color: #c9ff4c;
+  margin: auto;
 }
 
 #instructions .eng {
