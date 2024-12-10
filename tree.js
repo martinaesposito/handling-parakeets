@@ -61,6 +61,8 @@ let listingsDataReady = false;
 let z = 800;
 let targetZ = 800;
 
+////////////////////////////////////////////////////////////////
+
 ///PRELOAD
 window.preload = async () => {
   font = loadFont("assets/fonts/IBM_Plex_Sans/IBMPlexSans-Regular.ttf"); //font
@@ -124,8 +126,6 @@ window.setup = async () => {
     setTimeout(window.setup, 10);
     return;
   }
-
-  loading.style.display = "none"; //nascondo il loading
 
   //legenda
   for (let i = 1; i < handPoses.length; i++) {
@@ -200,13 +200,11 @@ window.setup = async () => {
   textFont(font);
 
   detectSetup();
+  loading.style.display = "none"; //nascondo il loading
 };
 
 ///DRAW
 window.draw = () => {
-  // console.log(Math.round(1000 / deltaTime));
-
-  // Reset completo del background ad ogni frame
   background(bg);
   targetZ = selectedPose ? 450 : 800;
 
@@ -216,7 +214,11 @@ window.draw = () => {
     line(start.x, start.y, end.x, end.y);
     noStroke();
     fill("black");
-    text(`${window.listingsData[index].name}`, end.x, end.y);
+    text(
+      `${window.listingsData[index].name} [${branchPlatform[index].value}] `,
+      end.x,
+      end.y
+    );
   });
 
   z += (targetZ - z) * 0.1;
@@ -266,15 +268,15 @@ function generateBranchDots(branches) {
   return allDots;
 }
 
-window.keyPressed = () => {
-  pose = null;
+// window.keyPressed = () => {
+//   pose = null;
 
-  const keyNum = parseInt(key); // Convert key to number and check if it's one of the poses
-  if (keyNum >= 1 && keyNum <= handPoses.length) {
-    pose = handPoses[keyNum - 1];
+//   const keyNum = parseInt(key); // Convert key to number and check if it's one of the poses
+//   if (keyNum >= 1 && keyNum <= handPoses.length) {
+//     pose = handPoses[keyNum - 1];
 
-    const matchingDots = dots.filter((dot) => dot.shouldHighlight(pose));
-    console.log(`Found ${matchingDots.length} dots matching pose: ${pose}`);
-    targetZ = 450; //camera zoom in
-  } else targetZ = 800;
-};
+//     const matchingDots = dots.filter((dot) => dot.shouldHighlight(pose));
+//     console.log(`Found ${matchingDots.length} dots matching pose: ${pose}`);
+//     targetZ = 450; //camera zoom in
+//   } else targetZ = 800;
+// };

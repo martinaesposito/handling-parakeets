@@ -147,7 +147,7 @@ export class Dot {
 
     this.isHovered = d < hoverThreshold;
 
-    const targetRadius = this.isHovered ? this.baseRadius * 5 : this.baseRadius;
+    const targetRadius = this.isHovered ? this.baseRadius * 5 : this.baseRadius; //se l'oggetto viene hoverato aumentail raggio
     this.radius += (targetRadius - this.radius) * 0.1;
 
     mouseIsPressed && d < hoverThreshold && frameCount % 3 === 0 //impongo una treshold legata al framecount così da evitare un pochino click multipli

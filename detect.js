@@ -48,6 +48,15 @@ let handimages = [];
 let similarHand;
 let font;
 
+const prak = "#C9FF4C";
+
+// instructions
+// let instructions = document.getElementById("instructions");
+let ita = document.getElementById("ita");
+let eng = document.getElementById("eng");
+let itaO = "Muovi la mano per esplorare";
+let engO = "Move your hand to explore";
+
 export let cursor;
 export let selectedPose;
 
@@ -115,6 +124,7 @@ export function draw() {
 
   scale(-1, 1); //rifletto il video in modo da vederlo correttamente
   stroke("black");
+  noFill();
   strokeWeight(2);
   rect(0, 0, videoSize.w, videoSize.h); //disegno un rettangolo in modo che abbia il bordo
   image(video, 0, 0, videoSize.w, videoSize.h);
@@ -128,8 +138,8 @@ export function draw() {
     cursor = hands[0].points[9]?.pos;
     if (!cursor) return;
 
-    // ita.innerHTML = itaO;
-    // eng.innerHTML = engO;
+    ita.innerHTML = itaO;
+    eng.innerHTML = engO;
 
     const scale =
       videoSize.w / videoSize.h > width / height
@@ -147,12 +157,12 @@ export function draw() {
     }
     pop();
 
-    fill("red");
+    fill(prak);
     noStroke();
     ellipse(cursor.x, cursor.y, 10);
   } else {
-    // ita.innerHTML = "Dov'è andata la tua mano?";
-    // eng.innerHTML = "Where did your hand go?";
+    ita.innerHTML = "Dov'è andata la tua mano?";
+    eng.innerHTML = "Where did your hand go?";
   }
 
   //se tutti i counter sono a 0 setta selectedPose a undefined
