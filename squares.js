@@ -1,19 +1,22 @@
 let myJSON;
-let myImgs = [];
+
 let img_n;
 
 let squares = [];
 
 let current_pose = "start";
 
+let playing = false;
+
 let debugmenu;
+let debugsound;
 
 function preload() {
 
-    myJSON = loadJSON("./listings.json", createObjects);  
+    myJSON = loadJSON("./listings.json", createObjects);
 }
 
-function createObjects(Json) {
+function createObjects() {
 
     img_n = Object.keys(myJSON).length;
 
@@ -22,17 +25,29 @@ function createObjects(Json) {
 
     for (let i = 0; i < img_n; i++) {
 
+        // general position
+
         let xpos = random(padding[0], windowWidth - padding[0]);
         let ypos = random(padding[1], windowHeight - padding[1]);
         let size = random(sizing[0], sizing[1]);
 
+        // text & photo divs containers
+
         let div = createDiv();
         div.style("display", "none"); // not displayed initially
 
-        squares[i] = new rects(xpos, ypos, size, div, myJSON[i]);
+        // audio element
+
+        // loading only the needed audio
+
+        var sound = (myJSON[i].Content_pose && myJSON[i].Content_pose != "Image") ?
+        loadSound("./assets/audio-test/-" + myJSON[i].Image_num + ".ogg") : null;
+
+        squares[i] = new rects(xpos, ypos, size, div, myJSON[i], sound);
         squares[i].settings();
     }
 
+    debugsound = loadSound("./assets/audio-test/-" + myJSON[0].Image_num + ".ogg");
 }
 
 function setup() {
@@ -73,15 +88,21 @@ function windowResized() {
     resizeCanvas(windowWidth, windowHeight);
 }
 
+function hasPlayed() {
+
+    playing = false;
+}
+
 
 class rects {
-    constructor (x, y, size, div, data) {
+    constructor (x, y, size, div, data, sound) {
 
         this.x = x;
         this.y = y;
         this.size = size;
         this.div = div;
         this.data = data;
+        this.sound = sound;
     }
 
     settings() {
@@ -106,6 +127,11 @@ class rects {
             this.div.html("<img src='./assets/hands/" + this.data.Image_num % 114 + // remove the % stuff & number after we have the right images
                 ".png' class='image'><br><br>" + this.data.Image_num + this.data.Description);
         }
+
+        // adding audio functionalities
+
+        (this.sound) ? this.sound.onended(hasPlayed) : console.log("no audio");
+
     }
 
     draw() {
@@ -138,14 +164,34 @@ class rects {
 
             if (mouseX <= this.x + offsetx && mouseX >= this.x - offsetx && mouseY <= this.y + offsety && mouseY >= this.y - offsety) {
 
-                this.div.style("display", "block");
-                this.div.style("animation", "appear 0.5s forwards");
+                if (!playing) { // avoiding any other div appearing while audio is playing
+
+                    this.div.style("display", "block");
+                    this.div.style("animation", "appear 0.5s forwards");
+                }
 
                 // narration
 
+                if (this.sound && !playing) {
+
+                    playing = true;
+                    (!this.sound.isPlaying()) ? this.sound.play() : console.log("Playing");
+                }
+
             } else {
 
-                this.div.style("animation", "disappear 0.25s forwards");
+                if (this.sound) {
+
+                    if (!this.sound.isPlaying()) {
+
+                        this.div.style("animation", "disappear 0.25s forwards");
+                    }
+                } else {
+
+                    this.div.style("animation", "disappear 0.25s forwards");
+                }
+
+                // narration
             }
         } else {
 
