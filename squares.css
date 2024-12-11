@@ -1,14 +1,42 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&family=Manrope:wght@200..800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&family=IBM+Plex+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&family=Manrope:wght@200..800&display=swap');
+
+*{
+    font-size: 1vw;
+}
+
 .image {
-    max-width: 200px;
-    max-height: 200px;
+    width: 20vw;
+    align-self: center;
+    margin: none;
+    padding: none;
+    vertical-align: bottom;
 }
 
 .box {
+    font-family: "IBM Plex Sans", sans-serif;
+    font-weight: normal;
+    font-style: normal;
+    margin: none;
+    padding: 0.25vw;
+}
+
+.info {
+    font-family: "IBM Plex Mono", sans-serif;
+    font-style: normal;
+    margin: none;
+    padding: none;
+    font-size: smaller;
+    padding-bottom: 0.25vw;
+}
+
+.container {
+    width: 20vw;
     position: absolute;
-    max-width: 400px;
-    padding: 10px;
-    background: #eeeeee;
-    color: #818181;
+    padding: none;
+    margin: none;
+    border: solid 0.25vw #C9FF4C;
+    background: #ffffff;
 }
 
 @keyframes appear {

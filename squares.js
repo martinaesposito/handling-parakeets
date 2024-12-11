@@ -20,8 +20,8 @@ function createObjects() {
 
     img_n = Object.keys(myJSON).length;
 
-    let padding = [400, 50];
-    let sizing = [30, 30];
+    let padding = [windowWidth / 6, windowHeight / 6];
+    let sizing = 30;
 
     for (let i = 0; i < img_n; i++) {
 
@@ -29,7 +29,16 @@ function createObjects() {
 
         let xpos = random(padding[0], windowWidth - padding[0]);
         let ypos = random(padding[1], windowHeight - padding[1]);
-        let size = random(sizing[0], sizing[1]);
+
+        // leaving space in the middle for the prompt / incipit
+
+        while (xpos > padding[0] * 2 && xpos < windowWidth - padding[0] * 2 && ypos > padding[1] * 2 && ypos < windowHeight - padding[1] * 2) {
+
+            xpos = random(padding[0], windowWidth - padding[0]);
+            ypos = random(padding[1], windowHeight - padding[1]);
+        }
+
+        let size = sizing;
 
         // text & photo divs containers
 
@@ -85,6 +94,7 @@ function draw() {
 }
 
 function windowResized() {
+
     resizeCanvas(windowWidth, windowHeight);
 }
 
@@ -111,44 +121,75 @@ class rects {
 
         this.div.position(this.x, this.y);
 
-        this.div.addClass("box");
-
+        this.div.addClass("container");
         this.div.addClass(this.data.Pose);
 
         if (this.data.Content_pose == "Text") {
 
-            this.div.html(this.data.Description);
+            this.div.html("<div class='box'><div class='info'>[" + this.data.Platform +
+                ((this.data.Year) ? ", " + this.data.Year : "") + "]</div>" + this.data.Description + "</div>");
         } else if (this.data.Content_pose == "Image") {
 
-            this.div.html("<img src='./assets/hands/" + this.data.Image_num % 114 + // remove the % stuff & number after we have the right images
-                ".png' class='image'>" + this.data.Image_num);
+            this.div.html("<img src='./assets/immagini/" + this.data.Image_num + ".png' class='image'>");
         } else if (this.data.Content_pose == "Image_and_text") {
 
-            this.div.html("<img src='./assets/hands/" + this.data.Image_num % 114 + // remove the % stuff & number after we have the right images
-                ".png' class='image'><br><br>" + this.data.Image_num + this.data.Description);
+            this.div.html("<img src='./assets/immagini/" + this.data.Image_num +
+                ".png' class='image' style='border-bottom: solid 0.25vw #C9FF4C;'><div class='box'><div class='info'>["
+                + this.data.Platform + ((this.data.Year) ? ", " + this.data.Year : "") + "]</div>" + this.data.Description + "</div>");
         }
 
         // adding audio functionalities
 
-        (this.sound) ? this.sound.onended(hasPlayed) : console.log("no audio");
+        if (this.sound) {
+
+            this.sound.onended(hasPlayed)
+        }
 
     }
 
-    draw() {
+    positioning () {
+
+        // positioning the divs relating to the screen
+
+        let divxoffset = (this.x > windowWidth / 2) ? this.div.style("width").replace("px","") : 0;
+        let divyoffset = 0;
         
-        // positioning the divs relating to the screen (needs to be here for some reason)
+        let divh = this.div.size().height;
 
-        let xpos = 0;
+        if (this.y < windowHeight / 2) {
 
-        if (this.x > windowWidth / 2) {
+            if (this.y + divh > windowHeight) {
 
-            this.div.style("transform", "translate(-" + this.div.style("width"));
-            xpos = this.div.style("width");
+                divyoffset = this.y + divh - windowHeight;
+            }
+        } else if (this.y >= windowHeight / 2) {
+
+            if (this.y - divh < 0) {
+
+                divyoffset = divh - (divh - this.y);
+            } else {
+
+                divyoffset = divh;
+            }
         }
 
-        if (this.y > windowHeight / 2) {
+        this.div.position(this.x - divxoffset, this.y - divyoffset);
+    }
 
-            this.div.style("transform", "translate(-" + xpos + ", -" + this.div.style("height"));
+    draw() {
+
+        // no overlap method
+
+        for (let i = 0; i < squares.length; i++) {
+
+            let other = squares[i];
+            let care = (other.data.Pose != this.data.Pose) ? false : true;
+
+            if (dist(other.x, other.y, this.x, this.y) <= this.size * 1.5 && care && other != this) {
+
+                this.x += Math.sign(this.x - other.x);
+                this.y += Math.sign(this.y - other.y);
+            }
         }
 
         // handling what appears during narration
@@ -163,26 +204,30 @@ class rects {
             let offsety = this.size / 2;
 
             if (mouseX <= this.x + offsetx && mouseX >= this.x - offsetx && mouseY <= this.y + offsety && mouseY >= this.y - offsety) {
-
+                
                 if (!playing) { // avoiding any other div appearing while audio is playing
 
                     this.div.style("display", "block");
                     this.div.style("animation", "appear 0.5s forwards");
                 }
 
+                // positioning the divs relating to the screen needs to happen when the div is "displayed"
+
+                this.positioning();
+
                 // narration
 
-                if (this.sound && !playing) {
+                if (this.sound && !playing) { // avoiding errors from non-existing sounds and from audio playing while another is
 
                     playing = true;
-                    (!this.sound.isPlaying()) ? this.sound.play() : console.log("Playing");
+                    this.sound.play(); // play sound if it's not already
                 }
 
             } else {
 
-                if (this.sound) {
+                if (this.sound) { // avoiding errors from non-existing sounds
 
-                    if (!this.sound.isPlaying()) {
+                    if (!this.sound.isPlaying()) { // keep div open while sound plays
 
                         this.div.style("animation", "disappear 0.25s forwards");
                     }
@@ -190,8 +235,6 @@ class rects {
 
                     this.div.style("animation", "disappear 0.25s forwards");
                 }
-
-                // narration
             }
         } else {
 

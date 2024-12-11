@@ -1,4 +1,7 @@
 import { cursor } from "./detect.js";
+import { selectedPose } from "./detect.js";
+import { playing } from "./tree.js";
+import { isPlaying, hasPlayed } from "./tree.js";
 
 export class Dot {
   static colors = [
@@ -68,6 +71,48 @@ export class Dot {
     // Noise offset and random pre-generation
     this.noiseOffset = random(1000);
     this.randomC = random(1, 4);
+    
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Create divs
+
+    this.div = (itemData.Content_pose) ? createDiv() : null;
+
+    // Set divs
+
+    if (this.div) {
+
+      this.div.style("display", "none")
+
+      this.div.addClass("storycontainer");
+      this.div.addClass(itemData.Pose);
+
+      if (this.itemData.Content_pose == "Text") {
+
+          this.div.html("<div class='box'><div class='info'>[" + this.itemData.Platform +
+              ((this.itemData.Year) ? ", " + this.itemData.Year : "") + "]</div>" + this.itemData.Description + "</div>");
+      } else if (this.itemData.Content_pose == "Image") {
+
+          this.div.html("<img src='./assets/immagini/" + this.itemData.Image_num + ".png' class='image'>");
+      } else if (this.itemData.Content_pose == "Image_and_text") {
+
+          this.div.html("<img src='./assets/immagini/" + this.itemData.Image_num +
+              ".png' class='image' style='border-bottom: solid 0.25vw #C9FF4C;'><div class='box'><div class='info'>["
+              + this.itemData.Platform + ((this.itemData.Year) ? ", " + this.itemData.Year : "") + "]</div>" + this.itemData.Description + "</div>");
+      }
+    }
+
+    // adding audio
+
+    this.sound = (itemData.Content_pose && itemData.Content_pose != "Image") ?
+    loadSound("./assets/audio-test/-" + itemData.Image_num + ".ogg") : null;
+
+    // adding audio functionalities
+
+    if (this.sound) {
+
+        this.sound.onended(hasPlayed);
+    }
+
   }
 
   //DRAW
@@ -85,7 +130,84 @@ export class Dot {
     // if (this.isHovered) {
     image(this.image, this.pos.x, this.pos.y, this.radius, this.radius);
     // }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // handling what appears during narration
+
+    if (this.div) {
+
+      if (this.itemData.Pose == selectedPose) {
+
+        // on hover
+
+        if (this.isHovered) {
+            
+            if (!playing) { // avoiding any other div appearing while audio is playing
+
+                this.div.style("display", "block");
+                this.div.style("animation", "appear 0.5s forwards");
+            }
+
+            // positioning the divs relating to the screen needs to happen when the div is "displayed"
+
+            this.positioning();
+
+            // narration
+
+            if (this.sound && !playing) { // avoiding errors from non-existing sounds and from audio playing while another is
+
+                isPlaying();
+                this.sound.play(); // play sound if it's not already
+            }
+
+        } else {
+
+            if (this.sound) { // avoiding errors from non-existing sounds
+
+                if (!this.sound.isPlaying()) { // keep div open while sound plays
+
+                    this.div.style("animation", "disappear 0.5s forwards");
+                }
+            } else {
+
+                this.div.style("animation", "disappear 0.5s forwards");
+            }
+        }
+    } else {
+
+        this.div.style("display", "none");
+    }
+    }
   }
+
+  positioning () {
+
+    // positioning the divs relating to the screen
+
+    let divxoffset = (this.pos.x > windowWidth / 2) ? this.div.size().width : 0;
+    let divyoffset = 0;
+    
+    let divh = this.div.size().height;
+
+    if (this.pos.y < windowHeight / 2) {
+
+        if (this.pos.y + divh > windowHeight) {
+
+            divyoffset = this.pos.y + divh - windowHeight;
+        }
+    } else if (this.pos.y >= windowHeight / 2) {
+
+        if (this.pos.y - divh < 0) {
+
+            divyoffset = divh - (divh - this.pos.y);
+        } else {
+
+            divyoffset = divh;
+        }
+    }
+
+    this.div.position(this.pos.x - divxoffset, this.pos.y - divyoffset);
+}
 
   //MOVE
   move(dots, currentPose, z, imageMap) {

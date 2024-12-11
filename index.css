@@ -175,3 +175,65 @@ canvas {
   width: auto;
   height: 5vh;
 }
+
+/* NARRATION */
+
+.image {
+    width: 20vw;
+    align-self: center;
+    margin: none;
+    padding: none;
+    vertical-align: bottom;
+}
+
+.box {
+    font-family: IBMplex-sans;
+    font-weight: normal;
+    font-style: normal;
+    margin: none;
+    padding: 0.25vw;
+}
+
+.info {
+    font-family: IBMplex-mono;
+    font-style: normal;
+    margin: none;
+    padding: none;
+    font-size: smaller;
+    padding-bottom: 0.25vw;
+}
+
+.storycontainer {
+    width: 20vw;
+    position: absolute;
+    z-index: 10;
+    padding: none;
+    margin: none;
+    border: solid 0.25vw #C9FF4C;
+    background: #ffffff;
+    font-size: 1vw;
+
+    box-sizing: content-box;
+}
+
+@keyframes appear {
+    from {
+        visibility: hidden;
+        opacity: 0%;
+    }
+    to {
+        visibility: visible;
+        opacity: 100%;
+    }
+}
+
+@keyframes disappear {
+    from {
+        visibility: visible;
+        opacity: 100%;
+    }
+    to {
+        visibility: hidden;
+        opacity: 0%;
+    }
+}
