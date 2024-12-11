@@ -9,21 +9,21 @@ import { Hand } from "./hand.js"; //importa l'oggetto mano definito nel javascri
 
 let handLandmarker, imageSegmenter, labels;
 
-const legendColors = [
-  [255, 197, 0, 255], // Vivid Yellow
-  [128, 62, 117, 255], // Strong Purple
-  [255, 104, 0, 255], // Vivid Orange - BODY COLOR
-  [166, 189, 215, 255], // Very Light Blue
-  [193, 0, 32, 255], // Vivid Red
-];
+// const legendColors = [
+//   [255, 197, 0, 255], // Vivid Yellow
+//   [128, 62, 117, 255], // Strong Purple
+//   [255, 104, 0, 255], // Vivid Orange - BODY COLOR
+//   [166, 189, 215, 255], // Very Light Blue
+//   [193, 0, 32, 255], // Vivid Red
+// ];
 
 let container = document.querySelector(".container");
 let hands = [];
 
 let handsData; //json
 
-let video;
-let videoSize;
+export let video;
+export let videoSize;
 
 const handPoses = [
   "FingerPerch",
@@ -45,7 +45,7 @@ let counters = [
   0, //TouchingTips
 ];
 
-let handimages = [];
+export let handimages = [];
 let similarHand;
 let font;
 
@@ -53,10 +53,10 @@ const prak = "#C9FF4C";
 
 // instructions
 // let instructions = document.getElementById("instructions");
-let ita = document.getElementById("ita");
-let eng = document.getElementById("eng");
-let itaO = "Muovi la mano per esplorare";
-let engO = "Move your hand to explore";
+// export let ita = document.getElementById("ita");
+// export let eng = document.getElementById("eng");
+// export let itaO = ita.innerHTML;
+// export let engO = eng.innerHTML;
 
 export let cursor;
 export let selectedPose;
@@ -87,7 +87,7 @@ export async function preload() {
 
   for (let i = 1; i <= handPoses.length; i++) {
     const img = loadImage(
-      `assets/legend/${i}.svg`,
+      `assets/cursor/${i}.svg`,
       () => {
         handimages[i] = img;
       },
@@ -114,8 +114,9 @@ export function setup() {
   createHandLandmarker(); //hand detector mediapipe
 }
 
+let firstDetect = false;
 //DRAW
-export function draw() {
+export function draw(shouldDrawHand = true) {
   if (!video) return; //se non c'è il video non va
 
   //VIDEO
@@ -125,29 +126,20 @@ export function draw() {
     w: (height / 4.5 / video.height) * video.width,
   };
 
-  scale(-1, 1); //rifletto il video in modo da vederlo correttamente
-  stroke("black");
-  noFill();
-  strokeWeight(2);
-  image(video, 0, 0, videoSize.w, videoSize.h);
-
-  rect(0, 0, videoSize.w, videoSize.h); //disegno un rettangolo in modo che abbia il bordo
-
   //DISEGNO LE MANI
-  scale(-1, 1); //riporto il riferimento del video non flippato così da effettuare il confronto
-  drawHands();
+  drawHands(shouldDrawHand);
 
   //CURSOR
-
   if (hands.length > 0 && hands[0]?.points) {
     cursor = hands[0].points[9]?.pos;
     if (!cursor) return;
 
+    firstDetect = true;
     // Calculate zoom factor based on current z
     zoomFactor = z / 800;
 
-    ita.innerHTML = itaO;
-    eng.innerHTML = engO;
+    // ita.innerHTML = itaO;
+    // eng.innerHTML = engO;
 
     const scale =
       videoSize.w / videoSize.h > width / height
@@ -159,25 +151,32 @@ export function draw() {
 
     push();
     imageMode(CENTER);
-    if (typeof similarHand !== "undefined" && handimages[similarHand + 1]) {
-      handCounter(similarHand);
-      image(
-        handimages[similarHand + 1],
-        cursor.x,
-        cursor.y,
-        handimages[similarHand + 1].width * zoomFactor,
-        handimages[similarHand + 1].height * zoomFactor
-      );
+    if (!shouldDrawHand) {
+      similarHand = 3;
     }
+
+    handCounter(similarHand, shouldDrawHand);
+
+    image(
+      handimages[similarHand + 1],
+      cursor.x,
+      cursor.y,
+      (handimages[similarHand + 1].width / 3) * 2 * zoomFactor,
+      (handimages[similarHand + 1].height / 3) * 2 * zoomFactor
+    );
     pop();
 
     fill(prak);
     noStroke();
     ellipse(cursor.x, cursor.y, 10);
-  } else {
-    ita.innerHTML = "Dov'è andata la tua mano?";
-    eng.innerHTML = "Where did your hand go?";
   }
+  // else {
+  //   if (firstDetect == true) {
+  //     ita.innerHTML = "Dov'è andata la tua mano?";
+  //     eng.innerHTML = "Where did your hand go?";
+  //   }
+  // console.log(firstDetect);
+  // }
 
   //se tutti i counter sono a 0 setta selectedPose a undefined
   if (counters.every((c) => c === 0)) {
@@ -186,7 +185,7 @@ export function draw() {
 }
 
 //DISEGNO LE MANI
-const drawHands = () => {
+const drawHands = (shouldDrawHand) => {
   if (handLandmarker && video) {
     //video
     const video = document.querySelector("video");
@@ -212,7 +211,7 @@ const drawHands = () => {
         hands[0] = new Hand(points, 0); //creo un'istanza dell'oggetto mano con le coordinate dei punti ricavati
       } else {
         //If there is already a hand object, updates the existing hand by calling its draw method with new points
-        hands[0].draw(points);
+        hands[0].draw(points, shouldDrawHand);
       }
 
       // chiamo funzione che confronta i LANDMARKS con quelli del json e mi restituisce la mano detectata
@@ -223,7 +222,7 @@ const drawHands = () => {
   }
 };
 
-function handCounter(detectedHand) {
+function handCounter(detectedHand, shouldDrawCircle) {
   const maxCounter = 150; // Maximum counter value
   const loadingRadius = 60 * zoomFactor; // Radius of the loading circle
   const angleOffset = -HALF_PI; // Start from the top
@@ -285,6 +284,7 @@ function handCounter(detectedHand) {
       counters[i]--;
     }
   });
+  // console.log(counters);
 }
 
 //confronto con i LANDMARKS usando gli angoli

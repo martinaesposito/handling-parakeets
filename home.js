@@ -17,9 +17,8 @@ let fontSize = 200;
 
 let bounds1;
 let bounds2;
-
+let subTitle;
 let colors = [
-  //colors
   "#87BDF3",
   "#7DE44A",
   "#BDFF91",
@@ -29,9 +28,15 @@ let colors = [
   "#2E7F2E",
 ];
 
-// let dots = [];
-// import { Dot } from "./listings.js";
+import {
+  preload as detectPreload,
+  setup as detectSetup,
+  draw as detectDraw,
+  cursor as detectCursor,
+  handimages,
+} from "./detect.js";
 
+// //////////////////////////////////////////////////////////////////////////
 window.preload = async () => {
   font = loadFont("assets/fonts/IBM_Plex_Sans/IBMPlexSans-Regular.ttf"); //font
 
@@ -54,21 +59,24 @@ window.preload = async () => {
 
   await Promise.all(imagePromises); // Wait for all image loading attempts to complete
   console.log(images); //controllo che ci siano tutte e che siano corrette
+  detectPreload();
 };
 
+// Setup
 window.setup = async () => {
-  // canvas
+  // CANVAS
   p5 = createCanvas(windowWidth, windowHeight, WEBGL);
   pixelDensity(1);
   canvas = p5.canvas;
   container.appendChild(canvas);
 
-  background("#F5F5F5");
+  imageMode(CENTER);
+  rectMode(CENTER);
 
+  // TITOLONE
   // Measure text bounds
   bounds1 = font.textBounds("Handling", 0, 0, fontSize);
   bounds2 = font.textBounds("Parakeets", 0, 0, fontSize);
-
   // Get points with translation
   let points1 = font.textToPoints(
     "Handling",
@@ -79,7 +87,6 @@ window.setup = async () => {
       sampleFactor: 0.4,
     }
   );
-
   let points2 = font.textToPoints(
     "Parakeets",
     -bounds2.w / 2,
@@ -89,10 +96,8 @@ window.setup = async () => {
       sampleFactor: 0.4,
     }
   );
-
   // Add points to array
   points = [...points1, ...points2];
-
   // Initialize positions and velocities
   points.forEach((p, i) => {
     let immg =
@@ -103,13 +108,22 @@ window.setup = async () => {
       c: random(colors),
       type: random() > 0.5 ? "image" : "rect",
     };
-
     imgPoints.push(img);
     // Initialize positions
     currentPositions[i] = createVector(p.x, p.y);
     targetPositions[i] = createVector(p.x, p.y);
     velocities[i] = createVector(0, 0);
   });
+
+  // SUBTITLE
+  subTitle = document.getElementById("subtitle");
+  console.log(subTitle);
+  subTitle.innerHTML =
+    "How do humans interact with parakeets in the online trading market?";
+  subTitle.style.top = `${height / 2 + (bounds1.h * 3.2) / 4}px`; // Adjust as needed
+
+  detectSetup();
+  loading.style.display = "none"; //nascondo il loading
 };
 
 // Easing function
@@ -118,11 +132,9 @@ function easeOutCubic(t) {
 }
 
 window.draw = () => {
-  background("#F5F5F5");
+  // background("#F5F5F5");
+  clear();
   time += 0.01;
-
-  let mx = mouseX - width / 2;
-  let my = mouseY - height / 2;
 
   points.forEach((p, i) => {
     // Calculate noise-based movement
@@ -130,8 +142,8 @@ window.draw = () => {
     let yOffset = map(noise(i, (time + 300) * 0.5), 0, 1, -12, 12);
 
     // Calculate mouse interaction
-    let dx = p.x - mx;
-    let dy = p.y - my;
+    let dx = detectCursor ? p.x - detectCursor.x : p.x;
+    let dy = detectCursor ? p.y - detectCursor.y : p.y;
     let distance = sqrt(dx * dx + dy * dy);
 
     // Update target position
@@ -140,7 +152,7 @@ window.draw = () => {
 
     // Apply mouse repulsion
     let repulsionRadius = imgPoints[i].size * 4;
-    if (distance < repulsionRadius) {
+    if (detectCursor && distance < repulsionRadius) {
       let repulsionForce = map(distance, 0, repulsionRadius, 1, 0);
       repulsionForce = easeOutCubic(repulsionForce) * (imgPoints[i].size * 2);
       let angle = atan2(dy, dx);
@@ -162,25 +174,25 @@ window.draw = () => {
     currentPositions[i].y += velocities[i].y;
 
     noStroke();
-    if (imgPoints[i].type == "image") {
-      // Draw image
-      image(
-        imgPoints[i].img,
-        currentPositions[i].x + xOffset / 100,
-        currentPositions[i].y + yOffset / 100,
-        imgPoints[i].size,
-        imgPoints[i].size
-      );
-    } else {
-      // Draw colored rect
-      fill(imgPoints[i].c);
-      rect(
-        currentPositions[i].x + xOffset / 100,
-        currentPositions[i].y + yOffset / 100,
-        imgPoints[i].size,
-        imgPoints[i].size
-      );
-    }
+    // if (imgPoints[i].type == "image") {
+    //   // Draw image
+    //   image(
+    //     imgPoints[i].img,
+    //     currentPositions[i].x + xOffset / 100,
+    //     currentPositions[i].y + yOffset / 100,
+    //     imgPoints[i].size,
+    //     imgPoints[i].size
+    //   );
+    // } else {
+    //   // Draw colored rect
+    //   fill(imgPoints[i].c);
+    //   rect(
+    //     currentPositions[i].x + xOffset / 100,
+    //     currentPositions[i].y + yOffset / 100,
+    //     imgPoints[i].size,
+    //     imgPoints[i].size
+    //   );
+    // }
 
     // Draw image at current position
     // image(
@@ -191,11 +203,24 @@ window.draw = () => {
     //   imgPoints[i].size
     // );
     // noStroke();
-    // fill(imgPoints[i].c);
-    // rect(
-    //   currentPositions[i].x + xOffset / 100,
-    //   currentPositions[i].y + yOffset / 100,
-    //   imgPoints[i].size
-    // );
+    fill(imgPoints[i].c);
+    rect(
+      currentPositions[i].x + xOffset / 100,
+      currentPositions[i].y + yOffset / 100,
+      imgPoints[i].size
+    );
   });
+
+  translate(0, 0, 1);
+  detectDraw(false);
+
+  if (!detectCursor && handimages.length > 0) {
+    image(
+      handimages[4],
+      0, // x-coordinate (center)
+      (bounds1.h * 4) / 3.2, // y-coordinate
+      (handimages[4].width / 3) * 2,
+      (handimages[4].height / 3) * 2
+    );
+  }
 };

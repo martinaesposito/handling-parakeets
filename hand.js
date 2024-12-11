@@ -1,8 +1,4 @@
-const handsRef = {
-  //riconosce solo la mano destra
-  left: 1,
-  right: 0,
-};
+const prak = "#C9FF4C";
 
 const Point = class {
   //classe dei punti che compongono la mano
@@ -14,16 +10,8 @@ const Point = class {
   }
 
   draw() {
-    fill(
-      this.hand === handsRef.right ? 255 : 0,
-      0,
-      this.hand === handsRef.left ? 255 : 0
-    );
-
     stroke(this.selected ? "red" : 255);
-    // ellipse(this.pos.x, this.pos.y, this.size, this.size);
 
-    // noStroke();
     fill(255);
     stroke(0);
     strokeWeight(1);
@@ -31,94 +19,89 @@ const Point = class {
     // textSize(9);
     // textAlign(CENTER);
     // text(this.index, this.pos.x, this.pos.y);
-    circle(this.pos.x, this.pos.y, 4);
+    circle(this.pos.x, this.pos.y, this.size);
   }
 
   update(coords) {
     this.pos = coords;
-    this.draw();
   }
 };
 
 export const Hand = class {
   //crea la classe mano basata sulla classe punti che compongono la mano
-  //chiamo la funzione export perchè i dati saranno poi utilizzati dal javascript principale
   constructor(data, type) {
     this.points = [];
     this.origin = null; //punto d'origine della mano
     this.type = type; //destra o sinistra - anche se per adesso non è implementato
 
-    this.draw(data);
+    this.draw(data, false);
   }
 
-  draw(data) {
-    //METODO CHE CALCOLA I PUNTI DELLA MANO
+  draw(data, shouldDrawHand) {
     let increment = 1;
 
     if (!data) {
-      //se data non esiste, utilizza this.points per il disegno
+      // Se data non esiste, utilizza this.points per il disegno
       data = this.points.map((p) => p.pos);
     }
 
+    // UPDATE
     for (let f = 0; f < data.length; f += increment) {
-      //definito data f è la variabile che itera per i punti per disegnare la mano
       if (f === 1) {
         increment = 4;
       }
 
-      beginShape(); //disegno una forma a partire dai punti del palmo
       for (let i = f; i < f + increment; i++) {
-        let point = data[i]; //prende il primo elemento dell'array data
+        let point = data[i];
         const coords = point;
 
         if (!this.points[i]) {
-          //se points non esiste allora lo crea se no lo aggiorna
+          // Se points non esiste allora lo crea
           const newPoint = new Point(coords, i, this.type);
           this.points[i] = newPoint;
         } else {
+          // Altrimenti aggiorna le coordinate
           this.points[i].update(coords);
         }
+      }
+    }
 
-        vertex(...Object.values(coords)); //crea i vertici della forma a partire dalle coordinate dei punti
+    this.calculateAngles(shouldDrawHand);
 
-        strokeWeight(2);
-        stroke(255);
+    // Secondo passaggio: disegno dei punti e delle forme
+    if (shouldDrawHand) {
+      increment = 1;
+      for (let f = 0; f < data.length; f += increment) {
+        if (f === 1) {
+          increment = 4;
+        }
+
+        beginShape(); // Disegno una forma a partire dai punti del palmo
+        for (let i = f; i < f + increment; i++) {
+          vertex(...Object.values(this.points[i].pos)); // Usa i punti aggiornati
+        }
+
+        strokeWeight(1);
+        stroke(prak);
         noFill();
+
+        if (f === 0) {
+          // Disegna il palmo unendo specifici punti
+          const palmPoints = [0, 1, 5, 9, 13, 17, 0];
+          palmPoints.forEach((p) =>
+            vertex(...Object.values(this.points[p].pos))
+          );
+        }
+
+        endShape();
       }
 
-      if (f === 0) {
-        //disegna il palmo unendo specifici punti ossia le coordinate dei punti del palmo
-        const palmPoints = [0, 1, 5, 9, 13, 17, 0];
-
-        palmPoints.forEach((p) => vertex(...Object.values(data[p])));
+      // Disegna tutti i punti
+      for (let p = 0; p < this.points.length; p++) {
+        this.points[p].draw();
       }
-
-      endShape();
     }
-
-    for (let p = 0; p < data.length; p++) {
-      this.points[p].draw();
-    }
-
-    this.calculateAngles();
-    this.origin = this.points[0]; //aggiorna il punto di origine della mano
-  }
-
-  toggleSelectedPoint(coords) {
-    //Funzione per modificare i punti della mano
-    this.deselect(); //deseleziona tutto
-
-    const target = this.points.find((p) => {
-      return dist(p.pos.x, p.pos.y, coords.x, coords.y) < 10; //se la distanza tra il punto in cui premo e uno dei punti della mano è inferiore a dieci pixel
-    });
-
-    if (target) {
-      //allora ritorna le coordiante del punto e dà quel punto come selezionato
-      target.selected = !target.selected;
-      this.editing = true;
-    }
-
-    this.draw();
+    this.origin = this.points[0]; // Aggiorna il punto di origine della mano
   }
 
   deselect() {
@@ -137,7 +120,7 @@ export const Hand = class {
     this.draw();
   }
 
-  calculateAngles() {
+  calculateAngles(shouldDraw = true) {
     let angles = [
       [2, 0, 5], //angolo del palmo
       [5, 0, 17], //angolo del palmo
@@ -173,16 +156,14 @@ export const Hand = class {
       const base = { ...this.points[a[1]].pos };
       base.x = base.x + 50;
 
-      stroke("red");
-      stroke(colors[index]);
-      strokeWeight(1);
+      // ANGOLI DELLE MANI
+      // if (shouldDraw) {
+      //   stroke(colors[index]);
+      //   strokeWeight(1);
 
-      line(p1.x, p1.y, p2.x, p2.y);
-      line(p2.x, p2.y, p3.x, p3.y);
-
-      noStroke();
-      fill(colors[index]);
-      fill("red");
+      //   line(p1.x, p1.y, p2.x, p2.y);
+      //   line(p2.x, p2.y, p3.x, p3.y);
+      // }
 
       let relativeAangle = calculateAngle(p1, p2, p3);
       let absoluteAngle = calculateAngle(p1, p2, base);

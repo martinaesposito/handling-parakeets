@@ -3,6 +3,8 @@ import {
   setup as detectSetup,
   draw as detectDraw,
   selectedPose,
+  video,
+  videoSize,
 } from "./detect.js";
 
 //LOADING
@@ -26,7 +28,7 @@ const branchPlatform = [
   { value: 149, start: 0.3, end: 0.7, name: "usato.it" },
   { value: 14, start: 0.6, end: 0.8, name: "TrovaPet" },
   { value: 3, start: 0.9, end: 1, name: "petpappagalli" },
-  { value: 44, start: 0.55, end: 0.65, name: "Telegram" },
+  { value: 44, start: 0.6, end: 0.65, name: "Telegram" },
   { value: 7, start: 0.9, end: 1, name: "animalissimo" },
   { value: 12, start: 0.6, end: 0.7, name: "Trovalosubito" },
   { value: 11, start: 0.85, end: 0.9, name: "likesx" },
@@ -34,7 +36,7 @@ const branchPlatform = [
   { value: 10, start: 0.6, end: 0.7, name: "Secondamano" },
   { value: 18, start: 0.9, end: 1, name: "AnimaleAmico" },
   { value: 14, start: 0.4, end: 0.6, name: "FB marketplace" },
-  { value: 177, start: 0.65, end: 0.75, name: "FB groups" },
+  { value: 177, start: 0.7, end: 0.9, name: "FB groups" },
   { value: 19, start: 0.8, end: 0.9, name: "AAAnnunci" },
   { value: 11, start: 0.5, end: 0.6, name: "trovacuccioli" },
   { value: 3, start: 0.9, end: 1, name: "petfocus" },
@@ -137,7 +139,6 @@ window.setup = async () => {
 
   //disegno la canvas
   p5 = createCanvas(windowWidth, windowHeight, WEBGL);
-  console.log("Renderer:", _renderer.drawingContext.constructor.name);
   pixelDensity(1);
   rectMode(CENTER);
   imageMode(CENTER);
@@ -167,7 +168,7 @@ window.setup = async () => {
       },
       end: {
         x: 0 + (width / 2.4) * cos(angle),
-        y: 0 + (height / 2.4) * sin(angle),
+        y: 0 + (height / 2.7) * sin(angle),
       },
     };
 
@@ -205,21 +206,22 @@ window.setup = async () => {
 
 ///DRAW
 window.draw = () => {
-  background(bg);
+  // background(bg);
+  clear();
   targetZ = selectedPose ? 450 : 800;
 
-  branchesss.forEach(({ bounds: { start, end } }, index) => {
-    stroke("lightgray");
-    strokeWeight(1);
-    line(start.x, start.y, end.x, end.y);
-    noStroke();
-    fill("black");
-    text(
-      `${window.listingsData[index].name} [${branchPlatform[index].value}] `,
-      end.x,
-      end.y
-    );
-  });
+  // branchesss.forEach(({ bounds: { start, end } }, index) => {
+  //   stroke("lightgray");
+  //   strokeWeight(1);
+  //   line(start.x, start.y, end.x, end.y);
+  //   noStroke();
+  //   fill("black");
+  //   text(
+  //     `${window.listingsData[index].name} [${branchPlatform[index].value}] `,
+  //     end.x,
+  //     end.y
+  //   );
+  // });
 
   z += (targetZ - z) * 0.1;
   if (canvasReady) {
@@ -238,9 +240,21 @@ window.draw = () => {
   if (selectedPose) {
     textAlign(CENTER);
     fill("black");
-    text(selectedPose, 0, cH / 2 + 25);
+    text(selectedPose, 0, cH / 2 + cH / 10);
   }
 
+  push();
+  if (video && videoSize) {
+    scale(-1, 1); //rifletto il video in modo da vederlo correttamente
+    stroke("black");
+    noFill();
+    // translate(0, 0, 10);
+    strokeWeight(2);
+    image(video, 0, 0, videoSize.w, videoSize.h);
+
+    rect(0, 0, videoSize.w, videoSize.h); //disegno un rettangolo in modo che abbia il bordo
+    pop();
+  }
   translate(0, 0, 1);
   detectDraw();
 };
