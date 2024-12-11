@@ -1,4 +1,4 @@
-import { cursor } from "./detect.js";
+import { cursor, zoomFactor } from "./detect.js";
 import { selectedPose } from "./detect.js";
 import { playing } from "./tree.js";
 import { isPlaying, hasPlayed } from "./tree.js";
@@ -71,48 +71,61 @@ export class Dot {
     // Noise offset and random pre-generation
     this.noiseOffset = random(1000);
     this.randomC = random(1, 4);
-    
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Create divs
 
-    this.div = (itemData.Content_pose) ? createDiv() : null;
+    this.div = itemData.Content_pose ? createDiv() : null;
 
     // Set divs
 
     if (this.div) {
-
-      this.div.style("display", "none")
+      this.div.style("display", "none");
 
       this.div.addClass("storycontainer");
       this.div.addClass(itemData.Pose);
 
       if (this.itemData.Content_pose == "Text") {
-
-          this.div.html("<div class='box'><div class='info'>[" + this.itemData.Platform +
-              ((this.itemData.Year) ? ", " + this.itemData.Year : "") + "]</div>" + this.itemData.Description + "</div>");
+        this.div.html(
+          "<div class='box'><div class='info'>[" +
+            this.itemData.Platform +
+            (this.itemData.Year ? ", " + this.itemData.Year : "") +
+            "]</div>" +
+            this.itemData.Description +
+            "</div>"
+        );
       } else if (this.itemData.Content_pose == "Image") {
-
-          this.div.html("<img src='./assets/immagini/" + this.itemData.Image_num + ".png' class='image'>");
+        this.div.html(
+          "<img src='./assets/immagini/" +
+            this.itemData.Image_num +
+            ".png' class='image'>"
+        );
       } else if (this.itemData.Content_pose == "Image_and_text") {
-
-          this.div.html("<img src='./assets/immagini/" + this.itemData.Image_num +
-              ".png' class='image' style='border-bottom: solid 0.25vw #C9FF4C;'><div class='box'><div class='info'>["
-              + this.itemData.Platform + ((this.itemData.Year) ? ", " + this.itemData.Year : "") + "]</div>" + this.itemData.Description + "</div>");
+        this.div.html(
+          "<img src='./assets/immagini/" +
+            this.itemData.Image_num +
+            ".png' class='image' style='border-bottom: solid 0.25vw #C9FF4C;'><div class='box'><div class='info'>[" +
+            this.itemData.Platform +
+            (this.itemData.Year ? ", " + this.itemData.Year : "") +
+            "]</div>" +
+            this.itemData.Description +
+            "</div>"
+        );
       }
     }
 
     // adding audio
 
-    this.sound = (itemData.Content_pose && itemData.Content_pose != "Image") ?
-    loadSound("./assets/audio-test/-" + itemData.Image_num + ".ogg") : null;
+    this.sound =
+      itemData.Content_pose && itemData.Content_pose != "Image"
+        ? loadSound("./assets/audio-test/-" + itemData.Image_num + ".ogg")
+        : null;
 
     // adding audio functionalities
 
     if (this.sound) {
-
-        this.sound.onended(hasPlayed);
+      this.sound.onended(hasPlayed);
     }
-
   }
 
   //DRAW
@@ -135,79 +148,77 @@ export class Dot {
     // handling what appears during narration
 
     if (this.div) {
-
       if (this.itemData.Pose == selectedPose) {
-
         // on hover
 
         if (this.isHovered) {
-            
-            if (!playing) { // avoiding any other div appearing while audio is playing
+          if (!playing) {
+            // avoiding any other div appearing while audio is playing
 
-                this.div.style("display", "block");
-                this.div.style("animation", "appear 0.5s forwards");
-            }
+            this.div.style("display", "block");
+            this.div.style("animation", "appear 0.5s forwards");
+          }
 
-            // positioning the divs relating to the screen needs to happen when the div is "displayed"
+          // positioning the divs relating to the screen needs to happen when the div is "displayed"
 
-            this.positioning();
+          this.positioning();
 
-            // narration
+          // narration
 
-            if (this.sound && !playing) { // avoiding errors from non-existing sounds and from audio playing while another is
+          if (this.sound && !playing) {
+            // avoiding errors from non-existing sounds and from audio playing while another is
 
-                isPlaying();
-                this.sound.play(); // play sound if it's not already
-            }
-
+            isPlaying();
+            this.sound.play(); // play sound if it's not already
+          }
         } else {
+          if (this.sound) {
+            // avoiding errors from non-existing sounds
 
-            if (this.sound) { // avoiding errors from non-existing sounds
+            if (!this.sound.isPlaying()) {
+              // keep div open while sound plays
 
-                if (!this.sound.isPlaying()) { // keep div open while sound plays
-
-                    this.div.style("animation", "disappear 0.5s forwards");
-                }
-            } else {
-
-                this.div.style("animation", "disappear 0.5s forwards");
+              this.div.style("animation", "disappear 0.5s forwards");
             }
+          } else {
+            this.div.style("animation", "disappear 0.5s forwards");
+          }
         }
-    } else {
-
+      } else {
         this.div.style("display", "none");
-    }
+      }
     }
   }
 
-  positioning () {
-
+  positioning() {
     // positioning the divs relating to the screen
 
-    let divxoffset = (this.pos.x > windowWidth / 2) ? this.div.size().width : 0;
-    let divyoffset = 0;
-    
+    let screenPos = {
+      x: cursor.x / zoomFactor + width / 2,
+      y: cursor.y / zoomFactor + height / 2,
+    };
+
     let divh = this.div.size().height;
+    let divw = this.div.size().width;
 
-    if (this.pos.y < windowHeight / 2) {
+    // let divxoffset = screenPos.x > width / 2 ? divw: 0;
+    let divxoffset = -divw / 2;
+    let divyoffset = -divh / 2;
 
-        if (this.pos.y + divh > windowHeight) {
-
-            divyoffset = this.pos.y + divh - windowHeight;
-        }
-    } else if (this.pos.y >= windowHeight / 2) {
-
-        if (this.pos.y - divh < 0) {
-
-            divyoffset = divh - (divh - this.pos.y);
-        } else {
-
-            divyoffset = divh;
-        }
+    //sotto
+    if (screenPos.y > height / 2) {
+      if (screenPos.y + divh / 2 > height) {
+        divyoffset += height - (screenPos.y + divh / 2);
+      }
+      //sopra
+    } else if (screenPos.y <= height / 2) {
+      if (screenPos.y - divh / 2 < 0) {
+        divyoffset += divh / 2 - screenPos.y;
+      }
     }
 
-    this.div.position(this.pos.x - divxoffset, this.pos.y - divyoffset);
-}
+    this.div.position(screenPos.x + divxoffset, screenPos.y + divyoffset);
+  }
 
   //MOVE
   move(dots, currentPose, z, imageMap) {

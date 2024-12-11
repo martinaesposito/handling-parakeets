@@ -60,8 +60,7 @@ const prak = "#C9FF4C";
 
 export let cursor;
 export let selectedPose;
-
-let zoomFactor;
+export let zoomFactor;
 
 /////////////////////////////////////////////
 
@@ -109,6 +108,7 @@ async function importJSON(path) {
 export function setup() {
   //video
   video = createCapture(VIDEO);
+  video.elt.id = "camera";
   video.hide();
 
   createHandLandmarker(); //hand detector mediapipe
@@ -151,7 +151,9 @@ export function draw(shouldDrawHand = true) {
 
     push();
     imageMode(CENTER);
+
     if (!shouldDrawHand) {
+      //nella home disegno la mano in posa 3
       similarHand = 3;
     }
 
@@ -188,7 +190,7 @@ export function draw(shouldDrawHand = true) {
 const drawHands = (shouldDrawHand) => {
   if (handLandmarker && video) {
     //video
-    const video = document.querySelector("video");
+    const video = document.querySelector("#camera");
 
     let startTimeMs = performance.now(); //ritorna un timestamp del video che mi serve da mandare a mediapipe per il riconoscimento dell'immagine
     if (video.currentTime) {
@@ -221,8 +223,8 @@ const drawHands = (shouldDrawHand) => {
     }
   }
 };
-
-function handCounter(detectedHand, shouldDrawCircle) {
+let isRedirecting = false;
+function handCounter(detectedHand, shouldDrawHand) {
   const maxCounter = 150; // Maximum counter value
   const loadingRadius = 60 * zoomFactor; // Radius of the loading circle
   const angleOffset = -HALF_PI; // Start from the top
@@ -272,6 +274,12 @@ function handCounter(detectedHand, shouldDrawCircle) {
 
       if (counters[detectedHand] >= maxCounter) {
         selectedPose = handPoses[i];
+
+        if (!shouldDrawHand && !isRedirecting) {
+          window.location.href = "tree.html";
+          console.log("ue");
+          isRedirecting = true;
+        }
 
         // push();
         // textFont(font);

@@ -56,6 +56,11 @@ const handPoses = [
 
 let imageMap = {}; // Map images by their filename
 
+let tutorial = document.getElementById("tutorial");
+tutorial?.addEventListener("ended", () => {
+  tutorial.classList.remove("show");
+});
+
 let dots = [];
 import { Dot } from "./listings.js";
 let listingsDataReady = false;
@@ -63,9 +68,7 @@ let listingsDataReady = false;
 export let z = 800;
 let targetZ = 800;
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // sound
-
 export let playing = false;
 
 ////////////////////////////////////////////////////////////////
@@ -302,11 +305,9 @@ function generateBranchDots(branches) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 export function isPlaying() {
-
   playing = true;
 }
 
 export function hasPlayed() {
-
   playing = false;
 }
