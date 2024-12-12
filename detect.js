@@ -114,7 +114,6 @@ export function setup() {
   createHandLandmarker(); //hand detector mediapipe
 }
 
-let firstDetect = false;
 //DRAW
 export function draw(shouldDrawHand = true) {
   if (!video) return; //se non c'è il video non va
@@ -134,7 +133,6 @@ export function draw(shouldDrawHand = true) {
     cursor = hands[0].points[9]?.pos;
     if (!cursor) return;
 
-    firstDetect = true;
     // Calculate zoom factor based on current z
     zoomFactor = z / 800;
 
@@ -172,15 +170,6 @@ export function draw(shouldDrawHand = true) {
     noStroke();
     ellipse(cursor.x, cursor.y, 10);
   }
-  // else {
-  //   if (firstDetect == true) {
-  //     ita.innerHTML = "Dov'è andata la tua mano?";
-  //     eng.innerHTML = "Where did your hand go?";
-  //   }
-  // console.log(firstDetect);
-  // }
-
-  //se tutti i counter sono a 0 setta selectedPose a undefined
   if (counters.every((c) => c === 0)) {
     selectedPose = undefined;
   }

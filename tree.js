@@ -218,18 +218,19 @@ window.draw = () => {
   clear();
   targetZ = selectedPose ? 450 : 800;
 
-  // branchesss.forEach(({ bounds: { start, end } }, index) => {
-  //   stroke("lightgray");
-  //   strokeWeight(1);
-  //   line(start.x, start.y, end.x, end.y);
-  //   noStroke();
-  //   fill("black");
-  //   text(
-  //     `${window.listingsData[index].name} [${branchPlatform[index].value}] `,
-  //     end.x,
-  //     end.y
-  //   );
-  // });
+  branchesss.forEach(({ bounds: { start, end } }, index) => {
+    // stroke("lightgray");
+    // strokeWeight(1);
+    // line(start.x, start.y, end.x, end.y);
+    console.log(branchPlatform[index].start);
+    noStroke();
+    fill("black");
+    text(
+      `${window.listingsData[index].name} [${branchPlatform[index].value}] `,
+      end.x,
+      end.y
+    );
+  });
 
   z += (targetZ - z) * 0.1;
   if (canvasReady) {
