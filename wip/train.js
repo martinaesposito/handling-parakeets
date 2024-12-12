@@ -3,7 +3,7 @@ import {
   FilesetResolver,
 } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.0";
 
-import { Hand } from "./hand.js"; //importa l'oggetto mano definito nel javascript precedente
+import { Hand } from "../hand.js"; //importa l'oggetto mano definito nel javascript precedente
 
 let handLandmarker = undefined;
 let runningMode = "IMAGE";

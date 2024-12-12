@@ -269,13 +269,6 @@ function handCounter(detectedHand, shouldDrawHand) {
           console.log("ue");
           isRedirecting = true;
         }
-
-        // push();
-        // textFont(font);
-        // textSize(18);
-        // textAlign(CENTER);
-        // text("HURRAY! You have selected " + selectedPose, 0, videoSize.h);
-        // pop();
       }
     } else if (counters[i] > 0) {
       counters[i]--;

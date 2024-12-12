@@ -222,7 +222,7 @@ window.draw = () => {
     // stroke("lightgray");
     // strokeWeight(1);
     // line(start.x, start.y, end.x, end.y);
-    console.log(branchPlatform[index].start);
+    // console.log(branchPlatform[index].start);
     noStroke();
     fill("black");
     text(
@@ -290,19 +290,6 @@ function generateBranchDots(branches) {
   });
   return allDots;
 }
-
-// window.keyPressed = () => {
-//   pose = null;
-
-//   const keyNum = parseInt(key); // Convert key to number and check if it's one of the poses
-//   if (keyNum >= 1 && keyNum <= handPoses.length) {
-//     pose = handPoses[keyNum - 1];
-
-//     const matchingDots = dots.filter((dot) => dot.shouldHighlight(pose));
-//     console.log(`Found ${matchingDots.length} dots matching pose: ${pose}`);
-//     targetZ = 450; //camera zoom in
-//   } else targetZ = 800;
-// };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 export function isPlaying() {

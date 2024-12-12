@@ -72,13 +72,10 @@ export class Dot {
     this.noiseOffset = random(1000);
     this.randomC = random(1, 4);
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Create divs
-
+    // DIVs
     this.div = itemData.Content_pose ? createDiv() : null;
 
     // Set divs
-
     if (this.div) {
       this.div.style("display", "none");
 
@@ -115,14 +112,12 @@ export class Dot {
     }
 
     // adding audio
-
     this.sound =
       itemData.Content_pose && itemData.Content_pose != "Image"
         ? loadSound("./assets/audio-test/-" + itemData.Image_num + ".ogg")
         : null;
 
     // adding audio functionalities
-
     if (this.sound) {
       this.sound.onended(hasPlayed);
     }
@@ -136,9 +131,9 @@ export class Dot {
     } else {
       noStroke(); //se non ce l'hanno niente
     }
-    // noFill();
-    // fill(this.color);
-    // rect(this.pos.x, this.pos.y, this.radius + 3); //rect per disegnare il bordo, + 3 per disegnarlo esterno
+    noFill();
+    //fill(this.color);
+    rect(this.pos.x, this.pos.y, this.radius + 3); //rect per disegnare il bordo, + 3 per disegnarlo esterno
 
     // if (this.isHovered) {
     image(this.image, this.pos.x, this.pos.y, this.radius, this.radius);
