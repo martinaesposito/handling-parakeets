@@ -56,9 +56,11 @@ const handPoses = [
 
 let imageMap = {}; // Map images by their filename
 
+export let tutorialEnd = false;
 let tutorial = document.getElementById("tutorial");
 tutorial?.addEventListener("ended", () => {
   tutorial.classList.remove("show");
+  tutorialEnd = true;
 });
 
 let dots = [];

@@ -131,12 +131,12 @@ export class Dot {
     } else {
       noStroke(); //se non ce l'hanno niente
     }
-    // noFill();
-    fill(this.color);
+    noFill();
+    // fill(this.color);
     rect(this.pos.x, this.pos.y, this.radius + 3); //rect per disegnare il bordo, + 3 per disegnarlo esterno
 
     // if (this.isHovered) {
-    // image(this.image, this.pos.x, this.pos.y, this.radius, this.radius);
+    image(this.image, this.pos.x, this.pos.y, this.radius, this.radius);
     // }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////

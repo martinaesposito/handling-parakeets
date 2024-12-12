@@ -4,7 +4,7 @@ import {
   FilesetResolver,
 } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.0";
 
-import { z, warning, endCounter } from "./tree.js";
+import { z, warning, endCounter, tutorialEnd } from "./tree.js";
 import { Hand } from "./hand.js"; //importa l'oggetto mano definito nel javascript precedente
 
 let handLandmarker, imageSegmenter, labels;
@@ -177,7 +177,7 @@ export function draw(shouldDrawHand = true) {
     selectedPose = undefined;
   }
 
-  if (!selectedPose && !hands[0]) {
+  if (!selectedPose && !hands[0] && tutorialEnd) {
     if (counters.every((c) => c === 0)) {
       escapeTree();
     }
@@ -297,7 +297,7 @@ function handCounter(detectedHand, shouldDrawHand) {
 function escapeTree() {
   escapeCounters[0]++;
 
-  let maxCounter = 200;
+  let maxCounter = 300;
 
   if (escapeCounters[0] < maxCounter) {
     if (escapeCounters[0] > maxCounter / 2) {
