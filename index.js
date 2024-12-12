@@ -84,7 +84,7 @@ window.setup = async () => {
     -bounds1.h / 2,
     fontSize,
     {
-      sampleFactor: 0.4,
+      sampleFactor: 0.2,
     }
   );
   let points2 = font.textToPoints(
@@ -93,7 +93,7 @@ window.setup = async () => {
     bounds1.h / 2,
     fontSize,
     {
-      sampleFactor: 0.4,
+      sampleFactor: 0.2,
     }
   );
   // Add points to array
