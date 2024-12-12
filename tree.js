@@ -92,13 +92,13 @@ window.preload = async () => {
   for (let i = 2; i < 887; i++) {
     const imagePromise = new Promise((resolve) => {
       const img = loadImage(
-        `assets/immagini/${i}.png`,
+        `assets/image-compress/${i}.webp`,
         () => {
           imageMap[Number(i)] = img; // Store with numeric keys
           resolve();
         },
         () => {
-          console.warn(`Failed to load image: ${i}.png`);
+          console.warn(`Failed to load image: ${i}.webp`);
           resolve(); // Resolve even if the image fails
         }
       );
