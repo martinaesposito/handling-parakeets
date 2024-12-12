@@ -71,6 +71,10 @@ let targetZ = 800;
 // sound
 export let playing = false;
 
+// story divs
+
+let storyIntro;
+
 // warning
 export let warning = document.getElementById("warning");
 export let endCounter = document.getElementById("endCounter");
@@ -214,6 +218,11 @@ window.setup = async () => {
 
   detectSetup();
   loading.style.display = "none"; //nascondo il loading
+
+  // create and position the stories central description's container
+
+  storyIntro = createDiv();
+  storyIntro.addClass("introcontainer");
 };
 
 ///DRAW
