@@ -19,9 +19,24 @@
   --info: 0.75rem;
   --instruction: 1.25rem;
   --subtitle: 1.75rem;
+  --subtitle-eng: 1.5rem;
 
-  --spacer1: 0.25;
+  --mini-spacer: 0.25;
+  --spacer1: 1;
+  --spacer2: 1.25;
+  --spacer3: 2.5vh;
+
+  --ins-margin: 2vw;
+  --icon: 4vw;
+  --hand: 4vh;
+  --explore: 7.5vh;
+
+  --img-height: 25vh;
+  --img-story: 25vw;
+  --intro-story: 50vw;
 }
+
+/* //////////////////// */
 
 /* general */
 * {
@@ -37,24 +52,8 @@ img {
   width: fit-content;
 }
 p {
-  font-family: IBMplex-sans;
   font-size: var(--testi);
   line-height: 110%;
-  margin: 0;
-}
-.flex-column {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-.flex-row {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-}
-
-.eng {
-  opacity: 0.4;
 }
 
 /* CANVAS */
@@ -66,23 +65,15 @@ p {
   background: rgb(238, 238, 238);
   background: linear-gradient(
     180deg,
-    rgba(238, 238, 238, 1) 0%,
+    var(--bg-grey) 0%,
     rgba(238, 238, 238, 1) 85%,
-    rgba(201, 255, 76, 1) 100%
+    var(--prak) 100%
   );
 }
 .container {
   position: relative;
-  height: 100vh;
-  width: fit-content;
-}
-.container.full {
-  width: 100%;
 }
 canvas {
-  position: absolute;
-  top: 0;
-  left: 0;
   z-index: 2;
 }
 
@@ -101,12 +92,12 @@ canvas {
   height: 100vh;
   background-color: #f5f5f5;
 
-  gap: 3vh;
+  gap: var(--spacer3);
 
-  z-index: 500;
+  z-index: 750;
 }
 #loading-img {
-  height: 30vh;
+  height: var(--img-height);
   width: auto;
 }
 /* VIDEO TUTORIAL */
@@ -121,7 +112,7 @@ canvas {
   height: 100vh;
 
   object-fit: cover;
-  z-index: 9999;
+  z-index: 1000;
 }
 #tutorial.show {
   display: block;
@@ -129,16 +120,17 @@ canvas {
 
 /* SUBTITLE */
 #subtitle {
-  font-size: 1.75rem;
-  line-height: 2rem;
   width: 100%;
-  text-align: center;
   position: absolute;
   z-index: 10;
   top: 50%;
+
+  font-size: var(--subtitle);
+  line-height: 2rem;
+  text-align: center;
 }
 #subtitle > .eng {
-  font-size: 1.5rem;
+  font-size: var(--subtitle-eng);
 }
 
 /* INSTRUCTIONS */
@@ -148,10 +140,6 @@ canvas {
   transform: translate(-50%, 0%);
 
   width: 100%;
-
-  display: flex;
-  flex-direction: row;
-  align-items: center;
 
   z-index: 500;
 }
@@ -175,7 +163,6 @@ canvas {
   gap: 1vw;
   justify-content: center;
   align-items: center;
-  font-family: IBMplex-sans;
   color: black;
   display: flex;
   flex-direction: row;
@@ -186,66 +173,50 @@ canvas {
   text-align: left;
 }
 .instructions > p {
-  font-size: 1.25rem;
-  width: 100%;
+  font-size: var(--instruction);
+  margin: 0;
 }
 
 .eng.tree {
   font-size: var(--text);
+  width: 100%;
 }
 
-/* LEGENDA  delle mani */
-/* #legend {
-  text-align: center;
-  position: fixed;
-  top: 1vh;
-  right: 1vh;
-  display: flex;
-  flex-direction: column;
-  background: #c9ff4c;
-  color: black;
-  z-index: 5;
-  padding: 0.5vh;
-}
-#legend > p {
-  font-size: 12px;
-} */
 #hands-legend {
   display: flex;
   flex-direction: row;
   justify-content: center;
   align-items: center;
-  gap: 1vh;
+  gap: var(--spacer1) vh;
 }
 .hand {
   width: auto;
-  height: 5vh;
+  height: var(--hand);
 }
-#move {
-  height: 7.5vh;
+#explore {
+  height: var(--explore);
 }
 
 /* STORY */
 .image {
-  width: 20vw;
+  width: var(--img-story);
   align-self: center;
   vertical-align: bottom;
 }
 .box {
-  font-family: IBMplex-sans;
-  padding: 0.25vw;
+  padding: var(--mini-spacer) vw;
 }
 .info {
   font-family: IBMplex-mono;
   font-size: var(--testi);
-  padding-bottom: 0.25vw;
+  padding-bottom: var(--mini-spacer) vw;
 }
 .storycontainer {
-  width: 20vw;
+  width: var(--img-story);
   position: absolute;
   z-index: 10;
 
-  border: solid 0.25vw #c9ff4c;
+  border: solid var(--mini-spacer) vw #c9ff4c;
   background: #ffffff;
   font-size: var(--testi);
   box-sizing: content-box;
@@ -256,7 +227,7 @@ canvas {
   left: 50%;
   transform: translate(-50%, -50%);
   z-index: 100;
-  width: 40vw;
+  width: var(--intro-story);
 }
 
 /* WARNING */
@@ -265,7 +236,6 @@ canvas {
   position: fixed;
   top: 0;
   left: 0;
-
   width: 100%;
   height: 100vh;
   z-index: 300;
@@ -283,20 +253,36 @@ canvas {
 .overlaybox {
   display: block;
   margin: auto;
-  border: #c9ff4c 2px solid;
-  background-color: #eeeeee;
+  border: var(--prak) 2px solid;
+  background-color: var(--bg-grey);
   width: auto;
   height: auto;
-  gap: 1vh;
-  padding: 1vh;
+  padding: var(--spacer1) vh;
   z-index: 450;
 }
 #endCounter {
-  font-size: 1.75rem;
+  font-size: var(--subtitle);
   text-align: center;
+  margin: 0;
 }
 .gap {
   gap: 1vh;
+}
+
+/* general */
+.flex-column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.flex-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.eng {
+  opacity: 0.4;
 }
 
 /* ANIMAZIONI */
