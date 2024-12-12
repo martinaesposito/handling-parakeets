@@ -240,7 +240,7 @@ canvas {
   height: 100vh;
   background-color: black;
   opacity: 0.4;
-  z-index: 600;
+  z-index: 300;
 }
 .overlaybox {
   display: block;
@@ -251,7 +251,7 @@ canvas {
   height: auto;
   gap: 1vh;
   padding: 1vh;
-  z-index: 750;
+  z-index: 450;
 }
 #endCounter {
   font-size: 1.75rem;
