@@ -33,7 +33,7 @@
 
   --img-height: 25vh;
   --img-story: 25vw;
-  --intro-story: 50vw;
+  --intro-story: 25vw;
 }
 
 /* //////////////////// */
@@ -216,9 +216,8 @@ canvas {
   position: absolute;
   z-index: 10;
 
-  border: solid var(--mini-spacer) vw #c9ff4c;
-  background: #ffffff;
-  font-size: var(--testi);
+  background: var(--prak);
+  font-size: var(--instruction);
   box-sizing: content-box;
 }
 .introcontainer {
