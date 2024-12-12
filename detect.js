@@ -121,10 +121,10 @@ export function setup() {
   createHandLandmarker(); //hand detector mediapipe
 
   //warning box
-  warning = createDiv();
+  warning = document.getElementById("warning");
   warning.style("display", "none");
   warning.addClass("overlaybox");
-  warning.position(width/2, height/2);
+  warning.position(width / 2, height / 2);
 }
 
 //DRAW
@@ -148,9 +148,6 @@ export function draw(shouldDrawHand = true) {
 
     // Calculate zoom factor based on current z
     zoomFactor = z / 800;
-
-    // ita.innerHTML = itaO;
-    // eng.innerHTML = engO;
 
     const scale =
       videoSize.w / videoSize.h > width / height
@@ -183,23 +180,18 @@ export function draw(shouldDrawHand = true) {
     noStroke();
     ellipse(cursor.x, cursor.y, 10);
   }
+
   if (counters.every((c) => c === 0)) {
     selectedPose = undefined;
   }
 
-  //////////////////////////////////////////////////////////////////////////////////////
-
-  if (!selectedPose && shouldDrawHand) {
-
+  if (!selectedPose && !hands[0]) {
     if (counters.every((c) => c === 0)) {
-
       escapeTree();
-    } else {
-  
-      escapeCounters[0] = 0;
-
-      warning.style("animation", "disappear 1s forwards");
     }
+  } else {
+    escapeCounters[0] = 0; //counter di uscita si riavvia e il warning scompare
+    warning.style("animation", "disappear 0.5s forwards");
   }
 }
 
@@ -240,7 +232,9 @@ const drawHands = (shouldDrawHand) => {
     }
   }
 };
-let isRedirecting = false;
+
+// HAND COUNTER
+let isRedirecting = false; //flag per fare una sola call quando cambia pagina
 function handCounter(detectedHand, shouldDrawHand) {
   const maxCounter = 150; // Maximum counter value
   const loadingRadius = 60 * zoomFactor; // Radius of the loading circle
@@ -290,12 +284,13 @@ function handCounter(detectedHand, shouldDrawHand) {
       pop();
 
       if (counters[detectedHand] >= maxCounter) {
-        selectedPose = handPoses[i];
+        selectedPose = handPoses[i]; //se il counter raggiunge il massimo di una delle pose segnala questa come la posa detectata
 
         if (!shouldDrawHand && !isRedirecting) {
+          //se sono nella home allora apre la pagina tree
           window.location.href = "tree.html";
           console.log("ue");
-          isRedirecting = true;
+          isRedirecting = true; //redirecting cambia così da fare un solo rindizziramento
         }
       }
     } else if (counters[i] > 0) {
@@ -305,31 +300,29 @@ function handCounter(detectedHand, shouldDrawHand) {
   // console.log(counters);
 }
 
-////////////////////////////////////////////////////////////////////////////////
+// COUNTER CHE FA ESCAPE DALLA PAGINA NEL CASO IN CUI NESSUNA MANO è DETECTATA
 function escapeTree() {
-
-  escapeCounters[0] ++;
+  escapeCounters[0]++;
 
   let maxCounter = 200;
-  console.log(escapeCounters[0]);
 
   if (escapeCounters[0] < maxCounter) {
-
-    if (escapeCounters[0] > maxCounter/2) {
-
+    if (escapeCounters[0] > maxCounter / 2) {
+      //quando sono a metà del counter
       warning.style("animation", "appear 1s forwards");
-      warning.html("Soon the experience will reset to the main menu.<br>To interrupt this, show your hand.");
-      warning.style("transform", "translate(-" + warning.size().width / 2 + "px, 0px)");
+      warning.html(
+        "Soon the experience will reset to the main menu.<br>To interrupt this, show your hand."
+      );
+      warning.style(
+        "transform",
+        "translate(-" + warning.size().width / 2 + "px, 0px)"
+      );
       warning.style("display", "block");
     }
-  } else if (!isRedirecting) {
-
-    backToStart();
-  }
+  } else if (!isRedirecting) backToStart();
 }
 
-export function backToStart() {
-
+function backToStart() {
   isRedirecting = true;
   window.location.href = "./index.html";
 }

@@ -39,6 +39,10 @@ p {
   align-items: center;
 }
 
+.eng {
+  opacity: 0.4;
+}
+
 /* CANVAS */
 .wrapper {
   height: 100vh;
@@ -159,10 +163,6 @@ canvas {
   font-size: 1rem;
 }
 
-.eng {
-  opacity: 0.4;
-}
-
 /* LEGENDA  delle mani */
 #legend {
   text-align: center;
@@ -191,8 +191,7 @@ canvas {
   height: 5vh;
 }
 
-/* NARRATION */
-
+/* STORY */
 .image {
   width: 20vw;
   align-self: center;
@@ -200,24 +199,18 @@ canvas {
   padding: none;
   vertical-align: bottom;
 }
-
 .box {
   font-family: IBMplex-sans;
-  font-weight: normal;
-  font-style: normal;
   margin: none;
   padding: 0.25vw;
 }
-
 .info {
   font-family: IBMplex-mono;
-  font-style: normal;
   margin: none;
   padding: none;
   font-size: smaller;
   padding-bottom: 0.25vw;
 }
-
 .storycontainer {
   width: 20vw;
   position: absolute;
@@ -229,7 +222,6 @@ canvas {
   font-size: 1vw;
   box-sizing: content-box;
 }
-
 .overlaybox {
   position: absolute;
   width: 20vw;
