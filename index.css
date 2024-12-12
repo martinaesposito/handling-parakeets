@@ -17,6 +17,7 @@
   padding: 0;
 
   font-family: IBMplex-sans;
+  color: black;
 }
 img {
   height: 100%;
@@ -35,7 +36,7 @@ p {
 }
 .flex-row {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
 }
 
@@ -164,7 +165,7 @@ canvas {
 }
 
 /* LEGENDA  delle mani */
-#legend {
+/* #legend {
   text-align: center;
   position: fixed;
   top: 1vh;
@@ -178,7 +179,7 @@ canvas {
 }
 #legend > p {
   font-size: 12px;
-}
+} */
 #hands-legend {
   display: flex;
   flex-direction: row;
@@ -222,15 +223,46 @@ canvas {
   font-size: 1vw;
   box-sizing: content-box;
 }
-.overlaybox {
-  position: absolute;
-  width: 20vw;
-  background: #c9ff4c;
-  font-family: IBMplex-sans;
-  padding: 1vw;
+
+/* WARNING */
+#warning {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+
+  width: 100%;
+  height: 100vh;
   z-index: 10000;
 }
-
+#warning-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  background-color: black;
+  opacity: 0.4;
+  z-index: 600;
+}
+.overlaybox {
+  display: block;
+  margin: auto;
+  border: #c9ff4c 2px solid;
+  background-color: #eeeeee;
+  width: auto;
+  height: auto;
+  gap: 1vh;
+  padding: 1vh;
+  z-index: 750;
+}
+#endCounter {
+  font-size: 1.75rem;
+  text-align: center;
+}
+.gap {
+  gap: 1vh;
+}
 @keyframes appear {
   from {
     visibility: hidden;

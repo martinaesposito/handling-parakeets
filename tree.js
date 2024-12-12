@@ -71,6 +71,10 @@ let targetZ = 800;
 // sound
 export let playing = false;
 
+// warning
+export let warning = document.getElementById("warning");
+export let endCounter = document.getElementById("endCounter");
+
 ////////////////////////////////////////////////////////////////
 
 ///PRELOAD

@@ -4,7 +4,7 @@ import {
   FilesetResolver,
 } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.0";
 
-import { z } from "./tree.js";
+import { z, warning, endCounter } from "./tree.js";
 import { Hand } from "./hand.js"; //importa l'oggetto mano definito nel javascript precedente
 
 let handLandmarker, imageSegmenter, labels;
@@ -49,8 +49,6 @@ let escapeCounters = [
   0, // from Tree
   0, // from Story
 ];
-
-let warning; // div for displaying warning messages
 
 export let handimages = [];
 let similarHand;
@@ -119,12 +117,6 @@ export function setup() {
   video.hide();
 
   createHandLandmarker(); //hand detector mediapipe
-
-  //warning box
-  warning = document.getElementById("warning");
-  warning.style("display", "none");
-  warning.addClass("overlaybox");
-  warning.position(width / 2, height / 2);
 }
 
 //DRAW
@@ -191,7 +183,8 @@ export function draw(shouldDrawHand = true) {
     }
   } else {
     escapeCounters[0] = 0; //counter di uscita si riavvia e il warning scompare
-    warning.style("animation", "disappear 0.5s forwards");
+    // warning ? (warning.style.animation = "disappear 0.5s forwards") : null;
+    warning ? (warning.style.display = "none") : null;
   }
 }
 
@@ -309,15 +302,10 @@ function escapeTree() {
   if (escapeCounters[0] < maxCounter) {
     if (escapeCounters[0] > maxCounter / 2) {
       //quando sono a metà del counter
-      warning.style("animation", "appear 1s forwards");
-      warning.html(
-        "Soon the experience will reset to the main menu.<br>To interrupt this, show your hand."
-      );
-      warning.style(
-        "transform",
-        "translate(-" + warning.size().width / 2 + "px, 0px)"
-      );
-      warning.style("display", "block");
+      // warning.style.animation = "appear 1s forwards";
+      warning ? (warning.style.display = "flex") : null;
+      // warning.style.opacity = "0.4";
+      endCounter ? (endCounter.innerHTML = escapeCounters[0]) : null;
     }
   } else if (!isRedirecting) backToStart();
 }

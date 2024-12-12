@@ -1,55 +1,69 @@
 <!DOCTYPE html>
 <html lang="en-US">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TREE 🌳</title>
+    <link rel="icon" type="image/x-icon" href="assets/parakeets.png" />
+    <script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"
+      crossorigin="anonymous"
+    ></script>
 
-  <title>TREE 🌳</title>
-  <link rel="icon" type="image/x-icon" href="assets/parakeets.png">
-  <script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+    <script src="libraries/p5.min.js"></script>
+    <script src="libraries/p5.sound.min.js"></script>
 
-  <script src="libraries/p5.min.js"></script>
-  <script src="libraries/p5.sound.min.js"></script>
+    <link rel="stylesheet" href="index.css" />
+  </head>
 
-  <link rel="stylesheet" href="index.css" />
-</head>
-
-<body>
-  <!-- CONTANER DI TUTTO -->
-  <div class="wrapper">
-    <div class="container full"></div>
-  </div>
-
-  <!-- LOADING -->
-  <div id="loading" class="flex-column">
-    <img id="loading-img">
-    <div id="loading-text">loading...</div>
-  </div>
-  <!-- video tutorial -->
-  <!-- <video id="tutorial" class="show" src="assets/tutorial.mp4" autoplay muted playsinline></video> -->
-
-  <!-- INSTRUCTIONS -->
-  <div id="ins-container">
-    <div class="instructions tree" id="ins-1">
-      <p id="ita">muovi la mano destra per navigare la mappa</p>
-      <p id="eng" class="eng">move your right hand to explore the map</p>
+  <body>
+    <!-- CONTANER DI TUTTO -->
+    <div class="wrapper">
+      <div class="container full"></div>
     </div>
-    <div class="instructions" id="ins-2">
-      <div id="hands-legend"></div>
-      <div class="instructions tree">
-        <p id="ita">fai una posa per scoprire le storie</p>
-        <p id="eng" class="eng">strike a pose to uncover the stories</p>
+
+    <!-- LOADING -->
+    <div id="loading" class="flex-column">
+      <img id="loading-img" />
+      <div id="loading-text">loading...</div>
+    </div>
+    <!-- video tutorial -->
+    <!-- <video id="tutorial" class="show" src="assets/tutorial.mp4" autoplay muted playsinline></video> -->
+
+    <!-- INSTRUCTIONS -->
+    <div id="ins-container">
+      <div class="instructions tree" id="ins-1">
+        <p id="ita">muovi la mano destra per navigare la mappa</p>
+        <p id="eng" class="eng">move your right hand to explore the map</p>
+      </div>
+      <div class="instructions" id="ins-2">
+        <div id="hands-legend"></div>
+        <div class="instructions tree">
+          <p id="ita">fai una posa per scoprire le storie</p>
+          <p id="eng" class="eng">strike a pose to uncover the stories</p>
+        </div>
+      </div>
+    </div>
+    <!-- WARNING -->
+    <div class="warning flex-column" id="warning">
+      <div id="warning-bg"></div>
+      <div class="overlaybox flex-column">
+        <div class="flex-row gap">
+          <p id="ita">riavvio in</p>
+          /
+          <p id="eng" class="eng">restarting in</p>
+        </div>
+        <p id="endCounter"></p>
       </div>
     </div>
 
-  </div>
-  </div>
-
-  <script src="tree.js" type="module"></script>
-  <script src="listings.js" type="module"></script>
-</body>
-
+    <script src="tree.js" type="module"></script>
+    <script src="listings.js" type="module"></script>
+  </body>
 </html>
