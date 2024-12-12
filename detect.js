@@ -307,7 +307,8 @@ function escapeTree() {
       // warning.style.opacity = "0.4";
       endCounter ? (endCounter.innerHTML = escapeCounters[0]) : null;
     }
-  } else if (!isRedirecting) backToStart();
+  }
+  // else if (!isRedirecting) backToStart();
 }
 
 function backToStart() {

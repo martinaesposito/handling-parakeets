@@ -43,23 +43,46 @@
       playsinline
     ></video>
 
-    <!-- INSTRUCTIONS -->
-    <div id="ins-container">
+    <!-- INSTRUCTIONS TOP-->
+    <div id="ins-container" class="double top">
+      <div class="instructions" id="ins-1">
+        <img src="assets/instructions/back.svg" class="icon" />
+        <div class="instructions tree">
+          <p id="ita">metti qui la mano per scoprire altre pose</p>
+          <p id="eng" class="eng tree">
+            put your hand here to discover more poses
+          </p>
+        </div>
+      </div>
+      <div class="instructions" id="ins-2">
+        <div class="instructions tree">
+          <p id="ita">metti qui la mano per riavviare</p>
+          <p id="eng" class="eng tree">put the hand here to restart</p>
+        </div>
+        <img src="assets/instructions/restart.svg" class="icon" />
+      </div>
+    </div>
+
+    <!-- INSTRUCTIONS BOTTOM-->
+    <div id="ins-container" class="double bottom">
       <div class="instructions" id="ins-1">
         <div class="instructions tree">
           <p id="ita">muovi la mano destra per navigare la mappa</p>
-          <p id="eng" class="eng">move your right hand to explore the map</p>
+          <p id="eng" class="eng tree">
+            move your right hand to explore the map
+          </p>
         </div>
-        <img src="assets/explore.png" class="hand" />
+        <img src="assets/instructions/explore.svg" id="move" />
       </div>
       <div class="instructions" id="ins-2">
         <div class="instructions tree">
           <p id="ita">fai una posa per scoprire le storie</p>
-          <p id="eng" class="eng">strike a pose to uncover the stories</p>
+          <p id="eng" class="eng tree">strike a pose to uncover the stories</p>
         </div>
         <div id="hands-legend"></div>
       </div>
     </div>
+
     <!-- WARNING -->
     <div class="warning flex-column" id="warning">
       <div id="warning-bg"></div>

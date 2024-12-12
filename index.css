@@ -10,6 +10,19 @@
   src: url("assets/fonts/IBM_Plex_Sans/IBMPlexSans-Regular.ttf")
     format("truetype");
 }
+
+:root {
+  --prak: #c9ff4c;
+  --bg-grey: #eeeeee;
+
+  --testi: 1rem;
+  --info: 0.75rem;
+  --instruction: 1.25rem;
+  --subtitle: 1.75rem;
+
+  --spacer1: 0.25;
+}
+
 /* general */
 * {
   box-sizing: border-box;
@@ -25,7 +38,7 @@ img {
 }
 p {
   font-family: IBMplex-sans;
-  font-size: 1rem;
+  font-size: var(--testi);
   line-height: 110%;
   margin: 0;
 }
@@ -61,9 +74,7 @@ p {
 .container {
   position: relative;
   height: 100vh;
-  width: 100vh;
   width: fit-content;
-  padding: 100px;
 }
 .container.full {
   width: 100%;
@@ -72,8 +83,6 @@ canvas {
   position: absolute;
   top: 0;
   left: 0;
-  width: 100vh;
-  height: 100vh;
   z-index: 2;
 }
 
@@ -142,11 +151,25 @@ canvas {
 
   display: flex;
   flex-direction: row;
-  justify-content: space-around;
   align-items: center;
-  bottom: 3vh;
 
   z-index: 500;
+}
+#ins-container.bottom {
+  bottom: 2vw;
+}
+#ins-container.top {
+  top: 2vw;
+}
+.double {
+  justify-content: space-between;
+  padding: 0 2vw;
+}
+.single {
+  justify-content: space-around;
+}
+.icon {
+  width: 4vh;
 }
 .instructions {
   gap: 1vw;
@@ -164,6 +187,11 @@ canvas {
 }
 .instructions > p {
   font-size: 1.25rem;
+  width: 100%;
+}
+
+.eng.tree {
+  font-size: var(--text);
 }
 
 /* LEGENDA  delle mani */
@@ -193,36 +221,33 @@ canvas {
   width: auto;
   height: 5vh;
 }
+#move {
+  height: 7.5vh;
+}
 
 /* STORY */
 .image {
   width: 20vw;
   align-self: center;
-  margin: none;
-  padding: none;
   vertical-align: bottom;
 }
 .box {
   font-family: IBMplex-sans;
-  margin: none;
   padding: 0.25vw;
 }
 .info {
   font-family: IBMplex-mono;
-  margin: none;
-  padding: none;
-  font-size: smaller;
+  font-size: var(--testi);
   padding-bottom: 0.25vw;
 }
 .storycontainer {
   width: 20vw;
   position: absolute;
   z-index: 10;
-  padding: none;
-  margin: none;
+
   border: solid 0.25vw #c9ff4c;
   background: #ffffff;
-  font-size: 1vw;
+  font-size: var(--testi);
   box-sizing: content-box;
 }
 
@@ -257,15 +282,6 @@ canvas {
   gap: 1vh;
   padding: 1vh;
   z-index: 450;
-}
-
-.introcontainer {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 100;
-  width: 40vw;
 }
 #endCounter {
   font-size: 1.75rem;
