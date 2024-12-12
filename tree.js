@@ -74,12 +74,14 @@ let targetZ = 800;
 export let playing = false;
 
 // story divs
-
 let storyIntro;
 
 // warning
 export let warning = document.getElementById("warning");
 export let endCounter = document.getElementById("endCounter");
+
+//stories
+let stories;
 
 ////////////////////////////////////////////////////////////////
 
@@ -136,8 +138,18 @@ window.preload = async () => {
     listingsDataReady = true;
   }
 
+  stories = loadJSON("./json/stories.json", storiesJSON);
+
   detectPreload();
 };
+
+function storiesJSON() {
+
+  for (let i = 0; i < Object.keys(stories).length; i++) {
+
+    console.log(stories[i]);
+  }
+}
 
 //SETUP
 window.setup = async () => {
@@ -224,6 +236,8 @@ window.setup = async () => {
   // create and position the stories central description's container
 
   storyIntro = createDiv();
+  storyIntro.style("display", "none");
+
   storyIntro.addClass("introcontainer");
 };
 
@@ -281,6 +295,11 @@ window.draw = () => {
   }
   translate(0, 0, 1);
   detectDraw();
+
+  if (selectedPose) {
+
+    changeStory();
+  }
 };
 
 function generateBranchDots(branches) {
@@ -313,4 +332,23 @@ export function isPlaying() {
 
 export function hasPlayed() {
   playing = false;
+}
+
+export function changeStory() {
+
+  let intro;
+  for (let i = 0; i < Object.keys(stories).length; i++) {
+      
+    if (stories[i].Pose == selectedPose) {
+
+      intro = stories[i];
+    }
+  }
+
+  if (intro) {
+    storyIntro.html("<div class='overlaybox'>" + intro.TitleIta +
+    "</div><br><div class='overlaybox'>" + intro.DescriptionIta + "</div>");
+  }
+
+  storyIntro.style("display", "block");
 }

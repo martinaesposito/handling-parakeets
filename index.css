@@ -258,6 +258,17 @@ canvas {
   padding: 1vh;
   z-index: 450;
 }
+.introbox {
+  
+}
+.introcontainer {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 100;
+  width: 40vw;
+}
 #endCounter {
   font-size: 1.75rem;
   text-align: center;

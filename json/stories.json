@@ -1,51 +1,51 @@
 [
   {
     "Pose": "FingerPerch",
-    "Title-ita": "Vendo con gabbia",
-    "Title-eng": "Sold with cage",
-    "Description-ita": "Il parrocchetto è spesso ritratto appollaiato sul dito indice, come se fosse su un trespolo nella sua gabbia.",
-    "Description-eng": "The parakeet is often represented resting on a pointing finger, as it would do on a perch inside its cage."
+    "TitleIta": "Vendo con gabbia",
+    "TitleEng": "Sold with cage",
+    "DescriptionIta": "Il parrocchetto è spesso ritratto appollaiato sul dito indice, come se fosse su un trespolo nella sua gabbia.",
+    "DescriptionEng": "The parakeet is often represented resting on a pointing finger, as it would do on a perch inside its cage."
   },
   {
     "Pose": "Grip",
-    "Title-ita": "Messo in mostra",
-    "Title-eng": "On display",
-    "Description-ita": "I parrocchetti stretti forte sono esibiti per sfoggiare le loro qualità come oggetti rari o beni di proprietà.",
-    "Description-eng": "Parakeets held tightly are showcased to emphasize their qualities as rare items or objects of possession."
+    "TitleIta": "Messo in mostra",
+    "TitleEng": "On display",
+    "DescriptionIta": "I parrocchetti stretti forte sono esibiti per sfoggiare le loro qualità come oggetti rari o beni di proprietà.",
+    "DescriptionEng": "Parakeets held tightly are showcased to emphasize their qualities as rare items or objects of possession."
   },
   {
     "Pose": "HalfClosed",
-    "Title-ita": "In vendita dal giorno 1",
-    "Title-eng": "On sale since day 1",
-    "Description-ita": "I parrocchetti tenuti con delicatezza sono spesso pulli appena nati, che vengono già visti come oggetti da vendere.",
-    "Description-eng": "Parakeets held gently are often newly born chicks, which are already being seen as objects for sale."
+    "TitleIta": "In vendita dal giorno 1",
+    "TitleEng": "On sale since day 1",
+    "DescriptionIta": "I parrocchetti tenuti con delicatezza sono spesso pulli appena nati, che vengono già visti come oggetti da vendere.",
+    "DescriptionEng": "Parakeets held gently are often newly born chicks, which are already being seen as objects for sale."
   },
   {
     "Pose": "Open",
-    "Title-ita": "Parte della famiglia",
-    "Title-eng": "A family member",
-    "Description-ita": "I parrocchetti appollaiati su una mano aperta cercano il contatto fisico e la compagnia del proprio padrone, con cui hanno un forte legame.",
-    "Description-eng": "Parakeets resting on an open hand seek physical contact and the company of their owner, with whom they share a strong bond."
+    "TitleIta": "Parte della famiglia",
+    "TitleEng": "A family member",
+    "DescriptionIta": "I parrocchetti appollaiati su una mano aperta cercano il contatto fisico e la compagnia del proprio padrone, con cui hanno un forte legame.",
+    "DescriptionEng": "Parakeets resting on an open hand seek physical contact and the company of their owner, with whom they share a strong bond."
   },
   {
     "Pose": "Relaxed",
-    "Title-ita": "Libero di andare",
-    "Title-eng": "Free to go",
-    "Description-ita": "Gli annunci di smarrimento contengono spesso foto in cui i parrocchetti sono appollaiati sulle mani e braccia dei loro proprietari, liberi di volare dove vogliono",
-    "Description-eng": "Listings of lost parakeets often contain photos where they’re casually perched on people’s hands and arms, looking like they’re free to go as they please."
+    "TitleIta": "Libero di andare",
+    "TitleEng": "Free to go",
+    "DescriptionIta": "Gli annunci di smarrimento contengono spesso foto in cui i parrocchetti sono appollaiati sulle mani e braccia dei loro proprietari, liberi di volare dove vogliono",
+    "DescriptionEng": "Listings of lost parakeets often contain photos where they’re casually perched on people’s hands and arms, looking like they’re free to go as they please."
   },
   {
     "Pose": "Shell",
-    "Title-ita": "Mille sfumature",
-    "Title-eng": "Colorful beauty",
-    "Description-ita": "I parrocchetti tenuti per le zampe sono spesso esposti per mostrare al meglio il loro splendido piumaggio.",
-    "Description-eng": "Parakeets held by their feet are often displayed to best show their gorgeous plumage."
+    "TitleIta": "Mille sfumature",
+    "TitleEng": "Colorful beauty",
+    "DescriptionIta": "I parrocchetti tenuti per le zampe sono spesso esposti per mostrare al meglio il loro splendido piumaggio.",
+    "DescriptionEng": "Parakeets held by their feet are often displayed to best show their gorgeous plumage."
   },
   {
     "Pose": "TouchingTips",
-    "Title-ita": "Nutrire con cura",
-    "Title-eng": "Feeding with care",
-    "Description-ita": "I parrocchetti fotografati mentre sono nutriti da una mano sono spesso visti come comapagni carini e giocherelloni.",
-    "Description-eng": "Parakeets photographed while being fed by a nourishing hand are often seen as cute and playful companions."
+    "TitleIta": "Nutrire con cura",
+    "TitleEng": "Feeding with care",
+    "DescriptionIta": "I parrocchetti fotografati mentre sono nutriti da una mano sono spesso visti come comapagni carini e giocherelloni.",
+    "DescriptionEng": "Parakeets photographed while being fed by a nourishing hand are often seen as cute and playful companions."
   }
 ]

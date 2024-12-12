@@ -1,7 +1,5 @@
-import { cursor, zoomFactor } from "./detect.js";
-import { selectedPose } from "./detect.js";
-import { playing } from "./tree.js";
-import { isPlaying, hasPlayed } from "./tree.js";
+import { cursor, zoomFactor, selectedPose } from "./detect.js";
+import { playing, isPlaying, hasPlayed } from "./tree.js";
 
 export class Dot {
   static colors = [
@@ -132,11 +130,11 @@ export class Dot {
       noStroke(); //se non ce l'hanno niente
     }
     noFill();
-    // fill(this.color);
+    fill(this.color);
     rect(this.pos.x, this.pos.y, this.radius + 3); //rect per disegnare il bordo, + 3 per disegnarlo esterno
 
     // if (this.isHovered) {
-    image(this.image, this.pos.x, this.pos.y, this.radius, this.radius);
+    //image(this.image, this.pos.x, this.pos.y, this.radius, this.radius);
     // }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////
