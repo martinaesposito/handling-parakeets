@@ -44,7 +44,7 @@ window.preload = async () => {
     //carico tutte le immagini di tutti i listings
     const imagePromise = new Promise((resolve) => {
       const img = loadImage(
-        "assets/immagini/" + i + ".png",
+        `assets/image-compress/${i}.webp`,
         () => {
           images.push(img);
           resolve(img);
@@ -117,9 +117,6 @@ window.setup = async () => {
 
   // SUBTITLE
   subTitle = document.getElementById("subtitle");
-  console.log(subTitle);
-  subTitle.innerHTML =
-    "How do humans interact with parakeets in the online trading market?";
   subTitle.style.top = `${height / 2 + (bounds1.h * 3.2) / 4}px`; // Adjust as needed
 
   detectSetup();

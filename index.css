@@ -120,7 +120,8 @@ canvas {
 
 /* SUBTITLE */
 #subtitle {
-  font-size: 1.5rem;
+  font-size: 1.75rem;
+  line-height: 2rem;
   width: 100%;
   text-align: center;
   position: absolute;
@@ -231,6 +232,7 @@ canvas {
 
   width: 100%;
   height: 100vh;
+  z-index: 300;
 }
 #warning-bg {
   position: fixed;
