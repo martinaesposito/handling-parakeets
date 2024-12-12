@@ -45,6 +45,13 @@ let counters = [
   0, //TouchingTips
 ];
 
+let escapeCounters = [
+  0, // from Tree
+  0, // from Story
+];
+
+let warning; // div for displaying warning messages
+
 export let handimages = [];
 let similarHand;
 let font;
@@ -112,6 +119,12 @@ export function setup() {
   video.hide();
 
   createHandLandmarker(); //hand detector mediapipe
+
+  //warning box
+  warning = createDiv();
+  warning.style("display", "none");
+  warning.addClass("overlaybox");
+  warning.position(width/2, height/2);
 }
 
 //DRAW
@@ -172,6 +185,21 @@ export function draw(shouldDrawHand = true) {
   }
   if (counters.every((c) => c === 0)) {
     selectedPose = undefined;
+  }
+
+  //////////////////////////////////////////////////////////////////////////////////////
+
+  if (!selectedPose && shouldDrawHand) {
+
+    if (counters.every((c) => c === 0)) {
+
+      escapeTree();
+    } else {
+  
+      escapeCounters[0] = 0;
+
+      warning.style("animation", "disappear 1s forwards");
+    }
   }
 }
 
@@ -275,6 +303,35 @@ function handCounter(detectedHand, shouldDrawHand) {
     }
   });
   // console.log(counters);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+function escapeTree() {
+
+  escapeCounters[0] ++;
+
+  let maxCounter = 200;
+  console.log(escapeCounters[0]);
+
+  if (escapeCounters[0] < maxCounter) {
+
+    if (escapeCounters[0] > maxCounter/2) {
+
+      warning.style("animation", "appear 1s forwards");
+      warning.html("Soon the experience will reset to the main menu.<br>To interrupt this, show your hand.");
+      warning.style("transform", "translate(-" + warning.size().width / 2 + "px, 0px)");
+      warning.style("display", "block");
+    }
+  } else if (!isRedirecting) {
+
+    backToStart();
+  }
+}
+
+export function backToStart() {
+
+  isRedirecting = true;
+  window.location.href = "./index.html";
 }
 
 //confronto con i LANDMARKS usando gli angoli

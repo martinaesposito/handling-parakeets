@@ -230,6 +230,15 @@ canvas {
   box-sizing: content-box;
 }
 
+.overlaybox {
+  position: absolute;
+  width: 20vw;
+  background: #c9ff4c;
+  font-family: IBMplex-sans;
+  padding: 1vw;
+  z-index: 10000;
+}
+
 @keyframes appear {
   from {
     visibility: hidden;
