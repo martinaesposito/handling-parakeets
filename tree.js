@@ -71,6 +71,10 @@ let targetZ = 800;
 // sound
 export let playing = false;
 
+// story divs
+
+let storyIntro;
+
 ////////////////////////////////////////////////////////////////
 
 ///PRELOAD
@@ -210,6 +214,11 @@ window.setup = async () => {
 
   detectSetup();
   loading.style.display = "none"; //nascondo il loading
+
+  // create and position the stories central description's container
+
+  storyIntro = createDiv();
+  storyIntro.addClass("introcontainer");
 };
 
 ///DRAW

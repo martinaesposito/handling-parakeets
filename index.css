@@ -222,6 +222,12 @@ canvas {
   font-size: 1vw;
   box-sizing: content-box;
 }
+.introcontainer {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
 .overlaybox {
   position: absolute;
   width: 20vw;
