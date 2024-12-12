@@ -148,7 +148,7 @@ window.setup = async () => {
   }
 
   //legenda
-  for (let i = 1; i < handPoses.length; i++) {
+  for (let i = 1; i < handPoses.length + 1; i++) {
     let hand = document.createElement("img");
     hand.src = "assets/legend/" + i + ".svg";
     hand.className = "hand";

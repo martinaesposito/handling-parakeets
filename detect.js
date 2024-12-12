@@ -170,7 +170,7 @@ export function draw(shouldDrawHand = true) {
 
     fill(prak);
     noStroke();
-    ellipse(cursor.x, cursor.y, 10);
+    ellipse(cursor.x, cursor.y, 5);
   }
 
   if (counters.every((c) => c === 0)) {

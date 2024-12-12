@@ -117,7 +117,7 @@ window.setup = async () => {
 
   // SUBTITLE
   subTitle = document.getElementById("subtitle");
-  subTitle.style.top = `${height / 2 + (bounds1.h * 3.2) / 4}px`; // Adjust as needed
+  subTitle.style.top = `${height / 2 + (bounds1.h * 3) / 4}px`; // Adjust as needed
 
   detectSetup();
   loading.style.display = "none"; //nascondo il loading
@@ -211,13 +211,17 @@ window.draw = () => {
   translate(0, 0, 1);
   detectDraw(false);
 
-  if (!detectCursor && handimages.length > 0) {
-    image(
-      handimages[4],
-      0, // x-coordinate (center)
-      (bounds1.h * 4) / 3.2, // y-coordinate
-      (handimages[4].width / 3) * 2,
-      (handimages[4].height / 3) * 2
-    );
+  // Add proper error handling for handimages
+  if (!detectCursor && handimages && handimages.length > 0 && handimages[4]) {
+    const handImage = handimages[4];
+    if (handImage.width && handImage.height) {
+      image(
+        handImage,
+        0,
+        (bounds1.h * 4) / 3.2,
+        (handImage.width / 3) * 2,
+        (handImage.height / 3) * 2
+      );
+    }
   }
 };
