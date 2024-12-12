@@ -1,12 +1,11 @@
 <!DOCTYPE html>
 <html lang="en-US">
   <head>
-    
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <title>Hand Landmarker</title>
-    <link rel="icon" type="image/x-icon" href="assets/parakeets.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>HOME 💚</title>
+    <link rel="icon" type="image/x-icon" href="assets/parakeets.png" />
     <script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
     <script
       src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"
@@ -23,13 +22,32 @@
     <link rel="stylesheet" href="index.css" />
   </head>
   <body>
+    <!-- CONTANER DI TUTTO -->
     <div class="wrapper">
-      <div class="container">
-        <img src=""> </img>
+      <div class="container full"></div>
+    </div>
+    <!-- SUBTITLE -->
+    <p id="subtitle">
+      How do humans interact with parakeets in the online trading market?
+    </p>
+    <!-- INSTRUCTIONS -->
+    <div id="ins-container">
+      <div class="instructions">
+        [
+        <p id="ita">Inquadra la mano e muovila per iniziare</p>
+        /
+        <p id="eng" class="eng">Show your hand and move it to start</p>
+        ]
       </div>
     </div>
 
+    <!-- LOADING -->
+    <div id="loading">
+      <img id="loading-img" />
+      <div id="loading-text">loading...</div>
+    </div>
+
     <script src="index.js" type="module"></script>
-    <script src="hand.js" type="module"></script>
+    <script src="listings.js" type="module"></script>
   </body>
 </html>

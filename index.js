@@ -1,173 +1,226 @@
-import {
-  HandLandmarker,
-  FilesetResolver,
-} from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.0";
+let font;
+let imagePromises = [];
+let images = [];
 
-import { Hand } from "./hand.js"; //importa l'oggetto mano definito nel javascript precedente
-
-let handLandmarker = undefined;
-let runningMode = "IMAGE";
-let currentImage = 0;
-let imageCount = 6;
-// let imageCount = 113;
-
-let handsData, newHandsData;
+let imgPoints = [];
+let time = 0;
+let targetPositions = []; // Store target positions for easing
+let currentPositions = []; // Store current positions for easing
+let velocities = []; // Store velocities for each point
 
 let container = document.querySelector(".container");
-let img = document.querySelector("img");
-const padding = 100;
-
 let p5, canvas;
-let hands = [];
 
-function mapCoords(point) {
-  const { width: imgWidth, height: imgHeight } = img.getBoundingClientRect();
-  return {
-    x: point.x * imgWidth + padding,
-    y: point.y * imgHeight + padding,
-    z: 0,
-  };
-}
+let points = [];
+const prak = "#C9FF4C";
+let fontSize = 200;
 
-const createHandLandmarker = async () => {
-  const vision = await FilesetResolver.forVisionTasks(
-    "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.0/wasm"
-  );
-  handLandmarker = await HandLandmarker.createFromOptions(vision, {
-    baseOptions: {
-      modelAssetPath: `https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task`,
-      delegate: "GPU",
-      minDetectionConfidence: 0.01,
-      minPresenceConfidence: 0.01,
-      minTrackingConfidence: 0.01,
-    },
-    runningMode,
-    numHands: 1,
-  });
-  processImage();
+let bounds1;
+let bounds2;
+let subTitle;
+let colors = [
+  "#87BDF3",
+  "#7DE44A",
+  "#BDFF91",
+  "#2CA02C",
+  "#FCFF5C",
+  "#009DB8",
+  "#2E7F2E",
+];
+
+import {
+  preload as detectPreload,
+  setup as detectSetup,
+  draw as detectDraw,
+  cursor as detectCursor,
+  handimages,
+} from "./detect.js";
+
+// //////////////////////////////////////////////////////////////////////////
+window.preload = async () => {
+  font = loadFont("assets/fonts/IBM_Plex_Sans/IBMPlexSans-Regular.ttf"); //font
+
+  for (let i = 2; i < 887; i++) {
+    //carico tutte le immagini di tutti i listings
+    const imagePromise = new Promise((resolve) => {
+      const img = loadImage(
+        "assets/immagini/" + i + ".png",
+        () => {
+          images.push(img);
+          resolve(img);
+        },
+        () => {
+          resolve(null); // Resolve with null if image fails to load
+        }
+      );
+    });
+    imagePromises.push(imagePromise);
+  }
+
+  await Promise.all(imagePromises); // Wait for all image loading attempts to complete
+  console.log(images); //controllo che ci siano tutte e che siano corrette
+  detectPreload();
 };
 
-const processImage = () => {
-  // img.src = `assets/training/${currentImage + 1}a.png`;
-  img.src = `assets/training/${currentImage + 1}.png`;
-
-  img.onload = async () => {
-    resizeCanvas(((windowHeight - 200) / 16) * 9 + 200, windowHeight);
-    // resizeCanvas(windowHeight, windowHeight);
-    drawHands(img);
-  };
-};
-
+// Setup
 window.setup = async () => {
-  p5 = createCanvas(((windowHeight - 200) / 16) * 9 + 200, windowHeight); // canvas sedici noni
-  // p5 = createCanvas(windowHeight, windowHeight); // canvas quadrato
+  // CANVAS
+  p5 = createCanvas(windowWidth, windowHeight, WEBGL);
   pixelDensity(1);
   canvas = p5.canvas;
   container.appendChild(canvas);
 
-  // handsData = await importJSON("json/training.json");
-  handsData = await importJSON("json/training.json");
-  newHandsData = handsData;
+  imageMode(CENTER);
+  rectMode(CENTER);
 
-  createHandLandmarker(); // Avvia il riconoscimento delle mani
+  // TITOLONE
+  // Measure text bounds
+  bounds1 = font.textBounds("Handling", 0, 0, fontSize);
+  bounds2 = font.textBounds("Parakeets", 0, 0, fontSize);
+  // Get points with translation
+  let points1 = font.textToPoints(
+    "Handling",
+    -bounds1.w / 2,
+    -bounds1.h / 2,
+    fontSize,
+    {
+      sampleFactor: 0.4,
+    }
+  );
+  let points2 = font.textToPoints(
+    "Parakeets",
+    -bounds2.w / 2,
+    bounds1.h / 2,
+    fontSize,
+    {
+      sampleFactor: 0.4,
+    }
+  );
+  // Add points to array
+  points = [...points1, ...points2];
+  // Initialize positions and velocities
+  points.forEach((p, i) => {
+    let immg =
+      i < images.length ? images[i] : images[floor(random(images.length))];
+    let img = {
+      img: immg,
+      size: random(5, 15),
+      c: random(colors),
+      type: random() > 0.5 ? "image" : "rect",
+    };
+    imgPoints.push(img);
+    // Initialize positions
+    currentPositions[i] = createVector(p.x, p.y);
+    targetPositions[i] = createVector(p.x, p.y);
+    velocities[i] = createVector(0, 0);
+  });
+
+  // SUBTITLE
+  subTitle = document.getElementById("subtitle");
+  console.log(subTitle);
+  subTitle.innerHTML =
+    "How do humans interact with parakeets in the online trading market?";
+  subTitle.style.top = `${height / 2 + (bounds1.h * 3.2) / 4}px`; // Adjust as needed
+
+  detectSetup();
+  loading.style.display = "none"; //nascondo il loading
 };
+
+// Easing function
+function easeOutCubic(t) {
+  return 1 - pow(1 - t, 2);
+}
 
 window.draw = () => {
-  if (hands.map((h) => h.editing).includes(true)) {
-    clear();
-    hands.forEach((h) => h.draw());
-  }
-};
+  // background("#F5F5F5");
+  clear();
+  time += 0.01;
 
-const drawHands = async (target) => {
-  const handLandmarkerResult = await handLandmarker.detect(target);
-  const landmarks = handLandmarkerResult.landmarks[0];
+  points.forEach((p, i) => {
+    // Calculate noise-based movement
+    let xOffset = map(noise(i, time * 0.5), 0, 1, -12, 12);
+    let yOffset = map(noise(i, (time + 300) * 0.5), 0, 1, -12, 12);
 
-  console.log(newHandsData, handsData);
+    // Calculate mouse interaction
+    let dx = detectCursor ? p.x - detectCursor.x : p.x;
+    let dy = detectCursor ? p.y - detectCursor.y : p.y;
+    let distance = sqrt(dx * dx + dy * dy);
 
-  let points =
-    newHandsData[currentImage]?.points ??
-    handsData[currentImage]?.points ??
-    landmarks?.map((p) => mapCoords(p));
+    // Update target position
+    targetPositions[i].x = p.x + xOffset;
+    targetPositions[i].y = p.y + yOffset;
 
-  if (!hands[0]) {
-    hands[0] = new Hand(points, 0);
-  } else {
-    hands[0].draw(points);
-  }
+    // Apply mouse repulsion
+    let repulsionRadius = imgPoints[i].size * 4;
+    if (detectCursor && distance < repulsionRadius) {
+      let repulsionForce = map(distance, 0, repulsionRadius, 1, 0);
+      repulsionForce = easeOutCubic(repulsionForce) * (imgPoints[i].size * 2);
+      let angle = atan2(dy, dx);
+      targetPositions[i].x += cos(angle) * repulsionForce;
+      targetPositions[i].y += sin(angle) * repulsionForce;
+    }
 
-  newHandsData[currentImage] = {
-    name: `${currentImage + 1}.png`,
-    points,
-    angles: hands[0].angles,
-  };
-};
+    // Smooth movement towards target position
+    let easing = 0.3; // Adjust this value to control smoothness (lower = smoother)
+    let dx2 = targetPositions[i].x - currentPositions[i].x;
+    let dy2 = targetPositions[i].y - currentPositions[i].y;
 
-function changeImage(index) {
-  currentImage = index;
-  processImage();
-}
+    // Apply easing to velocity
+    velocities[i].x = lerp(velocities[i].x, dx2 * easing, 1);
+    velocities[i].y = lerp(velocities[i].y, dy2 * easing, 1);
 
-window.mouseDragged = () => {
-  hands.forEach((h) => {
-    h.movePoint({ x: mouseX, y: mouseY });
+    // Update current position with velocity
+    currentPositions[i].x += velocities[i].x;
+    currentPositions[i].y += velocities[i].y;
 
-    newHandsData[currentImage] = {
-      name: `${currentImage + 1}.png`,
-      points: h.points.map((p) => p.pos),
-      angles: hands[0].angles,
-    };
+    noStroke();
+    // if (imgPoints[i].type == "image") {
+    //   // Draw image
+    //   image(
+    //     imgPoints[i].img,
+    //     currentPositions[i].x + xOffset / 100,
+    //     currentPositions[i].y + yOffset / 100,
+    //     imgPoints[i].size,
+    //     imgPoints[i].size
+    //   );
+    // } else {
+    //   // Draw colored rect
+    //   fill(imgPoints[i].c);
+    //   rect(
+    //     currentPositions[i].x + xOffset / 100,
+    //     currentPositions[i].y + yOffset / 100,
+    //     imgPoints[i].size,
+    //     imgPoints[i].size
+    //   );
+    // }
+
+    // Draw image at current position
+    // image(
+    //   imgPoints[i].img,
+    //   currentPositions[i].x + xOffset / 100,
+    //   currentPositions[i].y + yOffset / 100,
+    //   imgPoints[i].size,
+    //   imgPoints[i].size
+    // );
+    // noStroke();
+    fill(imgPoints[i].c);
+    rect(
+      currentPositions[i].x + xOffset / 100,
+      currentPositions[i].y + yOffset / 100,
+      imgPoints[i].size
+    );
   });
-};
 
-window.mousePressed = () => {
-  hands.forEach((h) => {
-    h.toggleSelectedPoint({ x: mouseX, y: mouseY });
+  translate(0, 0, 1);
+  detectDraw(false);
 
-    newHandsData[currentImage] = {
-      name: `${currentImage + 1}.png`,
-      points: h.points.map((p) => p.pos),
-      angles: hands[0].angles,
-    };
-  });
-};
-
-window.mouseReleased = () => {
-  hands.forEach((h) => h.deselect());
-  newHandsData[currentImage] = {
-    name: `${currentImage + 1}.png`,
-    points: hands[0].points.map((p) => p.pos),
-    angles: hands[0].angles,
-  };
-};
-
-document.addEventListener("keydown", (e) => {
-  if (e.code === "ArrowLeft") {
-    changeImage(Math.max(currentImage - 1, 0));
-  } else if (e.code === "ArrowRight") {
-    changeImage(Math.min(currentImage + 1, imageCount));
-  } else if (e.code === "Enter") {
-    saveJSON();
-  } else if (e.code === "Space") {
-    console.log("s");
-    //S
-    window.saveCanvas(`${currentImage + 1}.png`);
+  if (!detectCursor && handimages.length > 0) {
+    image(
+      handimages[4],
+      0, // x-coordinate (center)
+      (bounds1.h * 4) / 3.2, // y-coordinate
+      (handimages[4].width / 3) * 2,
+      (handimages[4].height / 3) * 2
+    );
   }
-});
-
-function saveJSON() {
-  const jsonString = JSON.stringify(newHandsData, null, 2);
-  const blob = new Blob([jsonString], { type: "application/json" });
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = "training.json";
-  // a.download = "json/hands.json";
-  a.click();
-  URL.revokeObjectURL(a.href);
-}
-
-async function importJSON(path) {
-  const response = await fetch(path);
-  const data = await response.json();
-  return data;
-}
+};

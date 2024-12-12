@@ -48,7 +48,7 @@ const handPoses = [
 let imageMap = {}; // Map images by their filename
 
 let dots = [];
-import { Dot } from "./listings.js";
+import { Dot } from "../listings.js";
 let listingsDataReady = false;
 
 let meCamera;
