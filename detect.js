@@ -45,8 +45,12 @@ let counters = [
   0, //TouchingTips
 ];
 
+let backtostart; // id: ins-2, button / div to go back to stories
+let backtotree; // id: ins-1, button / div to go back to screensaver
+
 let escapeCounters = [
-  0, // from Tree
+  0, // from Tree when inactivity
+  0, // from Tree when selected
   0, // from Story
 ];
 
@@ -117,6 +121,41 @@ export function setup() {
   video.hide();
 
   createHandLandmarker(); //hand detector mediapipe
+
+  // getting the elements
+
+  backtotree = document.getElementById("ins-1");
+  backtostart = document.getElementById("ins-2");
+}
+
+function goingBackToStart() {
+  let maxCounter = 200;
+
+  if(escapeCounters[1] < maxCounter) {
+
+    escapeCounters[1]++;
+  } else {
+
+    if (!isRedirecting) backToStart();
+  }
+}
+
+function goingBackToTree() {
+  let maxCounter = 100;
+
+  if(escapeCounters[2] < maxCounter) {
+
+    escapeCounters[2]++;
+  } else {
+    
+    for (let i = 0; i < counters.length; i++) { // pose reset and counters to 0
+
+      counters[i] = 0;
+    }
+    selectedPose = undefined;
+
+    escapeCounters[2] = 0;
+  }
 }
 
 //DRAW
@@ -186,6 +225,31 @@ export function draw(shouldDrawHand = true) {
     // warning ? (warning.style.animation = "disappear 0.5s forwards") : null;
     warning ? (warning.style.display = "none") : null;
   }
+
+  // onhover of the divs that control going back to the start or to the tree
+
+  if (cursor) {
+
+    if (cursor.x > (windowWidth/2 - backtotree.offsetWidth) * zoomFactor && cursor.y < (backtotree.offsetHeight - windowHeight/2) * zoomFactor) {
+
+      goingBackToStart();
+      //console.log(escapeCounters[1]);
+    } else {
+
+      if (escapeCounters[1] > 0) escapeCounters[1]--;
+    }
+    
+    if (selectedPose && cursor.x < (backtotree.offsetWidth - windowWidth/2) * zoomFactor && cursor.y < (backtotree.offsetHeight - windowHeight/2) * zoomFactor) {
+
+      goingBackToTree();
+      //console.log(escapeCounters[2]);
+    } else {
+
+      if (escapeCounters[2] > 0) escapeCounters[2]--;
+    }
+  }
+
+  (selectedPose) ? backtotree.style.animation = "appear 1s forwards" : backtotree.style.animation = "disappear 1s forwards";
 }
 
 //DISEGNO LE MANI
