@@ -157,7 +157,7 @@ export function draw(shouldDrawHand = true) {
       similarHand = 3;
     }
 
-    handCounter(similarHand, shouldDrawHand);
+    handCounter(similarHand, shouldDrawHand, hands[0]);
 
     image(
       handimages[similarHand + 1],
@@ -228,32 +228,35 @@ const drawHands = (shouldDrawHand) => {
 
 // HAND COUNTER
 let isRedirecting = false; //flag per fare una sola call quando cambia pagina
-function handCounter(detectedHand, shouldDrawHand) {
+function handCounter(detectedHand, shouldDrawHand, hands) {
   const maxCounter = 150; // Maximum counter value
   const loadingRadius = 60 * zoomFactor; // Radius of the loading circle
 
   counters.forEach((e, i) => {
-    if (detectedHand == i) {
-      // Only increment if not already at max
-      if (counters[detectedHand] < maxCounter) {
-        counters[detectedHand]++;
-      }
-
-      drawArc(counters[detectedHand], loadingRadius, maxCounter);
-
-      if (counters[detectedHand] >= maxCounter) {
-        selectedPose = handPoses[i]; //se il counter raggiunge il massimo di una delle pose segnala questa come la posa detectata
-
-        if (!shouldDrawHand && !isRedirecting) {
-          //se sono nella home allora apre la pagina tree
-          window.location.href = "tree.html";
-          console.log("ue");
-          isRedirecting = true; //redirecting cambia così da fare un solo rindizziramento
+    if ((shouldDrawHand && tutorialEnd) || (!shouldDrawHand && hands)) {
+      console.log("counter va");
+      if (detectedHand == i) {
+        // Only increment if not already at max
+        if (counters[detectedHand] < maxCounter) {
+          counters[detectedHand]++;
         }
+
+        drawArc(counters[detectedHand], loadingRadius, maxCounter);
+
+        if (counters[detectedHand] >= maxCounter) {
+          selectedPose = handPoses[i]; //se il counter raggiunge il massimo di una delle pose segnala questa come la posa detectata
+
+          if (!shouldDrawHand && !isRedirecting) {
+            //se sono nella home allora apre la pagina tree
+            window.location.href = "tree.html";
+            console.log("ue");
+            isRedirecting = true; //redirecting cambia così da fare un solo rindizziramento
+          }
+        }
+      } else if (counters[i] > 0) {
+        counters[i]--;
       }
-    } else if (counters[i] > 0) {
-      counters[i]--;
-    }
+    } else console.log("counter non va");
   });
   // console.log(counters);
 }
