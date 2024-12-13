@@ -234,7 +234,8 @@ function handCounter(detectedHand, shouldDrawHand, hands) {
 
   counters.forEach((e, i) => {
     if ((shouldDrawHand && tutorialEnd) || (!shouldDrawHand && hands)) {
-      console.log("counter va");
+      //se la mano non c'è o sta andando il tutorial blocco il counter
+      // console.log("counter va");
       if (detectedHand == i) {
         // Only increment if not already at max
         if (counters[detectedHand] < maxCounter) {
@@ -256,7 +257,8 @@ function handCounter(detectedHand, shouldDrawHand, hands) {
       } else if (counters[i] > 0) {
         counters[i]--;
       }
-    } else console.log("counter non va");
+    }
+    // else console.log("counter non va");
   });
   // console.log(counters);
 }

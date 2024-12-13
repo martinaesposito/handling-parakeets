@@ -15,10 +15,9 @@ let points = [];
 const prak = "#C9FF4C";
 let fontSize = 200;
 
-let bounds1;
-let bounds2;
+let bounds1, bounds2;
 let subTitle;
-let colors = [
+const colors = [
   "#87BDF3",
   "#7DE44A",
   "#BDFF91",
@@ -38,27 +37,31 @@ import {
 
 // //////////////////////////////////////////////////////////////////////////
 window.preload = async () => {
-  font = loadFont("assets/fonts/IBM_Plex_Sans/IBMPlexSans-Regular.ttf"); //font
+  font = loadFont("assets/fonts/IBM_Plex_Sans/IBMPlexSans-Regular.ttf");
 
-  for (let i = 2; i < 887; i++) {
-    //carico tutte le immagini di tutti i listings
-    const imagePromise = new Promise((resolve) => {
-      const img = loadImage(
-        `assets/image-compress/${i}.webp`,
-        () => {
-          images.push(img);
-          resolve(img);
-        },
-        () => {
-          resolve(null); // Resolve with null if image fails to load
-        }
-      );
-    });
-    imagePromises.push(imagePromise);
+  //Use Promise.all with batched loading to prevent memory spikes
+  const BATCH_SIZE = 50;
+  for (let batch = 0; batch < Math.ceil(885 / BATCH_SIZE); batch++) {
+    const batchPromises = [];
+    const start = batch * BATCH_SIZE + 2;
+    const end = Math.min(start + BATCH_SIZE, 887);
+
+    for (let i = start; i < end; i++) {
+      const imagePromise = new Promise((resolve) => {
+        // OPTIMIZATION: Use smaller image formats and sizes when possible
+        const img = loadImage(
+          `assets/image-compress/${i}.webp`,
+          () => resolve(img),
+          () => resolve(null)
+        );
+      });
+      batchPromises.push(imagePromise);
+    }
+
+    const batchResults = await Promise.all(batchPromises);
+    images.push(...batchResults.filter((img) => img !== null));
   }
 
-  await Promise.all(imagePromises); // Wait for all image loading attempts to complete
-  console.log(images); //controllo che ci siano tutte e che siano corrette
   detectPreload();
 };
 
@@ -77,27 +80,18 @@ window.setup = async () => {
   // Measure text bounds
   bounds1 = font.textBounds("Handling", 0, 0, fontSize);
   bounds2 = font.textBounds("Parakeets", 0, 0, fontSize);
-  // Get points with translation
-  let points1 = font.textToPoints(
-    "Handling",
-    -bounds1.w / 2,
-    -bounds1.h / 2,
-    fontSize,
-    {
-      sampleFactor: 0.2,
-    }
-  );
-  let points2 = font.textToPoints(
-    "Parakeets",
-    -bounds2.w / 2,
-    bounds1.h / 2,
-    fontSize,
-    {
-      sampleFactor: 0.2,
-    }
-  );
-  // Add points to array
-  points = [...points1, ...points2];
+  const sampleFactor = 0.25;
+
+  // Get points with translation and add points to array
+  points = [
+    ...font.textToPoints("Handling", -bounds1.w / 2, -bounds1.h / 2, fontSize, {
+      sampleFactor,
+    }),
+    ...font.textToPoints("Parakeets", -bounds2.w / 2, bounds1.h / 2, fontSize, {
+      sampleFactor,
+    }),
+  ];
+
   // Initialize positions and velocities
   points.forEach((p, i) => {
     let immg =

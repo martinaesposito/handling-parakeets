@@ -244,7 +244,7 @@ canvas {
 }
 .info {
   font-family: IBMplex-mono;
-  font-size: var(--testi);
+  font-size: var(--info);
   padding-bottom: var(--mini-spacer);
 }
 .storycontainer {
