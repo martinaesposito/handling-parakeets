@@ -14,6 +14,7 @@
 :root {
   --prak: #c9ff4c;
   --bg-grey: #eeeeee;
+  --transparent: 255, 0, 0, 0;
 
   --testi: 1rem;
   --info: 0.75rem;
@@ -195,6 +196,32 @@ canvas {
 }
 .explore {
   height: var(--explore);
+}
+
+#gradient-left {
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  width: 60%;
+  height: 30%;
+
+  background: radial-gradient(
+    ellipse at top left, var(--prak) 20%, rgba(0, 0, 0, 0) 50%
+  );
+}
+
+#gradient-right {
+  position: absolute;
+  left: 100%;
+  transform: translate(-100%, 0px);
+  overflow: hidden;
+  top: 0px;
+  width: 60%;
+  height: 30%;
+  
+  background: radial-gradient(
+    ellipse at top right, var(--prak) 20%, rgba(0, 0, 0, 0) 50%
+  );
 }
 
 /* WARNING */
