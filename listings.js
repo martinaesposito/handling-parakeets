@@ -263,16 +263,11 @@ export class Dot {
 
     // MOUSE INTERACTION
     // Scala le coordinate del mouse in base al fattore di zoom
-    // const zoomFactor = z / 800;
-    // const scaledMouseX = (cursor?.x - width / 2) * zoomFactor;
-    // const scaledMouseY = (cursor?.y - height / 2) * zoomFactor;
 
     const d = dist(cursor?.x, cursor?.y, this.pos.x, this.pos.y);
 
     const hoverThreshold = (this.baseRadius * 3) / 2;
-
     this.isHovered = d < hoverThreshold;
-
     const targetRadius = this.isHovered ? this.baseRadius * 5 : this.baseRadius; //se l'oggetto viene hoverato aumentail raggio
     this.radius += (targetRadius - this.radius) * 0.1;
 

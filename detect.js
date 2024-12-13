@@ -231,7 +231,6 @@ let isRedirecting = false; //flag per fare una sola call quando cambia pagina
 function handCounter(detectedHand, shouldDrawHand) {
   const maxCounter = 150; // Maximum counter value
   const loadingRadius = 60 * zoomFactor; // Radius of the loading circle
-  const angleOffset = -HALF_PI; // Start from the top
 
   counters.forEach((e, i) => {
     if (detectedHand == i) {
@@ -240,41 +239,7 @@ function handCounter(detectedHand, shouldDrawHand) {
         counters[detectedHand]++;
       }
 
-      // Always draw full arc if max is reached
-      const arcAngle =
-        counters[detectedHand] >= maxCounter
-          ? TWO_PI
-          : map(counters[detectedHand], 0, maxCounter, 0, TWO_PI);
-
-      // Outer arc
-      push();
-      noFill();
-      strokeWeight(8 * zoomFactor);
-      stroke("#C9FF4C");
-      arc(
-        cursor.x,
-        cursor.y,
-        loadingRadius * 2,
-        loadingRadius * 2,
-        angleOffset,
-        angleOffset + arcAngle
-      );
-      pop();
-
-      // Inner arc
-      push();
-      noFill();
-      strokeWeight(1);
-      stroke("black");
-      arc(
-        cursor.x,
-        cursor.y,
-        loadingRadius * 2 - 7,
-        loadingRadius * 2 - 7,
-        angleOffset,
-        angleOffset + arcAngle
-      );
-      pop();
+      drawArc(counters[detectedHand], loadingRadius, maxCounter);
 
       if (counters[detectedHand] >= maxCounter) {
         selectedPose = handPoses[i]; //se il counter raggiunge il massimo di una delle pose segnala questa come la posa detectata
@@ -293,6 +258,42 @@ function handCounter(detectedHand, shouldDrawHand) {
   // console.log(counters);
 }
 
+function drawArc(value, loadingRadius, maxCounter) {
+  const angleOffset = -HALF_PI; // Start from the top
+  // Always draw full arc if max is reached
+  const arcAngle =
+    value >= maxCounter ? TWO_PI : map(value, 0, maxCounter, 0, TWO_PI);
+
+  // Outer arc
+  push();
+  noFill();
+  strokeWeight(8 * zoomFactor);
+  stroke("#C9FF4C");
+  arc(
+    cursor.x,
+    cursor.y,
+    loadingRadius * 2,
+    loadingRadius * 2,
+    angleOffset,
+    angleOffset + arcAngle
+  );
+  pop();
+
+  // Inner arc
+  push();
+  noFill();
+  strokeWeight(1);
+  stroke("black");
+  arc(
+    cursor.x,
+    cursor.y,
+    loadingRadius * 2 - 7,
+    loadingRadius * 2 - 7,
+    angleOffset,
+    angleOffset + arcAngle
+  );
+  pop();
+}
 // COUNTER CHE FA ESCAPE DALLA PAGINA NEL CASO IN CUI NESSUNA MANO è DETECTATA
 function escapeTree() {
   escapeCounters[0]++;
