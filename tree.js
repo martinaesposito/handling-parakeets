@@ -144,9 +144,7 @@ window.preload = async () => {
 };
 
 function storiesJSON() {
-
   for (let i = 0; i < Object.keys(stories).length; i++) {
-
     console.log(stories[i]);
   }
 }
@@ -234,11 +232,11 @@ window.setup = async () => {
   loading.style.display = "none"; //nascondo il loading
 
   // create and position the stories central description's container
-
-  storyIntro = createDiv();
-  storyIntro.style("display", "none");
-
-  storyIntro.addClass("introcontainer");
+  if (!storyIntro) {
+    storyIntro = createDiv();
+    storyIntro.style("display", "none");
+    storyIntro.addClass("introcontainer flex-column");
+  }
 };
 
 ///DRAW
@@ -297,7 +295,6 @@ window.draw = () => {
   detectDraw();
 
   if (selectedPose) {
-
     changeStory();
   }
 };
@@ -335,20 +332,28 @@ export function hasPlayed() {
 }
 
 export function changeStory() {
-
   let intro;
+  let n;
   for (let i = 0; i < Object.keys(stories).length; i++) {
-      
     if (stories[i].Pose == selectedPose) {
-
       intro = stories[i];
     }
   }
 
-  if (intro) {
-    storyIntro.html("<div class='overlaybox'>" + intro.TitleIta +
-    "</div><br><div class='overlaybox'>" + intro.DescriptionIta + "</div>");
+  if (intro && !n) {
+    storyIntro.html(
+      "<div class='overlaybox' id='title'>" +
+        intro.TitleIta +
+        "</br><span class='eng'>" +
+        intro.TitleEng +
+        "</span></div><div class='overlaybox intro gap'>" +
+        intro.DescriptionIta +
+        "</br><span class='eng'>" +
+        intro.DescriptionEng +
+        "</span></div>"
+    );
+    n = true;
   }
 
-  storyIntro.style("display", "block");
+  storyIntro.style("display", "flex");
 }

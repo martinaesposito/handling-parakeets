@@ -21,8 +21,8 @@
   --subtitle: 1.75rem;
   --subtitle-eng: 1.5rem;
 
-  --mini-spacer: 0.25;
-  --spacer1: 1;
+  --mini-spacer: 0.25vw;
+  --spacer1: 1vh;
   --spacer2: 1.25;
   --spacer3: 2.5vh;
 
@@ -33,7 +33,7 @@
 
   --img-height: 25vh;
   --img-story: 25vw;
-  --intro-story: 25vw;
+  --intro-story: 50vh;
 }
 
 /* //////////////////// */
@@ -187,7 +187,7 @@ canvas {
   flex-direction: row;
   justify-content: center;
   align-items: center;
-  gap: var(--spacer1) vh;
+  gap: var(--spacer1);
 }
 .hand {
   width: auto;
@@ -195,38 +195,6 @@ canvas {
 }
 #explore {
   height: var(--explore);
-}
-
-/* STORY */
-.image {
-  width: var(--img-story);
-  align-self: center;
-  vertical-align: bottom;
-}
-.box {
-  padding: var(--mini-spacer) vw;
-}
-.info {
-  font-family: IBMplex-mono;
-  font-size: var(--testi);
-  padding-bottom: var(--mini-spacer) vw;
-}
-.storycontainer {
-  width: var(--img-story);
-  position: absolute;
-  z-index: 10;
-
-  background: var(--prak);
-  font-size: var(--instruction);
-  box-sizing: content-box;
-}
-.introcontainer {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 100;
-  width: var(--intro-story);
 }
 
 /* WARNING */
@@ -256,7 +224,7 @@ canvas {
   background-color: var(--bg-grey);
   width: auto;
   height: auto;
-  padding: var(--spacer1) vh;
+  padding: var(--spacer1);
   z-index: 450;
 }
 #endCounter {
@@ -264,6 +232,62 @@ canvas {
   text-align: center;
   margin: 0;
 }
+
+/* STORY */
+.image {
+  width: var(--img-story);
+  align-self: center;
+  vertical-align: bottom;
+}
+.box {
+  padding: var(--mini-spacer);
+}
+.info {
+  font-family: IBMplex-mono;
+  font-size: var(--testi);
+  padding-bottom: var(--mini-spacer);
+}
+.storycontainer {
+  width: var(--img-story);
+  position: absolute;
+  z-index: 10;
+
+  border: solid var(--mini-spacer) var(--prak);
+  background: #ffffff;
+  font-size: var(--testi);
+  box-sizing: content-box;
+}
+.introcontainer {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 100;
+  border: none;
+  width: var(--intro-story);
+  font-size: var(--instruction);
+  text-align: center;
+  gap: var(--spacer3);
+  line-height: 110%;
+}
+
+.introcontainer > .overlaybox {
+  background-color: var(--prak);
+  padding: 0;
+  width: 100%;
+}
+#title > .eng {
+  font-size: var(--testi);
+}
+.intro {
+  text-align: left;
+  font-size: var(--testi);
+}
+/* .intro > .eng {
+  font-size: var(--info);
+  line-height: 0;
+} */
+
 .gap {
   gap: 1vh;
 }
