@@ -206,16 +206,14 @@ window.draw = () => {
   detectDraw(false);
 
   // Add proper error handling for handimages
-  if (!detectCursor && handimages && handimages.length > 0 && handimages[4]) {
+  if (!detectCursor && handimages?.[4]?.width) {
     const handImage = handimages[4];
-    if (handImage.width && handImage.height) {
-      image(
-        handImage,
-        0,
-        (bounds1.h * 4) / 3.2,
-        (handImage.width / 3) * 2,
-        (handImage.height / 3) * 2
-      );
-    }
+    image(
+      handImage,
+      0,
+      (bounds1.h * 4) / 3.2,
+      (handImage.width / 3) * 2,
+      (handImage.height / 3) * 2
+    );
   }
 };
