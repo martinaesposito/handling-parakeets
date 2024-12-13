@@ -230,13 +230,6 @@ window.setup = async () => {
 
   detectSetup();
   loading.style.display = "none"; //nascondo il loading
-
-  // create and position the stories central description's container
-  if (!storyIntro) {
-    storyIntro = createDiv();
-    storyIntro.style("display", "none");
-    storyIntro.addClass("introcontainer flex-column");
-  }
 };
 
 ///DRAW
@@ -272,6 +265,13 @@ window.draw = () => {
 
   let cH = height / 4.5;
   let cW = (cH / 3) * 4;
+
+  // create and position the stories central description's container
+  if (!storyIntro) {
+    storyIntro = createDiv();
+    storyIntro.style("display", "none");
+    storyIntro.addClass("introcontainer flex-column");
+  }
 
   if (selectedPose) {
     // textAlign(CENTER);
