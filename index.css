@@ -193,7 +193,7 @@ canvas {
   width: auto;
   height: var(--hand);
 }
-#explore {
+.explore {
   height: var(--explore);
 }
 
@@ -269,6 +269,7 @@ canvas {
   text-align: center;
   gap: var(--spacer3);
   line-height: 110%;
+  z-index: 1;
 }
 
 .introcontainer > .overlaybox {

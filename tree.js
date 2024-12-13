@@ -145,7 +145,7 @@ window.preload = async () => {
 
 function storiesJSON() {
   for (let i = 0; i < Object.keys(stories).length; i++) {
-    console.log(stories[i]);
+    //console.log(stories[i]);
   }
 }
 
@@ -277,6 +277,10 @@ window.draw = () => {
     textAlign(CENTER);
     fill("black");
     text(selectedPose, 0, cH / 2 + cH / 10);
+
+    changeStory();
+  } else {
+    storyIntro.style("display", "none");
   }
 
   push();
@@ -293,10 +297,6 @@ window.draw = () => {
   }
   translate(0, 0, 1);
   detectDraw();
-
-  if (selectedPose) {
-    changeStory();
-  }
 };
 
 function generateBranchDots(branches) {
@@ -334,14 +334,28 @@ export function hasPlayed() {
 export function changeStory() {
   let intro;
   let n;
+  let s;
   for (let i = 0; i < Object.keys(stories).length; i++) {
     if (stories[i].Pose == selectedPose) {
       intro = stories[i];
+      s = i + 1;
     }
   }
 
   if (intro && !n) {
     storyIntro.html(
+      //PROVA CON IMMAGINE IN ALTO
+      // "<img src='/assets/cursor/" +
+      // s +
+      // ".svg' class='explore' > <div class='overlaybox' id='title'>" +
+      // intro.TitleIta +
+      // "</br><span class='eng'>" +
+      // intro.TitleEng +
+      // "</span></div><div class='overlaybox intro gap'>" +
+      // intro.DescriptionIta +
+      // "</br><span class='eng'>" +
+      // intro.DescriptionEng +
+      // "</span></div>"
       "<div class='overlaybox' id='title'>" +
         intro.TitleIta +
         "</br><span class='eng'>" +
