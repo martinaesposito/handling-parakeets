@@ -190,7 +190,7 @@ export function draw(shouldDrawHand = true) {
 
 //DISEGNO LE MANI
 const drawHands = (shouldDrawHand) => {
-  if (handLandmarker && video) {
+  if (handLandmarker && video && handsData) {
     //video
     const video = document.querySelector("#camera");
 
@@ -235,7 +235,7 @@ function handCounter(detectedHand, shouldDrawHand, hands) {
   counters.forEach((e, i) => {
     if ((shouldDrawHand && tutorialEnd) || (!shouldDrawHand && hands)) {
       //se la mano non c'è o sta andando il tutorial blocco il counter
-      // console.log("counter va");
+      console.log("counter va");
       if (detectedHand == i) {
         // Only increment if not already at max
         if (counters[detectedHand] < maxCounter) {
@@ -257,10 +257,9 @@ function handCounter(detectedHand, shouldDrawHand, hands) {
       } else if (counters[i] > 0) {
         counters[i]--;
       }
-    }
-    // else console.log("counter non va");
+    } else console.log("counter non va");
   });
-  // console.log(counters);
+  console.log(counters);
 }
 
 function drawArc(value, loadingRadius, maxCounter) {
@@ -329,7 +328,7 @@ function calculateDifferences(dataSet) {
     );
   };
 
-  return dataSet.map((data) => {
+  return dataSet?.map((data) => {
     const absoluteWeight = 0.2; // angoli assoluti - peso variabile
     const relativeWeight = 0.8; // angoli relativi - peso maggiore
 
