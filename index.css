@@ -102,7 +102,7 @@ canvas {
 
   width: 100%;
   height: 100vh;
-  background-color: #f5f5f5;
+  background-color: var(--bg-grey);
 
   gap: var(--spacer3);
 
@@ -154,14 +154,14 @@ canvas {
   width: 100%;
 }
 #ins-container.bottom {
-  bottom: 2vw;
+  bottom: var(--ins-margin);
 }
 #ins-container.top {
-  top: 2vw;
+  top: var(--ins-margin);
 }
 .double {
   justify-content: space-between;
-  padding: 0 2vw;
+  padding: 0 var(--ins-margin);
 }
 .single {
   justify-content: space-around;
@@ -234,7 +234,7 @@ canvas {
   background: radial-gradient(
     ellipse at top right,
     var(--prak) 20%,
-    rgba(0, 0, 0, 0) 50%
+    /* #87bdf3 20%, */ rgba(0, 0, 0, 0) 50%
   );
 }
 
