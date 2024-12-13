@@ -274,27 +274,28 @@ window.draw = () => {
   let cW = (cH / 3) * 4;
 
   if (selectedPose) {
-    textAlign(CENTER);
-    fill("black");
-    text(selectedPose, 0, cH / 2 + cH / 10);
+    // textAlign(CENTER);
+    // fill("black");
+    // text(selectedPose, 0, cH / 2 + cH / 10);
 
     changeStory();
   } else {
     storyIntro.style("display", "none");
+
+    push();
+    if (video && videoSize) {
+      scale(-1, 1); //rifletto il video in modo da vederlo correttamente
+      stroke("black");
+      noFill();
+      // translate(0, 0, 10);
+      strokeWeight(2);
+      image(video, 0, 0, videoSize.w, videoSize.h);
+
+      rect(0, 0, videoSize.w, videoSize.h); //disegno un rettangolo in modo che abbia il bordo
+      pop();
+    }
   }
 
-  push();
-  if (video && videoSize) {
-    scale(-1, 1); //rifletto il video in modo da vederlo correttamente
-    stroke("black");
-    noFill();
-    // translate(0, 0, 10);
-    strokeWeight(2);
-    image(video, 0, 0, videoSize.w, videoSize.h);
-
-    rect(0, 0, videoSize.w, videoSize.h); //disegno un rettangolo in modo che abbia il bordo
-    pop();
-  }
   translate(0, 0, 1);
   detectDraw();
 };
