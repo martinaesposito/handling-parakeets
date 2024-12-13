@@ -40,6 +40,13 @@
 /* //////////////////// */
 
 /* general */
+
+body {
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+}
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -58,12 +65,14 @@ p {
 }
 
 /* CANVAS */
-.wrapper {
+.bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
   height: 100vh;
-  display: flex;
-  justify-content: center;
+  z-index: -500;
 
-  background: rgb(238, 238, 238);
   background: linear-gradient(
     180deg,
     var(--bg-grey) 0%,
@@ -73,6 +82,8 @@ p {
 }
 .container {
   position: relative;
+  display: flex;
+  justify-content: center;
 }
 canvas {
   z-index: 2;
@@ -123,7 +134,7 @@ canvas {
 #subtitle {
   width: 100%;
   position: absolute;
-  z-index: 10;
+  z-index: -5;
   top: 50%;
 
   font-size: var(--subtitle);
@@ -141,8 +152,6 @@ canvas {
   transform: translate(-50%, 0%);
 
   width: 100%;
-
-  z-index: 200;
 }
 #ins-container.bottom {
   bottom: 2vw;
@@ -206,7 +215,9 @@ canvas {
   height: 30%;
 
   background: radial-gradient(
-    ellipse at top left, var(--prak) 20%, rgba(0, 0, 0, 0) 50%
+    ellipse at top left,
+    var(--prak) 20%,
+    rgba(0, 0, 0, 0) 50%
   );
 }
 
@@ -218,9 +229,12 @@ canvas {
   top: 0px;
   width: 60%;
   height: 30%;
-  
+  z-index: -1;
+
   background: radial-gradient(
-    ellipse at top right, var(--prak) 20%, rgba(0, 0, 0, 0) 50%
+    ellipse at top right,
+    var(--prak) 20%,
+    rgba(0, 0, 0, 0) 50%
   );
 }
 

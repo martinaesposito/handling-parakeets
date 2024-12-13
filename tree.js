@@ -56,8 +56,9 @@ const handPoses = [
 
 let imageMap = {}; // Map images by their filename
 
-export let tutorialEnd = false;
 let tutorial = document.getElementById("tutorial");
+export let tutorialEnd = tutorial ? false : undefined;
+
 tutorial?.addEventListener("ended", () => {
   tutorial.classList.remove("show");
   tutorialEnd = true;

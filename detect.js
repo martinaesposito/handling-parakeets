@@ -9,14 +9,6 @@ import { Hand } from "./hand.js"; //importa l'oggetto mano definito nel javascri
 
 let handLandmarker, imageSegmenter, labels;
 
-// const legendColors = [
-//   [255, 197, 0, 255], // Vivid Yellow
-//   [128, 62, 117, 255], // Strong Purple
-//   [255, 104, 0, 255], // Vivid Orange - BODY COLOR
-//   [166, 189, 215, 255], // Very Light Blue
-//   [193, 0, 32, 255], // Vivid Red
-// ];
-
 let container = document.querySelector(".container");
 let hands = [];
 
@@ -137,11 +129,9 @@ export function setup() {
 function goingBackToStart() {
   let maxCounter = 200;
 
-  if(escapeCounters[1] < maxCounter) {
-
+  if (escapeCounters[1] < maxCounter) {
     escapeCounters[1]++;
   } else {
-
     if (!isRedirecting) backToStart();
   }
 }
@@ -149,17 +139,15 @@ function goingBackToStart() {
 function goingBackToTree() {
   let maxCounter = 100;
 
-  if(escapeCounters[2] < maxCounter) {
-
+  if (escapeCounters[2] < maxCounter) {
     escapeCounters[2]++;
   } else {
-    
-    for (let i = 0; i < counters.length; i++) { // pose reset and counters to 0
+    for (let i = 0; i < counters.length; i++) {
+      // pose reset and counters to 0
 
       counters[i] = 0;
     }
     selectedPose = undefined;
-
     escapeCounters[2] = 0;
   }
 }
@@ -176,7 +164,7 @@ export function draw(shouldDrawHand = true) {
   };
 
   //DISEGNO LE MANI
-  drawHands(shouldDrawHand);
+  drawHands(selectedPose ? false : shouldDrawHand);
 
   //CURSOR
   if (hands.length > 0 && hands[0]?.points) {
@@ -202,7 +190,11 @@ export function draw(shouldDrawHand = true) {
       similarHand = 3;
     }
 
-    handCounter(similarHand, shouldDrawHand, hands[0]);
+    handCounter({
+      detectedHand: similarHand,
+      shouldDrawHand,
+      lock: !!selectedPose,
+    });
 
     image(
       handimages[similarHand + 1],
@@ -211,6 +203,7 @@ export function draw(shouldDrawHand = true) {
       (handimages[similarHand + 1].width / 3) * 2 * zoomFactor,
       (handimages[similarHand + 1].height / 3) * 2 * zoomFactor
     );
+
     pop();
 
     fill(prak);
@@ -233,45 +226,50 @@ export function draw(shouldDrawHand = true) {
   }
 
   // onhover of the divs that control going back to the start or to the tree
-
   if (backtotree && backtostart) {
-
     if (cursor) {
-
-      if (cursor.x > ((windowWidth/2 - windowWidth/50) - backtostart.offsetWidth) * zoomFactor && cursor.y < (backtostart.offsetHeight - (windowHeight/2 - windowHeight/50) * zoomFactor)) {
-  
+      if (
+        cursor.x >
+          (windowWidth / 2 - windowWidth / 50 - backtostart.offsetWidth) *
+            zoomFactor &&
+        cursor.y <
+          backtostart.offsetHeight -
+            (windowHeight / 2 - windowHeight / 50) * zoomFactor
+      ) {
         goingBackToStart();
         console.log(escapeCounters[1]);
       } else {
-  
         if (escapeCounters[1] > 0) escapeCounters[1]--;
       }
-      
-      if (selectedPose && cursor.x < (backtotree.offsetWidth - (windowWidth/2 - windowWidth/50)) * zoomFactor && cursor.y < (backtotree.offsetHeight - (windowHeight/2 - windowHeight/50) * zoomFactor)) {
-  
+
+      if (
+        selectedPose &&
+        cursor.x <
+          (backtotree.offsetWidth - (windowWidth / 2 - windowWidth / 50)) *
+            zoomFactor &&
+        cursor.y <
+          backtotree.offsetHeight -
+            (windowHeight / 2 - windowHeight / 50) * zoomFactor
+      ) {
         goingBackToTree();
         console.log(escapeCounters[2]);
       } else {
-  
         if (escapeCounters[2] > 0) escapeCounters[2]--;
       }
     }
-  
+
     // Applying animations for the going back divs
-  
+
     if (selectedPose) {
-  
       backtotree.style.visibility = "visible";
       backtotree.style.animation = "appear 1s forwards";
 
       leftgradient.style.visibility = "visible";
       leftgradient.style.animation = "appear 1s forwards";
-  
-     } else {
-
+    } else {
       backtotree.style.animation = "disappear 1s forwards";
       leftgradient.style.animation = "disappear 1s forwards";
-     }
+    }
   }
 }
 
@@ -293,7 +291,7 @@ const drawHands = (shouldDrawHand) => {
       if (!landmarks) {
         hands = [];
         //se non ci sono mani nello schermo i counter scendono
-        handCounter();
+        handCounter({ detectedHand: undefined });
         return;
       }
       let points = landmarks?.map((p) => mapCoords(p, videoSize)); //prende i punti della mano e li rimappa
@@ -308,19 +306,24 @@ const drawHands = (shouldDrawHand) => {
       // chiamo funzione che confronta i LANDMARKS con quelli del json e mi restituisce la mano detectata
       const differences = calculateDifferences(handsData); //calcola la differenza tra gli angoli di riferimento e quelli
       const minDifference = Math.min(...differences);
-      similarHand = differences.indexOf(minDifference);
+      if (!similarHand || shouldDrawHand) {
+        similarHand = differences.indexOf(minDifference);
+      }
     }
   }
 };
 
 // HAND COUNTER
 let isRedirecting = false; //flag per fare una sola call quando cambia pagina
-function handCounter(detectedHand, shouldDrawHand, hands) {
+function handCounter({ detectedHand, shouldDrawHand, lock }) {
+  console.log(lock);
+  if (tutorialEnd === false || lock) return;
+
   const maxCounter = 150; // Maximum counter value
   const loadingRadius = 60 * zoomFactor; // Radius of the loading circle
 
   counters.forEach((e, i) => {
-    if ((shouldDrawHand && tutorialEnd) || (!shouldDrawHand && hands)) {
+    if (hands[0]) {
       //se la mano non c'è o sta andando il tutorial blocco il counter
       console.log("counter va");
       if (detectedHand == i) {
@@ -337,16 +340,16 @@ function handCounter(detectedHand, shouldDrawHand, hands) {
           if (!shouldDrawHand && !isRedirecting) {
             //se sono nella home allora apre la pagina tree
             window.location.href = "tree.html";
-            console.log("ue");
             isRedirecting = true; //redirecting cambia così da fare un solo rindizziramento
           }
         }
       } else if (counters[i] > 0) {
         counters[i]--;
       }
-    } else console.log("counter non va");
+    } else if (counters[i] > 0) {
+      counters[i]--;
+    }
   });
-  console.log(counters);
 }
 
 function drawArc(value, loadingRadius, maxCounter) {
