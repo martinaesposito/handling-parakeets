@@ -31,22 +31,22 @@ let plat;
 let platforms = [];
 
 const branchPlatform = [
-  { value: 149, start: 0.3, end: 0.7, name: "usato.it" },
+  { value: 149, start: 0.6, end: 0.63, name: "usato.it" },
   { value: 14, start: 0.6, end: 0.8, name: "TrovaPet" },
   { value: 3, start: 0.9, end: 1, name: "petpappagalli" },
   { value: 44, start: 0.6, end: 0.65, name: "Telegram" },
   { value: 7, start: 0.9, end: 1, name: "animalissimo" },
   { value: 12, start: 0.6, end: 0.7, name: "Trovalosubito" },
-  { value: 11, start: 0.85, end: 0.9, name: "likesx" },
-  { value: 149, start: 0.6, end: 0.9, name: "FB pages" },
+  { value: 11, start: 0.9, end: 1, name: "likesx" },
+  { value: 149, start: 0.8, end: 0.85, name: "FB pages" },
   { value: 10, start: 0.6, end: 0.7, name: "Secondamano" },
   { value: 18, start: 0.9, end: 1, name: "AnimaleAmico" },
   { value: 14, start: 0.4, end: 0.6, name: "FB marketplace" },
-  { value: 177, start: 0.7, end: 0.9, name: "FB groups" },
-  { value: 19, start: 0.8, end: 0.9, name: "AAAnnunci" },
-  { value: 11, start: 0.5, end: 0.6, name: "trovacuccioli" },
-  { value: 3, start: 0.9, end: 1, name: "petfocus" },
-  { value: 94, start: 0.9, end: 1, name: "Clasf.it" },
+  { value: 177, start: 0.75, end: 0.85, name: "FB groups" },
+  { value: 19, start: 0.9, end: 1, name: "AAAnnunci" },
+  { value: 11, start: 0.33, end: 0.36, name: "trovacuccioli" },
+  { value: 3, start: 0.65, end: 0.7, name: "petfocus" },
+  { value: 94, start: 0.9, end: 0.95, name: "Clasf.it" },
 ];
 
 let pose;
@@ -203,7 +203,7 @@ window.setup = async () => {
       },
       end: {
         x: 0 + (width / 2.2) * cos(angle),
-        y: 0 + (height / 2.4) * sin(angle),
+        y: 0 + (height / 2.6) * sin(angle),
       },
     };
 
