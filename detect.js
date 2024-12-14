@@ -53,6 +53,8 @@ let escapeCounters = [
   0, // from Story
 ];
 
+let debugTimer = 0;
+
 export let handimages = [];
 let similarHand;
 let font;
@@ -69,6 +71,13 @@ const prak = "#C9FF4C";
 export let cursor;
 export let selectedPose;
 export let zoomFactor;
+
+// DOM cursor
+
+let loadingcircle;
+let loadingrects = [];
+
+let cursorcontainer;
 
 /////////////////////////////////////////////
 
@@ -132,6 +141,25 @@ export function setup() {
 
   if (backtotree) backtotree.style.visibility = "hidden";
   if (leftgradient) leftgradient.style.visibility = "hidden";
+
+  // setting up the loading circle
+
+  let precision = 64;
+  let radius = 40;
+  loadingcircle = document.getElementById('loading-circle');
+
+  let c = [...Array(precision)].map((_, i) => {
+    let a = -i/(precision-1)*Math.PI*2;
+    let x = Math.cos(a)*radius + 50;
+    let y = Math.sin(a)*radius + 50;
+    return `${x}% ${y}%`
+  })
+
+  if (loadingcircle) loadingcircle.style.clipPath = `polygon(100% 50%, 100% 100%, 0 100%, 0 0, 100% 0, 100% 50%, ${c.join(',')})`;
+
+  for (let i = 0; i < 4; i++) loadingrects[i] = document.getElementById('rect-' + (i + 1));
+
+  cursorcontainer = document.getElementById("loading-circle-container");
 }
 
 function goingBackToStart() {
@@ -143,6 +171,12 @@ function goingBackToStart() {
 
   if (escapeCounters[1] < maxCounter) {
     escapeCounters[1]++;
+    for (let i = 0; i < counters.length; i++) {
+      // stasis of counters
+  
+      if (counters[i] > 0) counters[i]--;
+    }
+    
   } else {
     if (!isRedirecting) backToStart();
   }
@@ -300,6 +334,10 @@ export function draw(shouldDrawHand = true) {
       leftgradient.style.animation = "disappear 1s forwards";
     }
   }
+
+  // moving the DOM cursor
+
+  if (cursor) cursorcontainer.style.transform = "translate(" + cursor.x / zoomFactor + "px," + cursor.y / zoomFactor + "px)";
 }
 
 //DISEGNO LE MANI
@@ -377,6 +415,28 @@ function handCounter({ detectedHand, shouldDrawHand, lock }) {
     } else if (counters[i] > 0) {
       counters[i]--;
     }
+
+    // counters applied to the DOM cursor loading bar
+
+    let cMapped = map(counters[detectedHand], 0, maxCounter, 0, 360);
+  
+    loadingrects.forEach( (rect, r) => {
+  
+      let rot_degrees = 270 - (90 * r);
+  
+      let curr_skew = rect.style.transform.replace("rotate(" + rot_degrees + "deg) skew(", "");
+      curr_skew = curr_skew.replace("deg)", "");
+  
+      let new_skew = cMapped - (90 * r);
+
+      if (new_skew < 0) new_skew = -1;
+      if (new_skew >= 90) new_skew = 90;
+  
+      rect.style.transform = "rotate(" + rot_degrees + "deg) skew(" + (-89 + new_skew) + "deg)";
+    });
+
+    // displaying the div itself
+    (detectedHand != null) ? cursorcontainer.style.display = "block" : cursorcontainer.style.display = "none";
   });
 }
 

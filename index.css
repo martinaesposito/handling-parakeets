@@ -145,6 +145,50 @@ canvas {
   font-size: var(--subtitle-eng);
 }
 
+/* CURSOR */
+#loading-circle-container {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 10;
+}
+#loading-circle {
+  width: 7vw;
+  height: 7vw;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  overflow: hidden;
+  z-index: 10;
+  background: transparent;
+}
+
+.loading-rectangle {
+  position: absolute;
+  width: 100vw;
+  height: 100vw;
+  background: var(--prak);
+  transform-origin: bottom left;
+  left: 50%;
+  bottom: 50%;
+  scale: -1 1;
+}
+
+#rect-1 {
+  
+}
+#rect-2 {
+  
+}
+#rect-3 {
+  
+}
+#rect-4 {
+  
+}
+
 /* INSTRUCTIONS */
 #ins-container {
   position: fixed;
