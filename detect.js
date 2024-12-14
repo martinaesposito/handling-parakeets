@@ -248,7 +248,7 @@ export function draw(shouldDrawHand = true) {
 
   // onhover of the divs that control going back to the start or to the tree
   if (backtotree && backtostart) {
-    console.log(escapeCounters);
+    // console.log(escapeCounters);
 
     if (cursor) {
       //se c'è il cursore e si trova sopra il coso destro

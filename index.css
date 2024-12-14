@@ -237,6 +237,16 @@ canvas {
     /* #87bdf3 20%, */ rgba(0, 0, 0, 0) 50%
   );
 }
+/* PLATFORM */
+.platform {
+  background-color: #ffffff;
+  font-size: var(--info);
+  font-family: IBMplex-mono;
+  text-align: center;
+  width: fit-content;
+  height: fit-content;
+  z-index: 5;
+}
 
 /* WARNING */
 #warning {

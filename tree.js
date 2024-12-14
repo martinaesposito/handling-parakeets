@@ -5,7 +5,10 @@ import {
   selectedPose,
   video,
   videoSize,
+  zoomFactor,
 } from "./detect.js";
+
+let branchPositions = [];
 
 //LOADING
 let loading = document.getElementById("loading");
@@ -23,6 +26,9 @@ let canvasReady = false;
 
 //BRANCHES
 let branchesss = [];
+
+let plat;
+let platforms = [];
 
 const branchPlatform = [
   { value: 149, start: 0.3, end: 0.7, name: "usato.it" },
@@ -231,6 +237,16 @@ window.setup = async () => {
 
   detectSetup();
   loading.style.display = "none"; //nascondo il loading
+
+  branchPlatform.forEach((branch, index) => {
+    plat = createDiv();
+    plat.class("platform");
+    plat.html(`${branch.name} [${branch.value}] `);
+    plat.id(branch.name);
+    platforms.push(plat);
+  });
+
+  console.log(platforms);
 };
 
 ///DRAW
@@ -238,20 +254,21 @@ window.draw = () => {
   // background(bg);
   clear();
   targetZ = selectedPose ? 450 : 800;
-
-  branchesss.forEach(({ bounds: { start, end } }, index) => {
-    // stroke("lightgray");
-    // strokeWeight(1);
-    // line(start.x, start.y, end.x, end.y);
-    // console.log(branchPlatform[index].start);
-    noStroke();
-    fill("black");
-    text(
-      `${window.listingsData[index].name} [${branchPlatform[index].value}] `,
-      end.x,
-      end.y
-    );
-  });
+  if (branchPositions.length > 0) {
+    branchesss.forEach((e, index) => {
+      platforms[index].position(
+        width / 2 +
+          branchPositions[index].x * (800 / z) -
+          platforms[index].width / 2,
+        height / 2 +
+          branchPositions[index].y * (800 / z) -
+          platforms[index].height / 2
+      );
+      selectedPose
+        ? platforms[index].style("animation", "disappear 1s forwards")
+        : platforms[index].style("animation", "appear 1s forwards");
+    });
+  }
 
   z += (targetZ - z) * 0.1;
   if (canvasReady) {
@@ -275,10 +292,6 @@ window.draw = () => {
   }
 
   if (selectedPose) {
-    // textAlign(CENTER);
-    // fill("black");
-    // text(selectedPose, 0, cH / 2 + cH / 10);
-
     changeStory();
   } else {
     storyIntro.style("display", "none");
@@ -308,19 +321,43 @@ function generateBranchDots(branches) {
     const branchDots = [];
     const items = window.listingsData[bIndex].items;
 
+    const branchAngle = atan2(
+      branch.bounds.end.y - branch.bounds.start.y,
+      branch.bounds.end.x - branch.bounds.start.x
+    );
+    const perpAngle = branchAngle + HALF_PI;
+
+    // Generate a single t value for this entire branch
+    const branchT = random(
+      branchPlatform[bIndex].start,
+      branchPlatform[bIndex].end
+    );
+
+    const baseX = lerp(branch.bounds.start.x, branch.bounds.end.x, branchT);
+    const baseY = lerp(branch.bounds.start.y, branch.bounds.end.y, branchT);
+    const offset = randomGaussian() * 50;
+
+    // Calculate position and store it
+    const commonX = baseX + cos(perpAngle) * offset;
+    const commonY = baseY + sin(perpAngle) * offset;
+
+    branchPositions.push({ x: commonX, y: commonY });
+
     items.forEach((item, i) => {
       const dot = new Dot(
-        { ...branch, index: bIndex },
+        { ...branch, index: bIndex, branchT },
         allDots.length + branchDots.length,
         random(12.5, 15),
-        item, // Pass the full item data
-        imageMap
+        item,
+        imageMap,
+        { x: commonX, y: commonY } // Pass the calculated position
       );
       branchDots.push(dot);
     });
 
     allDots.push(...branchDots);
   });
+
   return allDots;
 }
 

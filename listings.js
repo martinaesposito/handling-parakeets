@@ -1,6 +1,10 @@
 import { cursor, zoomFactor, selectedPose } from "./detect.js";
 import { playing, isPlaying, hasPlayed } from "./tree.js";
 
+export let platX;
+export let platY;
+export let branchIndex;
+
 export class Dot {
   static colors = [
     //colors
@@ -14,27 +18,13 @@ export class Dot {
   ];
 
   //CONTSTRUCTOR
-  constructor(branch, index, radius, itemData, imageMap) {
+  constructor(branch, index, radius, itemData, imageMap, position) {
     this.branch = branch.index;
 
-    //POSITIONING
-    const t = random(0.6, 1); //percentuale di tutto il ramo occupata dai punti
-    const branchAngle = atan2(
-      branch.end.y - branch.start.y,
-      branch.end.x - branch.start.x
-    );
-    const baseX = lerp(branch.start.x, branch.end.x, t);
-    const baseY = lerp(branch.start.y, branch.end.y, t);
-
-    const perpAngle = branchAngle + HALF_PI;
-    const offset = randomGaussian() * 50; //spread
-
-    this.pos = createVector(
-      baseX + cos(perpAngle) * offset,
-      baseY + sin(perpAngle) * offset
-    );
-    this.basePos = createVector(baseX, baseY);
-    this.originalPos = this.basePos; //creo una copia della posizione originale
+    // Use the provided position
+    this.pos = createVector(position.x, position.y);
+    this.basePos = createVector(position.x, position.y);
+    this.originalPos = this.basePos.copy(); // Copy original position
 
     // PROPERTIES
     this.index = index;
