@@ -263,7 +263,6 @@ export function draw(shouldDrawHand = true) {
         goingBackToStart();
         restart = true;
         //console.log(escapeCounters[1]);
-        handCounter({ lock: true });
       } else {
         restart = false;
         if (escapeCounters[1] > 0) escapeCounters[1] = 0;
