@@ -202,8 +202,8 @@ window.setup = async () => {
         y: 0,
       },
       end: {
-        x: 0 + (width / 2.4) * cos(angle),
-        y: 0 + (height / 2.7) * sin(angle),
+        x: 0 + (width / 2.2) * cos(angle),
+        y: 0 + (height / 2.4) * sin(angle),
       },
     };
 
