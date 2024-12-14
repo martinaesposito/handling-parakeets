@@ -257,9 +257,9 @@ window.draw = () => {
   if (branchPositions.length > 0) {
     branchesss.forEach(({ bounds: { start, end } }, index) => {
       //  disegno i rami
-      stroke("lightgray");
-      strokeWeight(1);
-      line(start.x, start.y, end.x, end.y);
+      // stroke("lightgray");
+      // strokeWeight(1);
+      // line(start.x, start.y, end.x, end.y);
       // disegno i div
       platforms[index].position(
         width / 2 +
