@@ -116,7 +116,7 @@ window.preload = async () => {
   ///
   // prendo tutti i listings dal json
   try {
-    const response = await fetch("listings.json"); //carico tutti i listings
+    const response = await fetch("json/listings.json"); //carico tutti i listings
     const jsonData = await response.json();
 
     window.listingsData = branchPlatform.map((config) => ({
