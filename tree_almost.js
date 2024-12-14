@@ -337,25 +337,27 @@ function generateBranchDots(branches) {
     const baseY = lerp(branch.bounds.start.y, branch.bounds.end.y, branchT);
     const offset = randomGaussian() * 50;
 
-    // Store the calculated position for this branch
-    branchPositions.push({
-      x: baseX + cos(perpAngle) * offset,
-      y: baseY + sin(perpAngle) * offset,
-    });
+    // Calculate position and store it
+    const commonX = baseX + cos(perpAngle) * offset;
+    const commonY = baseY + sin(perpAngle) * offset;
+
+    branchPositions.push({ x: commonX, y: commonY });
 
     items.forEach((item, i) => {
       const dot = new Dot(
         { ...branch, index: bIndex, branchT },
         allDots.length + branchDots.length,
         random(12.5, 15),
-        item, // Pass the full item data
-        imageMap
+        item,
+        imageMap,
+        { x: commonX, y: commonY } // Pass the calculated position
       );
       branchDots.push(dot);
     });
 
     allDots.push(...branchDots);
   });
+
   return allDots;
 }
 
