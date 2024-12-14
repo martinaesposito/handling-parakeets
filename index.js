@@ -98,7 +98,7 @@ window.setup = async () => {
       i < images.length ? images[i] : images[floor(random(images.length))];
     let img = {
       img: immg,
-      size: random(5, 15),
+      size: random(12.5, 15),
       c: random(colors),
       type: random() > 0.5 ? "image" : "rect",
     };
