@@ -16,6 +16,8 @@
       crossorigin="anonymous"
     ></script>
 
+    <link rel="manifest" href="manifest.json" />
+
     <script src="libraries/p5.min.js"></script>
     <script src="libraries/p5.sound.min.js"></script>
 
@@ -38,9 +40,11 @@
       class="show"
       src="assets/tutorial.mp4"
       autoplay
-      muted
       playsinline
-    ></video>
+      muted
+    >
+      <!-- da rimuovere il muted quando poi si scarica il manifest-->
+    </video>
 
     <!-- INSTRUCTIONS TOP-->
     <div id="gradient-left"></div>

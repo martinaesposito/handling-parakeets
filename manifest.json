@@ -1,0 +1,44 @@
+{
+  "short_name": "Handling parakeets",
+  "name": "Handling parakeets",
+  "icons": [
+    {
+      "src": "assets/manifest/192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "assets/manifest/512.png",
+      "type": "image/png",
+      "sizes": "511x512"
+    }
+  ],
+  "id": "/?source=pwa",
+  "start_url": "/?source=pwa",
+  "background_color": "#C9FF4C",
+  "display": "fullscreen",
+  "scope": "/",
+  "theme_color": "rgba(0,0,0,0.5)",
+
+  "description": "How do humans interact with parakeets in the italian online trading market?",
+  "screenshots": [
+    {
+      "src": "assets/manifest/home.png",
+      "type": "image/png",
+      "sizes": "569x321",
+      "form_factor": "wide"
+    },
+    {
+      "src": "assets/manifest/posa.png",
+      "type": "image/png",
+      "sizes": "569x321",
+      "form_factor": "narrow"
+    },
+    {
+      "src": "assets/manifest/screensaver.png",
+      "type": "image/png",
+      "sizes": "569x321",
+      "form_factor": "narrow"
+    }
+  ]
+}

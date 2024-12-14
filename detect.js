@@ -36,6 +36,8 @@ let counters = [
   0, //shell
   0, //TouchingTips
 ];
+let restartImg;
+let treeImg;
 
 let backtostart; // id: ins-2, button / div to go back to screensaver
 let backtotree; // id: ins-1, button / div to go back to stories
@@ -93,12 +95,15 @@ export async function preload() {
       () => {
         handimages[i] = img;
       },
-      console.warn(`Failed to load image: ${i}.png`) //warn + fallback if fails
+      console.warn(`Failed to load image: ${i}.svg`) //warn + fallback if fails
     );
   }
 
   //json
   handsData = await importJSON("json/training.json");
+
+  restartImg = loadImage("assets/instructions/restart2.svg");
+  treeImg = loadImage("assets/instructions/back2.svg");
 }
 
 async function importJSON(path) {
@@ -126,8 +131,15 @@ export function setup() {
   if (leftgradient) leftgradient.style.visibility = "hidden";
 }
 
+let restart = false;
+let market = false;
+
 function goingBackToStart() {
   let maxCounter = 200;
+  counters = counters.map(() => 0); // Reset all counters in the counters array
+  selectedPose = undefined; // Reset the selected pose
+
+  drawArc(escapeCounters[1], 45 * zoomFactor, maxCounter); // Draw the new arc
 
   if (escapeCounters[1] < maxCounter) {
     escapeCounters[1]++;
@@ -137,16 +149,13 @@ function goingBackToStart() {
 }
 
 function goingBackToTree() {
-  let maxCounter = 100;
+  let maxCounter = 200;
 
+  drawArc(escapeCounters[2], 45 * zoomFactor, maxCounter); // Draw the new arc
   if (escapeCounters[2] < maxCounter) {
     escapeCounters[2]++;
   } else {
-    for (let i = 0; i < counters.length; i++) {
-      // pose reset and counters to 0
-
-      counters[i] = 0;
-    }
+    counters = counters.map(() => 0);
     selectedPose = undefined;
     escapeCounters[2] = 0;
   }
@@ -188,6 +197,8 @@ export function draw(shouldDrawHand = true) {
     if (!shouldDrawHand) {
       //nella home disegno la mano in posa 3
       similarHand = 3;
+      restart = false;
+      market = false;
     }
 
     handCounter({
@@ -196,12 +207,19 @@ export function draw(shouldDrawHand = true) {
       lock: !!selectedPose,
     });
 
+    let imggg = restart
+      ? restartImg
+      : market
+      ? treeImg
+      : handimages[similarHand + 1];
+
+    // console.log(restart, market);
     image(
-      handimages[similarHand + 1],
+      imggg,
       cursor.x,
       cursor.y,
-      (handimages[similarHand + 1].width / 3) * 2 * zoomFactor,
-      (handimages[similarHand + 1].height / 3) * 2 * zoomFactor
+      (imggg.width / 3) * 2 * zoomFactor,
+      (imggg.height / 3) * 2 * zoomFactor
     );
 
     pop();
@@ -227,19 +245,25 @@ export function draw(shouldDrawHand = true) {
 
   // onhover of the divs that control going back to the start or to the tree
   if (backtotree && backtostart) {
+    console.log(escapeCounters);
+
     if (cursor) {
+      //se c'è il cursore e si trova sopra il coso destro
       if (
         cursor.x >
           (windowWidth / 2 - windowWidth / 50 - backtostart.offsetWidth) *
             zoomFactor &&
         cursor.y <
           backtostart.offsetHeight -
-            (windowHeight / 2 - windowHeight / 50) * zoomFactor
+            (windowHeight / 2 - windowHeight / 25) * zoomFactor
       ) {
         goingBackToStart();
-        console.log(escapeCounters[1]);
+        restart = true;
+        //console.log(escapeCounters[1]);
+        handCounter({ lock: true });
       } else {
-        if (escapeCounters[1] > 0) escapeCounters[1]--;
+        restart = false;
+        if (escapeCounters[1] > 0) escapeCounters[1] = 0;
       }
 
       if (
@@ -249,12 +273,15 @@ export function draw(shouldDrawHand = true) {
             zoomFactor &&
         cursor.y <
           backtotree.offsetHeight -
-            (windowHeight / 2 - windowHeight / 50) * zoomFactor
+            (windowHeight / 2 - windowHeight / 25) * zoomFactor // aumento leggermente il margine in alto - che sarebbe wisth/50= 2vw così da avere più margine per lo spostamento
       ) {
         goingBackToTree();
-        console.log(escapeCounters[2]);
+        market = true;
+        //console.log(escapeCounters[2]);
       } else {
-        if (escapeCounters[2] > 0) escapeCounters[2]--;
+        market = false;
+        if (escapeCounters[2] > 0) escapeCounters[2] = 0; //se esco dal counter scende
+        // console.log("escapeCounters[2]" + escapeCounters[2]);
       }
     }
 
@@ -316,16 +343,15 @@ const drawHands = (shouldDrawHand) => {
 // HAND COUNTER
 let isRedirecting = false; //flag per fare una sola call quando cambia pagina
 function handCounter({ detectedHand, shouldDrawHand, lock }) {
-  console.log(lock);
-  if (tutorialEnd === false || lock) return;
-
   const maxCounter = 150; // Maximum counter value
-  const loadingRadius = 60 * zoomFactor; // Radius of the loading circle
+  const loadingRadius = 45 * zoomFactor; // Radius of the loading circle
+  // console.log(lock);
+  if (tutorialEnd === false || lock) return;
 
   counters.forEach((e, i) => {
     if (hands[0]) {
       //se la mano non c'è o sta andando il tutorial blocco il counter
-      console.log("counter va");
+      //console.log("counter va");
       if (detectedHand == i) {
         // Only increment if not already at max
         if (counters[detectedHand] < maxCounter) {
@@ -362,7 +388,7 @@ function drawArc(value, loadingRadius, maxCounter) {
   push();
   noFill();
   strokeWeight(8 * zoomFactor);
-  stroke("#C9FF4C");
+  stroke(prak);
   arc(
     cursor.x,
     cursor.y,

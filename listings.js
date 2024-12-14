@@ -266,7 +266,7 @@ export class Dot {
 
     const d = dist(cursor?.x, cursor?.y, this.pos.x, this.pos.y);
 
-    const hoverThreshold = (this.baseRadius * 3) / 2;
+    const hoverThreshold = this.baseRadius * 2;
     this.isHovered = d < hoverThreshold;
     const targetRadius = this.isHovered ? this.baseRadius * 5 : this.baseRadius; //se l'oggetto viene hoverato aumentail raggio
     this.radius += (targetRadius - this.radius) * 0.1;
