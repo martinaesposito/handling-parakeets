@@ -213,6 +213,9 @@ export function draw(shouldDrawHand = true) {
       ? treeImg
       : handimages[similarHand + 1];
 
+    // let imgHtml= document.getElementById("imgCursor")
+    // imgHtml.src=imggg
+
     // console.log(restart, market);
     image(
       imggg,
