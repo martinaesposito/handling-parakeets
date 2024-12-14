@@ -36,6 +36,9 @@ let counters = [
   0, //shell
   0, //TouchingTips
 ];
+
+let restart = false;
+let market = false;
 let restartImg;
 let treeImg;
 
@@ -130,9 +133,6 @@ export function setup() {
   if (backtotree) backtotree.style.visibility = "hidden";
   if (leftgradient) leftgradient.style.visibility = "hidden";
 }
-
-let restart = false;
-let market = false;
 
 function goingBackToStart() {
   let maxCounter = 200;
