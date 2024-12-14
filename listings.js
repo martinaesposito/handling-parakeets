@@ -18,34 +18,25 @@ export class Dot {
   ];
 
   //CONTSTRUCTOR
-  constructor(branch, index, radius, itemData, imageMap) {
+  constructor(
+    branch,
+    index,
+    radius,
+    itemData,
+    imageMap,
+    basePosition,
+    finalPosition
+  ) {
     this.branch = branch.index;
 
-    //POSITIONING
-    const t = branch.branchT; //percentuale di tutto il ramo occupata dai punti
-    const branchAngle = atan2(
-      branch.end.y - branch.start.y,
-      branch.end.x - branch.start.x
-    );
-    const baseX = lerp(branch.start.x, branch.end.x, t);
-    const baseY = lerp(branch.start.y, branch.end.y, t);
+    // Base position along the branch (without offset)
+    this.basePos = createVector(basePosition.x, basePosition.y);
 
-    const perpAngle = branchAngle + HALF_PI;
-    const offset = randomGaussian() * 50; //spread
+    // Final position with offset applied
+    this.pos = createVector(finalPosition.x, finalPosition.y);
 
-    this.pos = createVector(
-      baseX + cos(perpAngle) * offset,
-      baseY + sin(perpAngle) * offset
-    );
-
-    platX = baseX + cos(perpAngle) * offset;
-    platY = baseY + sin(perpAngle) * offset;
-    branchIndex = branch.index;
-
-    baseY + sin(perpAngle) * offset;
-    this.basePos = createVector(baseX, baseY);
-    this.originalPos = this.basePos; //creo una copia della posizione originale
-
+    // Original position copy
+    this.originalPos = this.basePos.copy();
     // PROPERTIES
     this.index = index;
 

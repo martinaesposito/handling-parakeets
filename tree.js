@@ -255,7 +255,12 @@ window.draw = () => {
   clear();
   targetZ = selectedPose ? 450 : 800;
   if (branchPositions.length > 0) {
-    branchesss.forEach((e, index) => {
+    branchesss.forEach(({ bounds: { start, end } }, index) => {
+      //  disegno i rami
+      stroke("lightgray");
+      strokeWeight(1);
+      line(start.x, start.y, end.x, end.y);
+      // disegno i div
       platforms[index].position(
         width / 2 +
           branchPositions[index].x * (800 / z) -
@@ -333,23 +338,28 @@ function generateBranchDots(branches) {
       branchPlatform[bIndex].end
     );
 
+    // Base position along the branch (no offset)
     const baseX = lerp(branch.bounds.start.x, branch.bounds.end.x, branchT);
     const baseY = lerp(branch.bounds.start.y, branch.bounds.end.y, branchT);
+
+    // Final position with perpendicular offset
     const offset = randomGaussian() * 50;
+    const commonX = baseX + cos(perpAngle) * offset;
+    const commonY = baseY + sin(perpAngle) * offset;
 
-    // Store the calculated position for this branch
-    branchPositions.push({
-      x: baseX + cos(perpAngle) * offset,
-      y: baseY + sin(perpAngle) * offset,
-    });
+    // Store the final position in branchPositions
+    branchPositions.push({ x: baseX, y: baseY });
 
+    // Create dots
     items.forEach((item, i) => {
       const dot = new Dot(
         { ...branch, index: bIndex, branchT },
         allDots.length + branchDots.length,
         random(12.5, 15),
-        item, // Pass the full item data
-        imageMap
+        item,
+        imageMap,
+        { x: baseX, y: baseY }, // Base position
+        { x: commonX, y: commonY } // Final position
       );
       branchDots.push(dot);
     });
