@@ -125,7 +125,7 @@ canvas {
   height: 100vh;
 
   object-fit: cover;
-  z-index: 15;
+  z-index: 20;
 }
 #tutorial.show {
   display: block;
@@ -261,8 +261,8 @@ canvas {
   position: absolute;
   left: 0px;
   top: 0px;
-  width: 60%;
-  height: 30%;
+  width: 50vw;
+  height: 25vh;
 
   background: radial-gradient(
     ellipse at top left,
@@ -277,8 +277,8 @@ canvas {
   transform: translate(-100%, 0px);
   overflow: hidden;
   top: 0px;
-  width: 60%;
-  height: 30%;
+  width: 50vw;
+  height: 25vh;
   z-index: 4;
   /* lo metto leggermente sotto alle ins ma comunque sopra la canvas */
 
@@ -304,7 +304,7 @@ canvas {
 
 /* PLATFORM */
 .platform {
-  background-color: #ffffff;
+  background-color: var(--bg-grey);
   font-size: var(--info);
   font-family: IBMplex-mono;
   text-align: center;
