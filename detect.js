@@ -292,12 +292,18 @@ export function draw(shouldDrawHand = true) {
 
   // reset the counter when no action
   loadingrects.forEach((rect, r) => {
-    if (selectedPose && !market && !restart)
-      rect.style.transform =
-        "rotate(" + (270 - 90 * (r % 4)) + "deg) skew(" + -90 + "deg)";
+    if (selectedPose && !market && !restart) {
+      console.log("hidden")
+      // rect.style.transform =
+      //   "rotate(" + (270 - 90 * (r % 4)) + "deg) skew(" + -90 + "deg)";
+      rect.style.opacity = 0;
+    } else{ 
+      rect.style.opacity = 1;
+      console.log("visible")
+  }
   });
 
-  console.log(similarHand, cursorImages);
+  // console.log(selectedPose);
 }
 
 //DISEGNO LE MANI
@@ -434,7 +440,7 @@ function goingBackToStart(maxCounter) {
   !selectedPose ? (counters = counters.map(() => 0)) : null; // Reset all counters in the counters array
   // selectedPose = undefined; // Reset the selected pose
 
-  console.log(counters, selectedPose);
+  // console.log(counters, selectedPose);
   drawDOMArc(escapeCounters[1], maxCounter);
 
   if (escapeCounters[1] < maxCounter) {
