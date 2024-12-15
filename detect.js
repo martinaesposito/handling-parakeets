@@ -152,6 +152,8 @@ export function setup() {
 
 //DRAW
 export function draw(shouldDrawHand = true) {
+  let index;
+  
   if (!video) return; //se non c'è il video non va
 
   //VIDEO
@@ -194,11 +196,13 @@ export function draw(shouldDrawHand = true) {
       lock: !!selectedPose,
     });
 
-    let index = restart
+    index = restart
       ? 8
       : market
       ? 7
-      : similarHand;
+      : !shouldDrawHand
+      ? 9
+      : similarHand
     cursorImages.forEach((image, i) => {
       image.style.display = (i == index) ? "block" : "none";
     })
@@ -313,13 +317,19 @@ export function draw(shouldDrawHand = true) {
 
   // reset the counter when no action
   loadingrects.forEach((rect, r) => {
-    if (selectedPose && !market && !restart) {
 
+    if (index != 9) {
+      if (selectedPose && !market && !restart) {
+
+        rect.style.opacity = 0;
+      } else {
+
+        rect.style.opacity = 1;
+      }
+    } else if (shouldDrawHand) // making the loading invisible while in the 9th pose in all cases but the screensaver
       rect.style.opacity = 0;
-    } else { 
 
-      rect.style.opacity = 1;
-    }
+    console.log(index);
   });
 }
 
@@ -358,7 +368,7 @@ const drawHands = (shouldDrawHand) => {
       const minDifference = Math.min(...differences);
       console.log(...differences);
       if (!similarHand || shouldDrawHand) {
-        let treshold = 500;
+        let treshold = 300;
         similarHand = (minDifference <= treshold) ? differences.indexOf(minDifference) : 9;
       }
     }
