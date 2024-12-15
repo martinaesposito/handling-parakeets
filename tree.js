@@ -64,7 +64,9 @@ let imageMap = {}; // Map images by their filename
 
 export let tutorialEnd = tutorial ? false : undefined;
 
-tutorialEnd = true; // RIMUOVERE, PER TESTING
+// tutorialEnd = true;
+// RIMUOVERE, PER TESTING
+console.log(tutorialEnd, tutorial);
 
 tutorial?.addEventListener("ended", () => {
   tutorial.style.animation = "disappear 0.5s forwards";

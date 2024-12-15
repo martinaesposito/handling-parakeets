@@ -1,6 +1,6 @@
 ### Handling Parakeets
 
-🦜🦜🦜</br></br>
+🦜🦜🦜</br>
 
 Martina Esposito</br>
 Giulia Grassi</br>
