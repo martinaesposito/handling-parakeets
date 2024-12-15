@@ -12,7 +12,7 @@ let handLandmarker, imageSegmenter, labels;
 
 let hands = []; //mano detectata da mediapipe
 
-let handsData; //json con le pose
+let handsData = []; //json con le pose
 
 // VIDEO DELLA PERSONA AL CENTRO
 export let video;
@@ -206,7 +206,6 @@ export function draw(shouldDrawHand = true) {
       shouldDrawHand,
       lock: selectedPose !== undefined,
     });
-
 
     index = restart ? 8 : market ? 7 : !shouldDrawHand ? 9 : similarHand;
     cursorImages.forEach((image, i) => {
@@ -508,7 +507,9 @@ function escapeTree(maxCounter) {
       // warning.style.opacity = "0.4";
 
       endCounter
-        ? (endCounter.innerHTML = Math.floor(maxCounter / 1000) - Math.floor(escapeCounters[0] / 1000))
+        ? (endCounter.innerHTML =
+            Math.floor(maxCounter / 1000) -
+            Math.floor(escapeCounters[0] / 1000))
         : null;
     }
   } else if (!isRedirecting) backToStart();

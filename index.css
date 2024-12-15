@@ -101,7 +101,7 @@ canvas {
 
   gap: var(--spacer3);
 
-  z-index: 10;
+  z-index: 20;
 }
 #loading-img {
   height: var(--img-height);
@@ -123,6 +123,21 @@ canvas {
 }
 #tutorial.show {
   display: block;
+}
+
+.video-controls {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: var(--spacer3);
+  width: 100%;
+  z-index: 21;
+}
+
+#progress {
+  height: 100%;
+  background-color: var(--prak);
+  transform-origin: top left;
 }
 
 /* SUBTITLE */
@@ -468,5 +483,14 @@ canvas {
   }
   40% {
     transform: rotate(0deg);
+  }
+}
+
+@keyframes pippo {
+  from {
+    transform: scale(0, 1);
+  }
+  to {
+    transform: scale(1, 1);
   }
 }

@@ -7,13 +7,13 @@ export let branchIndex;
 export class Dot {
   static colors = [
     //colors
-    "#87BDF3",
-    "#7DE44A",
-    "#BDFF91",
-    "#2CA02C",
-    "#FCFF5C",
-    "#009DB8",
-    "#2E7F2E",
+    // "#D4FF5F",
+    // "#B0FF7B",
+    "#68EA28",
+    "#34DC74",
+    "#1EBF2B",
+    "#198E3E",
+    "#00755F",
   ];
 
   static cachedImages = {};
@@ -128,17 +128,22 @@ export class Dot {
 
   //DRAW
   draw(currentPose) {
-    // if (this.itemData.Hand == "Hand") {
-    //   stroke("#C9FF4C"); //colora le immagini con la mano
-    //   strokeWeight(3);
-    // } else {
-    noStroke(); //se non ce l'hanno niente
-    // }
+    if (this.itemData.Hand == "Hand") {
+      stroke("black");
+      stroke("#C9FF4C"); //colora le immagini con la mano
+      strokeWeight(3);
+    } else {
+      noStroke(); //se non ce l'hanno niente
+    }
 
     if (!this.shouldHighlight(currentPose)) {
       fill(this.color);
       rect(this.pos.x, this.pos.y, this.radius); //rect per disegnare il bordo, + 3 per disegnarlo esterno
     } else if (this.image) {
+      stroke("#C9FF4C"); //colora le immagini con la mano
+      strokeWeight(2);
+      noFill();
+      rect(this.pos.x, this.pos.y, this.radius + 0.5);
       image(this.image, this.pos.x, this.pos.y, this.radius, this.radius);
     }
 
@@ -212,7 +217,14 @@ export class Dot {
     }
 
     //this.div.position(screenPos.x + divxoffset, screenPos.y + divyoffset);
-    this.div.style("transform", "translate(" + (screenPos.x + divxoffset) + "px, " + (screenPos.y + divyoffset) + "px)");
+    this.div.style(
+      "transform",
+      "translate(" +
+        (screenPos.x + divxoffset) +
+        "px, " +
+        (screenPos.y + divyoffset) +
+        "px)"
+    );
   }
 
   //MOVE

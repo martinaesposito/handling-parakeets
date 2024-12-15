@@ -18,6 +18,8 @@ let tutorial = document.getElementById("tutorial");
 export let warning = document.getElementById("warning");
 export let endCounter = document.getElementById("endCounter");
 let imgLoading = document.getElementById("loading-img");
+// progressbar
+let progressBar = document.getElementById("progress");
 
 imgLoading.src =
   "assets/loading/" + Math.floor(Math.random() * 8 + 1).toString() + ".gif";
@@ -63,15 +65,20 @@ const handPoses = [
 let imageMap = {}; // Map images by their filename
 
 export let tutorialEnd = tutorial ? false : undefined;
-
 // tutorialEnd = true;
 // RIMUOVERE, PER TESTING
-console.log(tutorialEnd, tutorial);
+// console.log(tutorialEnd, tutorial);
 
-tutorial?.addEventListener("ended", () => {
-  tutorial.style.animation = "disappear 0.5s forwards";
-  tutorialEnd = true;
-});
+if (tutorial) {
+  const duration = tutorial.duration + "s";
+  progressBar.style.animation = "pippo " + duration + " linear forwards";
+
+  tutorial.addEventListener("ended", () => {
+    tutorial.style.animation = "disappear 0.5s forwards";
+    progressBar.style.animation = "disappear 0.5s forwards";
+    tutorialEnd = true;
+  });
+}
 
 let dots = [];
 let listingsDataReady = false;

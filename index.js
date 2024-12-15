@@ -21,13 +21,13 @@ let images = [];
 
 // colori dei rettangolini alernativi alle immagini
 const colors = [
-  "#87BDF3",
-  "#7DE44A",
-  "#BDFF91",
-  "#2CA02C",
-  "#FCFF5C",
-  "#009DB8",
-  "#2E7F2E",
+  // "#D4FF5F",
+  "#B0FF7B",
+  "#68EA28",
+  "#34DC74",
+  "#1EBF2B",
+  "#198E3E",
+  "#00755F",
 ];
 
 import {
@@ -52,34 +52,33 @@ window.preload = async () => {
   font = loadFont("assets/fonts/IBM_Plex_Sans/IBMPlexSans-Regular.ttf");
 
   //immaginine piccole
-  const BATCH_SIZE = 50;
-  for (let batch = 0; batch < Math.ceil(885 / BATCH_SIZE); batch++) {
-    const batchPromises = [];
-    const start = batch * BATCH_SIZE + 2;
-    const end = Math.min(start + BATCH_SIZE, 887);
+  // const BATCH_SIZE = 50;
+  // for (let batch = 0; batch < Math.ceil(885 / BATCH_SIZE); batch++) {
+  //   const batchPromises = [];
+  //   const start = batch * BATCH_SIZE + 2;
+  //   const end = Math.min(start + BATCH_SIZE, 887);
 
-    for (let i = start; i < end; i++) {
-      const imagePromise = new Promise((resolve) => {
-        // OPTIMIZATION: Use smaller image formats and sizes when possible
-       loadImage(
-          `assets/image-compress/${i}.webp`,
-          (img) => resolve(img),
-          () => resolve(null)
-        );
-      });
-      batchPromises.push(imagePromise);
-    }
+  //   for (let i = start; i < end; i++) {
+  //     const imagePromise = new Promise((resolve) => {
+  //       // OPTIMIZATION: Use smaller image formats and sizes when possible
+  //       loadImage(
+  //         `assets/image_ultra-compress/${i}.webp`,
+  //         (img) => resolve(img),
+  //         () => resolve(null)
+  //       );
+  //     });
+  //     batchPromises.push(imagePromise);
+  //   }
 
-    const batchResults = await Promise.all(batchPromises);
-    images.push(...batchResults.filter((img) => img !== null));
-  }
+  //   const batchResults = await Promise.all(batchPromises);
+  //   images.push(...batchResults.filter((img) => img !== null));
+  // }
 
-  detectPreload();
+  // detectPreload();
 };
 
 // SETUP
 window.setup = () => {
-  
   detectSetup();
   // CANVAS
   p5 = createCanvas(windowWidth, windowHeight, WEBGL);
@@ -94,7 +93,7 @@ window.setup = () => {
   // Measure text bounds
   bounds1 = font.textBounds("Handling", 0, 0, fontSize);
   bounds2 = font.textBounds("Parakeets", 0, 0, fontSize);
-  const sampleFactor = 0.25;
+  const sampleFactor = 0.175;
 
   // Get points with translation and add points to array
   points = [
@@ -112,7 +111,7 @@ window.setup = () => {
       img: i < images.length ? images[i] : images[floor(random(images.length))], //prima prende le immagini in ordine ma se finiscono ne prende altre a caso,
       size: random(12.5, 15),
       c: random(colors),
-      type: random() > 0.5 ? "image" : "rect",
+      type: random() > 0.9 ? "image" : "rect",
     };
     imgPoints.push(img);
 
@@ -176,7 +175,6 @@ window.draw = () => {
     currentPositions[i].x += velocities[i].x;
     currentPositions[i].y += velocities[i].y;
 
-    noStroke();
     // VERSIONE CON IMMAGINI + RECT
     // if (imgPoints[i].type == "image") {
     //   // Draw image
@@ -208,6 +206,10 @@ window.draw = () => {
     //   imgPoints[i].size
     // );
     // noStroke();
+    if (imgPoints[i].type == "image") {
+      stroke("#C9FF4C");
+      strokeWeight(3);
+    } else noStroke();
 
     // VERSIONE CON SOLO RETTANGOLINI
     fill(imgPoints[i].c);
