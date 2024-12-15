@@ -59,7 +59,7 @@ let escapeCounters = [
 const prak = "#C9FF4C";
 
 export let handimages = []; //!!! per ora questa non si può togliere
-let handimagessrc = []; // svg di tutte le pose
+// let handimagessrc = []; // svg di tutte le pose
 
 let similarHand;
 export let selectedPose;
@@ -68,11 +68,12 @@ export let zoomFactor;
 
 // CURSOR
 export let cursor;
-let loadingcircle;
+
+let loadingcircles;
 let loadingrects = [];
 
 let cursorcontainer = document.getElementById("loading-circle-container"); //div che contiene l'immagine con il cerchio di caricamento
-let cursorImage = document.getElementById("cursor-image"); //div che contiene l'immagine
+let cursorImages = document.getElementsByClassName("cursor-image"); //div che contiene l'immagine
 
 /////////////////////////////////////////////
 
@@ -93,9 +94,9 @@ async function createHandLandmarker() {
 
 //PRELOAD
 export async function preload() {
-  for (let i = 1; i <= handPoses.length; i++) {
-    handimagessrc[i] = `assets/cursor/${i}.svg`;
-  }
+  // for (let i = 1; i <= handPoses.length; i++) {
+  //   handimagessrc[i] = `assets/cursor/${i}.svg`;
+  // }
 
   //json
   handsData = await importJSON("json/training.json");
@@ -125,24 +126,26 @@ export function setup() {
 
   // LOADING CIRCLE
   let precision = 64;
-  let radius = 40;
-  loadingcircle = document.getElementById("loading-circle");
+  loadingcircles = document.getElementsByClassName("loading-circle");
 
-  let c = [...Array(precision)].map((_, i) => {
-    let a = (-i / (precision - 1)) * Math.PI * 2;
-    let x = Math.cos(a) * radius + 50;
-    let y = Math.sin(a) * radius + 50;
-    return `${x}% ${y}%`;
+  loadingcircles.forEach((circle, i) => {
+    let radius = 40 - (1*i);
+
+    let c = [...Array(precision)].map((_, i) => {
+      let a = (-i / (precision - 1)) * Math.PI * 2;
+      let x = Math.cos(a) * radius + 50;
+      let y = Math.sin(a) * radius + 50;
+      return `${x}% ${y}%`;
+    });
+  
+    if (circle)
+      circle.style.clipPath = `polygon(100% 50%, 100% 100%, 0 100%, 0 0, 100% 0, 100% 50%, ${c.join(
+        ","
+      )})`;
+
+    for (let j = i*4; j < 4 + 4*i; j++)
+    loadingrects[j] = circle.querySelector(".rect-" + (j - (i*4) + 1));
   });
-
-  if (loadingcircle)
-    loadingcircle.style.clipPath = `polygon(100% 50%, 100% 100%, 0 100%, 0 0, 100% 0, 100% 50%, ${c.join(
-      ","
-    )})`;
-
-  for (let i = 0; i < 4; i++) {
-    loadingrects[i] = document.getElementById("rect-" + (i + 1));
-  }
 }
 
 //DRAW
@@ -189,12 +192,16 @@ export function draw(shouldDrawHand = true) {
       lock: !!selectedPose,
     });
 
-    let imgggSrc = restart
-      ? restartImgSrc
+    let index = restart
+      ? 8
       : market
-      ? treeImgSrc
-      : handimagessrc[similarHand + 1];
-    cursorImage.src = imgggSrc;
+      ? 7
+      : similarHand;
+    cursorImages.forEach((image, i) => {
+      image.style.display = (i == index) ? "block" : "none";
+    })
+    
+    // console.log(cursorImage);
     pop();
 
     // fill(prak);
@@ -287,8 +294,10 @@ export function draw(shouldDrawHand = true) {
   loadingrects.forEach((rect, r) => {
     if (selectedPose && !market && !restart)
       rect.style.transform =
-        "rotate(" + (270 - 90 * r) + "deg) skew(" + -90 + "deg)";
+        "rotate(" + (270 - 90 * (r % 4)) + "deg) skew(" + -90 + "deg)";
   });
+
+  console.log(similarHand, cursorImages);
 }
 
 //DISEGNO LE MANI
@@ -408,13 +417,13 @@ function drawDOMArc(value, maxCounter) {
   let cMapped = map(value, 0, maxCounter, 0, 360);
 
   loadingrects.forEach((rect, r) => {
-    let rot_degrees = 270 - 90 * r;
+    let rot_degrees = 270 - 90 * (r % 4);
 
-    let new_skew = cMapped - 90 * r;
+    let new_skew = cMapped - 90 * (r % 4);
 
-    if (new_skew < 0) new_skew = -1;
+    (new_skew < 0) ? rect.style.visibility = "hidden" : rect.style.visibility = "visible";
     if (new_skew >= 90) new_skew = 90;
-
+    
     rect.style.transform =
       "rotate(" + rot_degrees + "deg) skew(" + (-89 + new_skew) + "deg)";
   });

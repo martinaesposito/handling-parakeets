@@ -34,16 +34,17 @@
       <img id="loading-img" />
       <div id="loading-text">loading...</div>
     </div>
-    <!-- video tutorial -->
-    <!-- <video
+    <!-- video tutorial 
+    <video
       id="tutorial"
       class="show"
       src="assets/tutorial2.mp4"
       autoplay
       playsinline
       muted
-    >    </video> -->
-    <!-- da rimuovere il muted quando poi si scarica il manifest-->
+    >-->
+      <!-- da rimuovere il muted quando poi si scarica il manifest-->
+    </video>
 
     <!-- INSTRUCTIONS TOP-->
     <div id="gradient-left"></div>
@@ -69,29 +70,51 @@
 
     <!-- Test circle / skew animation -->
     <div id="loading-circle-container">
-      <div id="loading-circle">
+      <div class="loading-circle" id="outer-circle">
         <div
-          class="loading-rectangle"
+          class="loading-rectangle rect-1"
           style="transform: rotate(270deg) skew(-90deg)"
-          id="rect-1"
         ></div>
         <div
-          class="loading-rectangle"
+          class="loading-rectangle rect-2"
           style="transform: rotate(180deg) skew(-90deg)"
-          id="rect-2"
         ></div>
         <div
-          class="loading-rectangle"
+          class="loading-rectangle rect-3"
           style="transform: rotate(90deg) skew(-90deg)"
-          id="rect-3"
         ></div>
         <div
-          class="loading-rectangle"
+          class="loading-rectangle rect-4"
           style="transform: rotate(0deg) skew(-90deg)"
-          id="rect-4"
         ></div>
       </div>
-      <img id="cursor-image" src="assets/cursor/4.svg" />
+      <div class="loading-circle" id="inner-circle">
+        <div
+          class="loading-rectangle rect-1"
+          style="transform: rotate(270deg) skew(-90deg)"
+        ></div>
+        <div
+          class="loading-rectangle rect-2"
+          style="transform: rotate(180deg) skew(-90deg)"
+        ></div>
+        <div
+          class="loading-rectangle rect-3"
+          style="transform: rotate(90deg) skew(-90deg)"
+        ></div>
+        <div
+          class="loading-rectangle rect-4"
+          style="transform: rotate(0deg) skew(-90deg)"
+        ></div>
+      </div>
+      <img class="cursor-image" src="assets/cursor/1.svg">
+      <img class="cursor-image" src="assets/cursor/2.svg">
+      <img class="cursor-image" src="assets/cursor/3.svg">
+      <img class="cursor-image" src="assets/cursor/4.svg">
+      <img class="cursor-image" src="assets/cursor/5.svg">
+      <img class="cursor-image" src="assets/cursor/6.svg">
+      <img class="cursor-image" src="assets/cursor/7.svg">
+      <img class="cursor-image" src="assets/instructions/back2.svg">
+      <img class="cursor-image" src="assets/instructions/restart2.svg">
     </div>
 
     <!-- INSTRUCTIONS BOTTOM-->

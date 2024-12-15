@@ -153,7 +153,8 @@ canvas {
   top: 50%;
   z-index: 15;
 }
-#loading-circle {
+
+.loading-circle {
   width: 7vw;
   height: 7vw;
   position: absolute;
@@ -174,25 +175,28 @@ canvas {
   left: 50%;
   bottom: 50%;
   scale: -1 1;
+  overflow: hidden;
 }
 
-#rect-1 {
-}
-#rect-2 {
-}
-#rect-3 {
-}
-#rect-4 {
+#inner-circle {
+  z-index: -1;
+  width: 6.9vw;
+  height: 6.9vw;
 }
 
-#cursor-image {
+#inner-circle .loading-rectangle {
+  background: black;
+}
+
+.cursor-image {
   align-self: center;
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 4.5vw;
-  height: 4.5vw;
+  width: var(--icon);
+  height: var(--icon);
+  display: none;
 }
 
 /* INSTRUCTIONS */
