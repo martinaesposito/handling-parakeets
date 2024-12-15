@@ -75,6 +75,8 @@ let loadingrects = [];
 let cursorcontainer = document.getElementById("loading-circle-container"); //div che contiene l'immagine con il cerchio di caricamento
 let cursorImages = document.getElementsByClassName("cursor-image"); //div che contiene l'immagine
 
+let introWave = true;
+
 /////////////////////////////////////////////
 
 //MEDIAPIPE
@@ -275,10 +277,29 @@ export function draw(shouldDrawHand = true) {
   }
 
   // displaying the cursor itself
-  if (hands[0] || !shouldDrawHand) {
+  if (hands[0]) {
+
+    introWave = (introWave) ? false : null;
     cursorcontainer.style.display = "block";
-  } else {
+  } else if (!introWave){
+
     cursorcontainer.style.display = "none";
+  }
+
+  // introductory wave
+
+  if (introWave) {
+
+    cursorcontainer.style.top = "90%";
+    cursorcontainer.style.left = "75%";
+    cursorcontainer.style.animation = "wave 3s infinite"
+    loadingrects.forEach((rect) => rect.style.visibility = "hidden");
+
+  } else if (introWave == false) {
+    console.log("did");
+    cursorcontainer.style.top = "50%";
+    cursorcontainer.style.left = "50%";
+    cursorcontainer.style.animation = "none"
   }
 
   //HTML CURSOR
@@ -293,17 +314,13 @@ export function draw(shouldDrawHand = true) {
   // reset the counter when no action
   loadingrects.forEach((rect, r) => {
     if (selectedPose && !market && !restart) {
-      console.log("hidden")
-      // rect.style.transform =
-      //   "rotate(" + (270 - 90 * (r % 4)) + "deg) skew(" + -90 + "deg)";
-      rect.style.opacity = 0;
-    } else{ 
-      rect.style.opacity = 1;
-      console.log("visible")
-  }
-  });
 
-  // console.log(selectedPose);
+      rect.style.opacity = 0;
+    } else { 
+
+      rect.style.opacity = 1;
+    }
+  });
 }
 
 //DISEGNO LE MANI
@@ -339,8 +356,10 @@ const drawHands = (shouldDrawHand) => {
       // chiamo funzione che confronta i LANDMARKS con quelli del json e mi restituisce la mano detectata
       const differences = calculateDifferences(handsData); //calcola la differenza tra gli angoli di riferimento e quelli
       const minDifference = Math.min(...differences);
+      console.log(...differences);
       if (!similarHand || shouldDrawHand) {
-        similarHand = differences.indexOf(minDifference);
+        let treshold = 500;
+        similarHand = (minDifference <= treshold) ? differences.indexOf(minDifference) : 9;
       }
     }
   }
@@ -464,6 +483,7 @@ function goingBackToTree(maxCounter) {
 // COUNTER CHE FA ESCAPE DALLA PAGINA NEL CASO IN CUI NESSUNA MANO è DETECTATA
 function escapeTree(maxCounter) {
   escapeCounters[0]++;
+  // console.log(escapeCounters[0]);
   if (escapeCounters[0] < maxCounter) {
     if (escapeCounters[0] > maxCounter / 2) {
       //quando sono a metà del counter

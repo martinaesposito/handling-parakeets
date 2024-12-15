@@ -155,8 +155,8 @@ canvas {
 }
 
 .loading-circle {
-  width: 7vw;
-  height: 7vw;
+  width: 6.7vw;
+  height: 6.7vw;
   position: absolute;
   left: 50%;
   top: 50%;
@@ -180,8 +180,8 @@ canvas {
 
 #inner-circle {
   z-index: -1;
-  width: 6.9vw;
-  height: 6.9vw;
+  width: 6.6vw;
+  height: 6.6vw;
 }
 
 #inner-circle .loading-rectangle {
@@ -449,5 +449,23 @@ canvas {
   to {
     visibility: hidden;
     opacity: 0%;
+  }
+}
+
+@keyframes wave {
+  0% {
+    transform: rotate(0deg);
+  }
+  10% {
+    transform: rotate(-30deg);
+  }
+  20% {
+    transform: rotate(0deg);
+  }
+  30% {
+    transform: rotate(-30deg);
+  }
+  40% {
+    transform: rotate(0deg);
   }
 }
