@@ -38,6 +38,15 @@ import {
   handimages,
 } from "./detect.js";
 
+// loading
+
+let loading = document.getElementById("loading");
+
+let imgLoading = document.getElementById("loading-img");
+
+imgLoading.src =
+  "assets/loading/" + Math.floor(Math.random() * 8 + 1).toString() + ".gif";
+
 // //////////////////////////////////////////////////////////////////////////
 window.preload = async () => {
   font = loadFont("assets/fonts/IBM_Plex_Sans/IBMPlexSans-Regular.ttf");
@@ -52,9 +61,9 @@ window.preload = async () => {
     for (let i = start; i < end; i++) {
       const imagePromise = new Promise((resolve) => {
         // OPTIMIZATION: Use smaller image formats and sizes when possible
-        const img = loadImage(
+       loadImage(
           `assets/image-compress/${i}.webp`,
-          () => resolve(img),
+          (img) => resolve(img),
           () => resolve(null)
         );
       });
@@ -69,7 +78,9 @@ window.preload = async () => {
 };
 
 // SETUP
-window.setup = async () => {
+window.setup = () => {
+  
+  detectSetup();
   // CANVAS
   p5 = createCanvas(windowWidth, windowHeight, WEBGL);
   pixelDensity(1);
@@ -115,7 +126,6 @@ window.setup = async () => {
   subTitle = document.getElementById("subtitle");
   subTitle.style.top = `${height / 2 + (bounds1.h * 3) / 4}px`; // Adjust as needed
 
-  detectSetup();
   loading.style.display = "none"; //nascondo il loading
 };
 

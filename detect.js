@@ -77,6 +77,11 @@ let cursorImages = document.getElementsByClassName("cursor-image"); //div che co
 
 let introWave = true;
 
+// time and space
+
+let prev_timestamp;
+let delta_time;
+
 /////////////////////////////////////////////
 
 //MEDIAPIPE
@@ -131,7 +136,7 @@ export function setup() {
   loadingcircles = document.getElementsByClassName("loading-circle");
 
   loadingcircles.forEach((circle, i) => {
-    let radius = 40 - (0.5*i);
+    let radius = 40 - 0.5 * i;
 
     let c = [...Array(precision)].map((_, i) => {
       let a = (-i / (precision - 1)) * Math.PI * 2;
@@ -139,21 +144,27 @@ export function setup() {
       let y = Math.sin(a) * radius + 50;
       return `${x}% ${y}%`;
     });
-  
+
     if (circle)
       circle.style.clipPath = `polygon(100% 50%, 100% 100%, 0 100%, 0 0, 100% 0, 100% 50%, ${c.join(
         ","
       )})`;
 
-    for (let j = i*4; j < 4 + 4*i; j++)
-    loadingrects[j] = circle.querySelector(".rect-" + (j - (i*4) + 1));
+    for (let j = i * 4; j < 4 + 4 * i; j++)
+      loadingrects[j] = circle.querySelector(".rect-" + (j - i * 4 + 1));
   });
 }
 
 //DRAW
 export function draw(shouldDrawHand = true) {
   let index;
-  
+
+  // time and space
+
+  let curr_timestamp = Date.now();
+  delta_time = prev_timestamp ? curr_timestamp - prev_timestamp : 0;
+  prev_timestamp = curr_timestamp;
+
   if (!video) return; //se non c'è il video non va
 
   //VIDEO
@@ -193,20 +204,15 @@ export function draw(shouldDrawHand = true) {
     handCounter({
       detectedHand: similarHand,
       shouldDrawHand,
-      lock: !!selectedPose,
+      lock: selectedPose !== undefined,
     });
 
-    index = restart
-      ? 8
-      : market
-      ? 7
-      : !shouldDrawHand
-      ? 9
-      : similarHand
+
+    index = restart ? 8 : market ? 7 : !shouldDrawHand ? 9 : similarHand;
     cursorImages.forEach((image, i) => {
-      image.style.display = (i == index) ? "block" : "none";
-    })
-    
+      image.style.display = i == index ? "block" : "none";
+    });
+
     // console.log(cursorImage);
     pop();
 
@@ -222,7 +228,7 @@ export function draw(shouldDrawHand = true) {
   // se non c'è la mano e nessuna posa è selezionata e il video tutorial è finito
   if (!selectedPose && !hands[0] && tutorialEnd) {
     if (counters.every((c) => c === 0)) {
-      escapeTree(600); //10 secondi
+      escapeTree(20000); //10 secondi
     }
   } else {
     escapeCounters[0] = 0; //counter di uscita si riavvia e il warning scompare
@@ -243,7 +249,7 @@ export function draw(shouldDrawHand = true) {
           backtostart.offsetHeight -
             (windowHeight / 2 - windowHeight / 25) * zoomFactor
       ) {
-        goingBackToStart(200);
+        goingBackToStart(5000);
         restart = true;
       } else {
         restart = false;
@@ -259,7 +265,7 @@ export function draw(shouldDrawHand = true) {
           backtotree.offsetHeight -
             (windowHeight / 2 - windowHeight / 25) * zoomFactor // aumento leggermente il margine in alto - che sarebbe wisth/50= 2vw così da avere più margine per lo spostamento
       ) {
-        goingBackToTree(150);
+        goingBackToTree(2000);
         market = true;
       } else {
         market = false;
@@ -282,28 +288,23 @@ export function draw(shouldDrawHand = true) {
 
   // displaying the cursor itself
   if (hands[0]) {
-
-    introWave = (introWave) ? false : null;
+    introWave = introWave ? false : null;
     cursorcontainer.style.display = "block";
-  } else if (!introWave){
-
+  } else if (!introWave) {
     cursorcontainer.style.display = "none";
   }
 
   // introductory wave
 
   if (introWave) {
-
     cursorcontainer.style.top = "90%";
     cursorcontainer.style.left = "75%";
-    cursorcontainer.style.animation = "wave 3s infinite"
-    loadingrects.forEach((rect) => rect.style.visibility = "hidden");
-
+    cursorcontainer.style.animation = "wave 3s infinite";
+    loadingrects.forEach((rect) => (rect.style.visibility = "hidden"));
   } else if (introWave == false) {
-    console.log("did");
     cursorcontainer.style.top = "50%";
     cursorcontainer.style.left = "50%";
-    cursorcontainer.style.animation = "none"
+    cursorcontainer.style.animation = "none";
   }
 
   //HTML CURSOR
@@ -317,19 +318,17 @@ export function draw(shouldDrawHand = true) {
 
   // reset the counter when no action
   loadingrects.forEach((rect, r) => {
-
     if (index != 9) {
       if (selectedPose && !market && !restart) {
-
         rect.style.opacity = 0;
       } else {
-
         rect.style.opacity = 1;
       }
-    } else if (shouldDrawHand) // making the loading invisible while in the 9th pose in all cases but the screensaver
+    } else if (shouldDrawHand)
+      // making the loading invisible while in the 9th pose in all cases but the screensaver
       rect.style.opacity = 0;
 
-    console.log(index);
+    //console.log(index);
   });
 }
 
@@ -352,6 +351,7 @@ const drawHands = (shouldDrawHand) => {
         hands = [];
         //se non ci sono mani nello schermo i counter scendono
         handCounter({ detectedHand: undefined });
+        cursor = undefined;
         return;
       }
       let points = landmarks?.map((p) => mapCoords(p, videoSize)); //prende i punti della mano e li rimappa
@@ -366,10 +366,12 @@ const drawHands = (shouldDrawHand) => {
       // chiamo funzione che confronta i LANDMARKS con quelli del json e mi restituisce la mano detectata
       const differences = calculateDifferences(handsData); //calcola la differenza tra gli angoli di riferimento e quelli
       const minDifference = Math.min(...differences);
-      console.log(...differences);
-      if (!similarHand || shouldDrawHand) {
+
+      // console.log(similarHand, shouldDrawHand)
+      if (similarHand === undefined || shouldDrawHand) {
         let treshold = 300;
-        similarHand = (minDifference <= treshold) ? differences.indexOf(minDifference) : 9;
+        similarHand =
+          minDifference <= treshold ? differences.indexOf(minDifference) : 9;
       }
     }
   }
@@ -411,7 +413,7 @@ function calculateDifferences(dataSet) {
 // HAND COUNTER
 let isRedirecting = false; //flag per fare una sola call quando cambia pagina
 function handCounter({ detectedHand, shouldDrawHand, lock }) {
-  const maxCounter = 150; // Maximum counter value
+  const maxCounter = 5000; // Maximum counter value
   const loadingRadius = 45 * zoomFactor; // Radius of the loading circle
   // console.log(lock);
   if (tutorialEnd === false || lock) return;
@@ -423,7 +425,7 @@ function handCounter({ detectedHand, shouldDrawHand, lock }) {
       if (detectedHand == i) {
         // Only increment if not already at max
         if (counters[detectedHand] < maxCounter) {
-          counters[detectedHand]++;
+          counters[detectedHand] += delta_time;
         }
 
         drawDOMArc(counters[detectedHand], maxCounter);
@@ -438,10 +440,12 @@ function handCounter({ detectedHand, shouldDrawHand, lock }) {
           }
         }
       } else if (counters[i] > 0) {
-        counters[i]--;
+        counters[i] -= delta_time;
+        counters[i] = Math.max(counters[i], 0);
       }
     } else if (counters[i] > 0) {
-      counters[i]--;
+      counters[i] -= delta_time;
+      counters[i] = Math.max(counters[i], 0);
     }
   });
 }
@@ -456,9 +460,11 @@ function drawDOMArc(value, maxCounter) {
 
     let new_skew = cMapped - 90 * (r % 4);
 
-    (new_skew < 0) ? rect.style.visibility = "hidden" : rect.style.visibility = "visible";
+    new_skew < 0
+      ? (rect.style.visibility = "hidden")
+      : (rect.style.visibility = "visible");
     if (new_skew >= 90) new_skew = 90;
-    
+
     rect.style.transform =
       "rotate(" + rot_degrees + "deg) skew(" + (-89 + new_skew) + "deg)";
   });
@@ -473,7 +479,7 @@ function goingBackToStart(maxCounter) {
   drawDOMArc(escapeCounters[1], maxCounter);
 
   if (escapeCounters[1] < maxCounter) {
-    escapeCounters[1]++;
+    escapeCounters[1] += delta_time;
   } else {
     if (!isRedirecting) backToStart();
   }
@@ -482,7 +488,7 @@ function goingBackToStart(maxCounter) {
 function goingBackToTree(maxCounter) {
   drawDOMArc(escapeCounters[2], maxCounter);
   if (escapeCounters[2] < maxCounter) {
-    escapeCounters[2]++;
+    escapeCounters[2] += delta_time;
   } else {
     counters = counters.map(() => 0);
     selectedPose = undefined;
@@ -492,7 +498,7 @@ function goingBackToTree(maxCounter) {
 
 // COUNTER CHE FA ESCAPE DALLA PAGINA NEL CASO IN CUI NESSUNA MANO è DETECTATA
 function escapeTree(maxCounter) {
-  escapeCounters[0]++;
+  escapeCounters[0] += delta_time;
   // console.log(escapeCounters[0]);
   if (escapeCounters[0] < maxCounter) {
     if (escapeCounters[0] > maxCounter / 2) {
@@ -502,7 +508,7 @@ function escapeTree(maxCounter) {
       // warning.style.opacity = "0.4";
 
       endCounter
-        ? (endCounter.innerHTML = 10 - Math.floor(escapeCounters[0] / 60))
+        ? (endCounter.innerHTML = Math.floor(maxCounter / 1000) - Math.floor(escapeCounters[0] / 1000))
         : null;
     }
   } else if (!isRedirecting) backToStart();

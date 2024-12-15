@@ -6,26 +6,28 @@ import {
   video,
   videoSize,
 } from "./detect.js";
+import { Dot } from "./listings.js";
 
 let branchPositions = [];
 
-//LOADING
 let loading = document.getElementById("loading");
-let imgLoading = (document.getElementById("loading-img").src =
-  "assets/loading/" + Math.floor(Math.random() * 8 + 1).toString() + ".gif");
-
-//LEGEND
 let handLegend = document.getElementById("hands-legend");
+let container = document.querySelector(".container");
+let tutorial = document.getElementById("tutorial");
+// warning
+export let warning = document.getElementById("warning");
+export let endCounter = document.getElementById("endCounter");
+let imgLoading = document.getElementById("loading-img");
+
+imgLoading.src =
+  "assets/loading/" + Math.floor(Math.random() * 8 + 1).toString() + ".gif";
 
 //P5
-let p5, canvas, font;
-let container = document.querySelector(".container");
-let bg = "#F5F5F5";
+let p5, canvas;
 let canvasReady = false;
 
 //BRANCHES
 let branchesss = [];
-
 let plat;
 let platforms = [];
 
@@ -48,7 +50,6 @@ const branchPlatform = [
   { value: 94, start: 0.9, end: 0.95, name: "Clasf.it" },
 ];
 
-let pose;
 const handPoses = [
   "FingerPerch",
   "Grip",
@@ -61,19 +62,16 @@ const handPoses = [
 
 let imageMap = {}; // Map images by their filename
 
-let tutorial = document.getElementById("tutorial");
 export let tutorialEnd = tutorial ? false : undefined;
 
-// tutorialEnd = true; // RIMUOVERE, PER TESTING
+tutorialEnd = true; // RIMUOVERE, PER TESTING
 
 tutorial?.addEventListener("ended", () => {
-  // tutorial.classList.remove("show");
   tutorial.style.animation = "disappear 0.5s forwards";
   tutorialEnd = true;
 });
 
 let dots = [];
-import { Dot } from "./listings.js";
 let listingsDataReady = false;
 
 export let z = 800;
@@ -85,10 +83,6 @@ export let playing = false;
 // story divs
 let storyIntro;
 
-// warning
-export let warning = document.getElementById("warning");
-export let endCounter = document.getElementById("endCounter");
-
 //stories
 let stories;
 
@@ -96,20 +90,17 @@ let stories;
 
 ///PRELOAD
 window.preload = async () => {
-  font = loadFont("assets/fonts/IBM_Plex_Sans/IBMPlexSans-Regular.ttf"); //font
-
   const imagePromises = [];
 
   for (let i = 2; i < 887; i++) {
     const imagePromise = new Promise((resolve) => {
-      const img = loadImage(
-        `assets/image-compress/${i}.webp`,
-        () => {
+      loadImage(
+        `assets/image_ultra-compress/${i}.webp`,
+        (img) => {
           imageMap[Number(i)] = img; // Store with numeric keys
           resolve();
         },
-        () => {
-          console.warn(`Failed to load image: ${i}.webp`);
+        (e) => {
           resolve(); // Resolve even if the image fails
         }
       );
@@ -118,10 +109,7 @@ window.preload = async () => {
   }
 
   await Promise.all(imagePromises);
-  // console.log("Loaded image keys:", Object.keys(imageMap).map(Number));
-  // console.log(imageMap); //controllo che ci siano tutte e che siano corrette
 
-  ///
   // prendo tutti i listings dal json
   try {
     const response = await fetch("json/listings.json"); //carico tutti i listings
@@ -147,16 +135,10 @@ window.preload = async () => {
     listingsDataReady = true;
   }
 
-  stories = loadJSON("./json/stories.json", storiesJSON);
+  stories = loadJSON("./json/stories.json");
 
   detectPreload();
 };
-
-function storiesJSON() {
-  for (let i = 0; i < Object.keys(stories).length; i++) {
-    //console.log(stories[i]);
-  }
-}
 
 //SETUP
 window.setup = async () => {
@@ -182,7 +164,6 @@ window.setup = async () => {
 
   canvas = p5.canvas;
   container.appendChild(canvas);
-  textFont(font);
 
   // ANGLES
   const totalDots = window.listingsData.reduce(
@@ -235,8 +216,6 @@ window.setup = async () => {
 
   canvasReady = true;
 
-  textFont(font);
-
   detectSetup();
   loading.style.display = "none"; //nascondo il loading
 
@@ -247,8 +226,6 @@ window.setup = async () => {
     plat.id(branch.name);
     platforms.push(plat);
   });
-
-  console.log(platforms);
 };
 
 ///DRAW
@@ -258,11 +235,6 @@ window.draw = () => {
   targetZ = selectedPose ? 450 : 800;
   if (branchPositions.length > 0) {
     branchesss.forEach(({ bounds: { start, end } }, index) => {
-      //  disegno i rami
-      // stroke("lightgray");
-      // strokeWeight(1);
-      // line(start.x, start.y, end.x, end.y);
-      // disegno i div
       platforms[index].position(
         width / 2 +
           branchPositions[index].x * (800 / z) -
@@ -283,9 +255,9 @@ window.draw = () => {
   }
 
   // Update and draw dots
-  dots.forEach((dot, index) => {
+  dots.forEach((dot) => {
     dot.move(dots, selectedPose, z); // Single iteration per frame for smooth animation
-    dot.draw(); //passo l'immagine corrispondente
+    dot.draw(selectedPose); //passo l'immagine corrispondente
   });
 
   let cH = height / 4.5;
@@ -308,13 +280,12 @@ window.draw = () => {
       scale(-1, 1); //rifletto il video in modo da vederlo correttamente
       stroke("black");
       noFill();
-      // translate(0, 0, 10);
       strokeWeight(2);
       image(video, 0, 0, videoSize.w, videoSize.h);
 
       rect(0, 0, videoSize.w, videoSize.h); //disegno un rettangolo in modo che abbia il bordo
-      pop();
     }
+    pop();
   }
 
   translate(0, 0, 1);
@@ -359,7 +330,7 @@ function generateBranchDots(branches) {
         allDots.length + branchDots.length,
         random(12.5, 15),
         item,
-        imageMap,
+        imageMap[item.Image_num],
         { x: baseX, y: baseY }, // Base position
         { x: commonX, y: commonY } // Final position
       );

@@ -4,7 +4,6 @@ import { playing, isPlaying, hasPlayed } from "./tree.js";
 export let platX;
 export let platY;
 export let branchIndex;
-
 export class Dot {
   static colors = [
     //colors
@@ -17,18 +16,19 @@ export class Dot {
     "#2E7F2E",
   ];
 
+  static cachedImages = {};
+
   //CONTSTRUCTOR
   constructor(
     branch,
     index,
     radius,
     itemData,
-    imageMap,
+    img,
     basePosition,
     finalPosition
   ) {
     this.branch = branch.index;
-
     // Base position along the branch (without offset)
     this.basePos = createVector(basePosition.x, basePosition.y);
 
@@ -39,16 +39,20 @@ export class Dot {
     this.originalPos = this.basePos.copy();
     // PROPERTIES
     this.index = index;
+    this.color = Dot.colors[Math.floor(random(Dot.colors.length))];
 
-    const imgIndex = Number(itemData.Image_num); // Convert to number
-    this.image = imageMap[imgIndex];
-    if (!this.image) {
-      console.warn(
-        `No image found for Image_num: ${itemData.Image_num}, Index: ${imgIndex}`
-      );
+    if (img && !Dot.cachedImages[itemData.Image_num]) {
+      let maxRadius = 120;
+      let graphics = createGraphics(maxRadius, maxRadius);
+      graphics.image(img, 0, 0, maxRadius, maxRadius);
+      Dot.cachedImages[itemData.Image_num] = graphics;
     }
 
-    this.color = Dot.colors[Math.floor(random(Dot.colors.length))];
+    this.sameBranchDots = [];
+    this.samePoseDots = [];
+
+    this.image = Dot.cachedImages[itemData.Image_num];
+
     this.baseRadius = radius;
     this.radius = radius;
     this.itemData = itemData;
@@ -123,16 +127,20 @@ export class Dot {
   }
 
   //DRAW
-  draw() {
-    if (this.itemData.Hand == "Hand") {
-      stroke("#C9FF4C"); //colora le immagini con la mano
-      strokeWeight(3);
-    } else {
-      noStroke(); //se non ce l'hanno niente
+  draw(currentPose) {
+    // if (this.itemData.Hand == "Hand") {
+    //   stroke("#C9FF4C"); //colora le immagini con la mano
+    //   strokeWeight(3);
+    // } else {
+    noStroke(); //se non ce l'hanno niente
+    // }
+
+    if (!this.shouldHighlight(currentPose)) {
+      fill(this.color);
+      rect(this.pos.x, this.pos.y, this.radius); //rect per disegnare il bordo, + 3 per disegnarlo esterno
+    } else if (this.image) {
+      image(this.image, this.pos.x, this.pos.y, this.radius, this.radius);
     }
-    noFill();
-    fill(this.color);
-    rect(this.pos.x, this.pos.y, this.radius + 3); //rect per disegnare il bordo, + 3 per disegnarlo esterno
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // handling what appears during narration
@@ -180,8 +188,8 @@ export class Dot {
     // positioning the divs relating to the screen
 
     let screenPos = {
-      x: cursor.x / zoomFactor + width / 2,
-      y: cursor.y / zoomFactor + height / 2,
+      x: cursor?.x / zoomFactor + width / 2,
+      y: cursor?.y / zoomFactor + height / 2,
     };
 
     let divh = this.div.size().height;
@@ -203,11 +211,23 @@ export class Dot {
       }
     }
 
-    this.div.position(screenPos.x + divxoffset, screenPos.y + divyoffset);
+    //this.div.position(screenPos.x + divxoffset, screenPos.y + divyoffset);
+    this.div.style("transform", "translate(" + (screenPos.x + divxoffset) + "px, " + (screenPos.y + divyoffset) + "px)");
   }
 
   //MOVE
-  move(dots, currentPose, z, imageMap) {
+  move(dots, currentPose) {
+    if (!this.sameBranchDots.length) {
+      this.sameBranchDots = dots.filter(
+        (d) => d.branch === this.branch && d !== this
+      );
+    }
+    if (!this.samePoseDots.length && this.itemData.Pose) {
+      this.samePoseDots = dots.filter(
+        (d) => d.shouldHighlight(this.itemData.Pose) && d !== this
+      );
+    }
+
     // RESET BASE POSITION
     if (!this.shouldHighlight(currentPose) && currentPose) {
       this.basePos = p5.Vector.mult(this.originalPos, 2);
@@ -228,14 +248,23 @@ export class Dot {
     // Separation
     let separation = createVector(0, 0);
 
-    const filteredDots = dots.filter((d) =>
-      this.shouldHighlight(currentPose)
-        ? d.shouldHighlight(currentPose)
-        : ((d.branch >= this.branch - 1 && d.branch <= this.branch + 1) ||
-            (this.branch === 0 && d.branch === 15) ||
-            (this.branch === 15 && d.branch === 0)) &&
-          d !== this
-    );
+    const filteredDots = this.shouldHighlight(currentPose)
+      ? this.samePoseDots
+      : this.sameBranchDots;
+
+    // const filteredDots = dots.filter(
+    //   (d) =>
+    //     this.shouldHighlight(currentPose)
+    //       ? d.shouldHighlight(currentPose)
+    //       : // controlla solo punti appartenenti allo stesso branch
+    //         d.branch === this.branch
+
+    // controlla anche punti dei branch adiacenti
+    // : ((d.branch >= this.branch - 1 && d.branch <= this.branch + 1) ||
+    //     (this.branch === 0 && d.branch === 15) ||
+    //     (this.branch === 15 && d.branch === 0)) &&
+    //   d !== this
+    // );
 
     // other DOTS
     for (const other of filteredDots) {
@@ -257,21 +286,15 @@ export class Dot {
     // MOUSE INTERACTION
     // Scala le coordinate del mouse in base al fattore di zoom
 
-    const d = dist(cursor?.x, cursor?.y, this.pos.x, this.pos.y);
+    if (frameCount % 2 === 0) {
+      // Check hover every 2 frames
+      const hoverThreshold = this.baseRadius * 2;
+      const d = dist(cursor?.x, cursor?.y, this.pos.x, this.pos.y);
+      this.isHovered = d < hoverThreshold;
+    }
 
-    const hoverThreshold = this.baseRadius * 2;
-    this.isHovered = d < hoverThreshold;
     const targetRadius = this.isHovered ? this.baseRadius * 5 : this.baseRadius; //se l'oggetto viene hoverato aumentail raggio
     this.radius += (targetRadius - this.radius) * 0.1;
-
-    mouseIsPressed && d < hoverThreshold && frameCount % 3 === 0 //impongo una treshold legata al framecount così da evitare un pochino click multipli
-      ? console.log(
-          this.itemData.Hand,
-          this.itemData.Image_num,
-          //imageMap.indexOf(this.image), // aggiungo 2 perchè this.itemData.Image_num is (ex. 324) = this.imageIndex (ex. 322, 324 - 2) because image files start numbering from 2
-          this.itemData.Description
-        )
-      : null;
 
     //POSA
     // calcolo delle forze e dei limiti di posizionamento specifico per i punti della posa
@@ -356,9 +379,9 @@ export class Dot {
     this.pos.add(this.vel);
   }
 
-  shouldHighlight(currentPose) {
-    if (!currentPose) return false;
-    return this.itemData.Pose == currentPose;
+  shouldHighlight(pose) {
+    if (!pose) return false;
+    return this.itemData.Pose == pose;
   }
 }
 
