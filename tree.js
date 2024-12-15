@@ -70,8 +70,10 @@ export let tutorialEnd = tutorial ? false : undefined;
 // console.log(tutorialEnd, tutorial);
 
 if (tutorial) {
-  const duration = tutorial.duration + "s";
-  progressBar.style.animation = "pippo " + duration + " linear forwards";
+  tutorial.addEventListener("play", () => {
+    const duration = tutorial.duration + "s";
+    progressBar.style.animation = "pippo " + duration + " linear forwards";
+  });
 
   tutorial.addEventListener("ended", () => {
     tutorial.style.animation = "disappear 0.5s forwards";
