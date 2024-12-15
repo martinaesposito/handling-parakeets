@@ -42,6 +42,9 @@ let market = false;
 let restartImg;
 let treeImg;
 
+let restartImgSrc;
+let treeImgSrc;
+
 let backtostart; // id: ins-2, button / div to go back to screensaver
 let backtotree; // id: ins-1, button / div to go back to stories
 
@@ -58,6 +61,8 @@ let debugTimer = 0;
 export let handimages = [];
 let similarHand;
 let font;
+
+let handimagessrc = [];
 
 const prak = "#C9FF4C";
 
@@ -78,6 +83,7 @@ let loadingcircle;
 let loadingrects = [];
 
 let cursorcontainer;
+let cursorimage;
 
 /////////////////////////////////////////////
 
@@ -106,6 +112,7 @@ export async function preload() {
       `assets/cursor/${i}.svg`,
       () => {
         handimages[i] = img;
+        handimagessrc[i] = `assets/cursor/${i}.svg`;
       },
       console.warn(`Failed to load image: ${i}.svg`) //warn + fallback if fails
     );
@@ -116,6 +123,9 @@ export async function preload() {
 
   restartImg = loadImage("assets/instructions/restart2.svg");
   treeImg = loadImage("assets/instructions/back2.svg");
+
+  restartImgSrc = "assets/instructions/restart2.svg";
+  treeImgSrc = "assets/instructions/back2.svg";
 }
 
 async function importJSON(path) {
@@ -164,6 +174,7 @@ export function setup() {
     loadingrects[i] = document.getElementById("rect-" + (i + 1));
 
   cursorcontainer = document.getElementById("loading-circle-container");
+  cursorimage = document.getElementById("cursor-image");
 }
 
 function goingBackToStart() {
@@ -250,17 +261,26 @@ export function draw(shouldDrawHand = true) {
       ? treeImg
       : handimages[similarHand + 1];
 
+    let imgggSrc = restart
+      ? restartImgSrc
+      : market
+      ? treeImgSrc
+      : handimagessrc[similarHand + 1];
+
     // let imgHtml= document.getElementById("imgCursor")
     // imgHtml.src=imggg
 
-    // console.log(restart, market);
-    image(
-      imggg,
-      cursor.x,
-      cursor.y,
-      (imggg.width / 3) * 2 * zoomFactor,
-      (imggg.height / 3) * 2 * zoomFactor
-    );
+    // console.log(restart, market); // old way to draw the cursor image
+    // image(
+    //   imggg,
+    //   cursor.x,
+    //   cursor.y,
+    //   (imggg.width / 3) * 2 * zoomFactor,
+    //   (imggg.height / 3) * 2 * zoomFactor
+    // );
+
+    cursorimage.innerHTML = "<img src='" + imgggSrc + "'>" // new way to do it
+    console.log(imgggSrc);
 
     pop();
 
@@ -431,12 +451,6 @@ function handCounter({ detectedHand, shouldDrawHand, lock }) {
 
     loadingrects.forEach((rect, r) => {
       let rot_degrees = 270 - 90 * r;
-
-      let curr_skew = rect.style.transform.replace(
-        "rotate(" + rot_degrees + "deg) skew(",
-        ""
-      );
-      curr_skew = curr_skew.replace("deg)", "");
 
       let new_skew = cMapped - 90 * r;
 
