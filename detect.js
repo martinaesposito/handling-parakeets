@@ -129,7 +129,7 @@ export function setup() {
   loadingcircles = document.getElementsByClassName("loading-circle");
 
   loadingcircles.forEach((circle, i) => {
-    let radius = 40 - (1*i);
+    let radius = 40 - (0.5*i);
 
     let c = [...Array(precision)].map((_, i) => {
       let a = (-i / (precision - 1)) * Math.PI * 2;
