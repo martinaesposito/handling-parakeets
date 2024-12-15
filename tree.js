@@ -64,6 +64,8 @@ let imageMap = {}; // Map images by their filename
 let tutorial = document.getElementById("tutorial");
 export let tutorialEnd = tutorial ? false : undefined;
 
+// tutorialEnd = true; // RIMUOVERE, PER TESTING
+
 tutorial?.addEventListener("ended", () => {
   // tutorial.classList.remove("show");
   tutorial.style.animation = "disappear 0.5s forwards";

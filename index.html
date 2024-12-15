@@ -59,37 +59,52 @@
 
     <!-- Test circle / skew animation -->
     <div id="loading-circle-container">
-      <div id="loading-circle">
+      <div class="loading-circle" id="outer-circle" style="visibility: hidden;">
         <div
-          class="loading-rectangle"
+          class="loading-rectangle rect-1"
           style="transform: rotate(270deg) skew(-90deg)"
-          id="rect-1"
         ></div>
         <div
-          class="loading-rectangle"
+          class="loading-rectangle rect-2"
           style="transform: rotate(180deg) skew(-90deg)"
-          id="rect-2"
         ></div>
         <div
-          class="loading-rectangle"
+          class="loading-rectangle rect-3"
           style="transform: rotate(90deg) skew(-90deg)"
-          id="rect-3"
         ></div>
         <div
-          class="loading-rectangle"
+          class="loading-rectangle rect-4"
           style="transform: rotate(0deg) skew(-90deg)"
-          id="rect-4"
+        ></div>
+      </div>
+      <div class="loading-circle" id="inner-circle" style="visibility: hidden;">
+        <div
+          class="loading-rectangle rect-1"
+          style="transform: rotate(270deg) skew(-90deg)"
+        ></div>
+        <div
+          class="loading-rectangle rect-2"
+          style="transform: rotate(180deg) skew(-90deg)"
+        ></div>
+        <div
+          class="loading-rectangle rect-3"
+          style="transform: rotate(90deg) skew(-90deg)"
+        ></div>
+        <div
+          class="loading-rectangle rect-4"
+          style="transform: rotate(0deg) skew(-90deg)"
         ></div>
       </div>
       <img class="cursor-image" src="assets/cursor/1.svg">
       <img class="cursor-image" src="assets/cursor/2.svg">
       <img class="cursor-image" src="assets/cursor/3.svg">
-      <img class="cursor-image" src="assets/cursor/4.svg">
+      <img class="cursor-image" src="assets/cursor/4.svg" style="display: block;">
       <img class="cursor-image" src="assets/cursor/5.svg">
       <img class="cursor-image" src="assets/cursor/6.svg">
       <img class="cursor-image" src="assets/cursor/7.svg">
       <img class="cursor-image" src="assets/instructions/back2.svg">
       <img class="cursor-image" src="assets/instructions/restart2.svg">
+      <img class="cursor-image" src="assets/cursor/8.svg">
     </div>
 
     <script src="index.js" type="module"></script>
