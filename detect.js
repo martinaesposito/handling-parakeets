@@ -180,9 +180,10 @@ export function setup() {
 function goingBackToStart() {
   let maxCounter = 200;
   counters = counters.map(() => 0); // Reset all counters in the counters array
-  selectedPose = undefined; // Reset the selected pose
+  // selectedPose = undefined; // Reset the selected pose
 
   drawArc(escapeCounters[1], 45 * zoomFactor, maxCounter); // Draw the new arc
+  drawDOMArc(escapeCounters[1], maxCounter);
 
   if (escapeCounters[1] < maxCounter) {
     escapeCounters[1]++;
@@ -200,6 +201,7 @@ function goingBackToTree() {
   let maxCounter = 150;
 
   drawArc(escapeCounters[2], 45 * zoomFactor, maxCounter); // Draw the new arc
+  drawDOMArc(escapeCounters[2], maxCounter);
   if (escapeCounters[2] < maxCounter) {
     escapeCounters[2]++;
   } else {
@@ -280,7 +282,6 @@ export function draw(shouldDrawHand = true) {
     // );
 
     cursorimage.innerHTML = "<img src='" + imgggSrc + "'>" // new way to do it
-    console.log(imgggSrc);
 
     pop();
 
@@ -289,9 +290,9 @@ export function draw(shouldDrawHand = true) {
     ellipse(cursor.x, cursor.y, 5);
   }
 
-  if (counters.every((c) => c === 0)) {
-    selectedPose = undefined;
-  }
+  // if (counters.every((c) => c === 0)) {
+  //   selectedPose = undefined;
+  // }
 
   if (!selectedPose && !hands[0] && tutorialEnd) {
     if (counters.every((c) => c === 0)) {
@@ -340,6 +341,7 @@ export function draw(shouldDrawHand = true) {
       } else {
         market = false;
         if (escapeCounters[2] > 0) escapeCounters[2] = 0; //se esco dal counter scende
+        console.log(escapeCounters[2]);
         // console.log("escapeCounters[2]" + escapeCounters[2]);
       }
     }
@@ -367,6 +369,23 @@ export function draw(shouldDrawHand = true) {
       "px," +
       cursor.y / zoomFactor +
       "px)";
+
+  // displaying the cursor itself
+  if (hands[0]) {
+
+    (cursorcontainer.style.display = "block");
+  } else {
+
+    (cursorcontainer.style.display = "none");
+  }
+
+  // reset the counter when no action
+
+  loadingrects.forEach((rect, r) => {
+
+    if (selectedPose && !market && !restart) rect.style.transform =
+    "rotate(" + (270 - 90 * r) + "deg) skew(" + (-90) + "deg)";
+  })
 }
 
 //DISEGNO LE MANI
@@ -428,6 +447,7 @@ function handCounter({ detectedHand, shouldDrawHand, lock }) {
         }
 
         drawArc(counters[detectedHand], loadingRadius, maxCounter);
+        drawDOMArc(counters[detectedHand], maxCounter);
 
         if (counters[detectedHand] >= maxCounter) {
           selectedPose = handPoses[i]; //se il counter raggiunge il massimo di una delle pose segnala questa come la posa detectata
@@ -444,65 +464,62 @@ function handCounter({ detectedHand, shouldDrawHand, lock }) {
     } else if (counters[i] > 0) {
       counters[i]--;
     }
-
-    // counters applied to the DOM cursor loading bar
-
-    let cMapped = map(counters[detectedHand], 0, maxCounter, 0, 360);
-
-    loadingrects.forEach((rect, r) => {
-      let rot_degrees = 270 - 90 * r;
-
-      let new_skew = cMapped - 90 * r;
-
-      if (new_skew < 0) new_skew = -1;
-      if (new_skew >= 90) new_skew = 90;
-
-      rect.style.transform =
-        "rotate(" + rot_degrees + "deg) skew(" + (-89 + new_skew) + "deg)";
-    });
-
-    // displaying the div itself
-    detectedHand != null
-      ? (cursorcontainer.style.display = "block")
-      : (cursorcontainer.style.display = "none");
   });
 }
 
 function drawArc(value, loadingRadius, maxCounter) {
-  const angleOffset = -HALF_PI; // Start from the top
-  // Always draw full arc if max is reached
-  const arcAngle =
-    value >= maxCounter ? TWO_PI : map(value, 0, maxCounter, 0, TWO_PI);
+  // const angleOffset = -HALF_PI; // Start from the top
+  // // Always draw full arc if max is reached
+  // const arcAngle =
+  //   value >= maxCounter ? TWO_PI : map(value, 0, maxCounter, 0, TWO_PI);
 
-  // Outer arc
-  push();
-  noFill();
-  strokeWeight(8 * zoomFactor);
-  stroke(prak);
-  arc(
-    cursor.x,
-    cursor.y,
-    loadingRadius * 2,
-    loadingRadius * 2,
-    angleOffset,
-    angleOffset + arcAngle
-  );
-  pop();
+  // // Outer arc
+  // push();
+  // noFill();
+  // strokeWeight(8 * zoomFactor);
+  // stroke(prak);
+  // arc(
+  //   cursor.x,
+  //   cursor.y,
+  //   loadingRadius * 2,
+  //   loadingRadius * 2,
+  //   angleOffset,
+  //   angleOffset + arcAngle
+  // );
+  // pop();
 
-  // Inner arc
-  push();
-  noFill();
-  strokeWeight(1);
-  stroke("black");
-  arc(
-    cursor.x,
-    cursor.y,
-    loadingRadius * 2 - 7,
-    loadingRadius * 2 - 7,
-    angleOffset,
-    angleOffset + arcAngle
-  );
-  pop();
+  // // Inner arc
+  // push();
+  // noFill();
+  // strokeWeight(1);
+  // stroke("black");
+  // arc(
+  //   cursor.x,
+  //   cursor.y,
+  //   loadingRadius * 2 - 7,
+  //   loadingRadius * 2 - 7,
+  //   angleOffset,
+  //   angleOffset + arcAngle
+  // );
+  // pop();
+}
+
+function drawDOMArc(value, maxCounter) {
+  // counters applied to the DOM cursor loading bar
+
+  let cMapped = map(value, 0, maxCounter, 0, 360);
+
+  loadingrects.forEach((rect, r) => {
+    let rot_degrees = 270 - 90 * r;
+
+    let new_skew = cMapped - 90 * r;
+
+    if (new_skew < 0) new_skew = -1;
+    if (new_skew >= 90) new_skew = 90;
+
+    rect.style.transform =
+      "rotate(" + rot_degrees + "deg) skew(" + (-89 + new_skew) + "deg)";
+  });
 }
 // COUNTER CHE FA ESCAPE DALLA PAGINA NEL CASO IN CUI NESSUNA MANO è DETECTATA
 function escapeTree() {
