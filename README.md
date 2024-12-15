@@ -1,10 +1,10 @@
-### parrocchetti
+### Handling Parakeets
 
-🦜🦜🦜
+🦜🦜🦜</br></br>
 
-Martina Esposito
-Giulia Grassi
-Ming Hu
-Nausicaa Naibo
-Fabio Pennone
-Anita Ruggiu
+Martina Esposito</br>
+Giulia Grassi</br>
+Ming Hu</br>
+Nausicaa Naibo</br>
+Fabio Pennone</br>
+Anita Ruggiu</br>
