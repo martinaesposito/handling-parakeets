@@ -401,11 +401,15 @@ canvas {
   font-size: var(--testi);
 }
 
-.gap {
-  gap: 1vh;
+.highlight {
+  background-color: var(--prak);
 }
 
 /* general */
+
+.gap {
+  gap: 1vh;
+}
 .flex-column {
   display: flex;
   flex-direction: column;

@@ -87,7 +87,7 @@ export class Dot {
             this.itemData.Platform +
             (this.itemData.Year ? ", " + this.itemData.Year : "") +
             "]</div>" +
-            this.itemData.Description +
+            highlightText(this.itemData.Description, this.itemData.Highlights) +
             "</div>"
         );
       } else if (this.itemData.Content_pose == "Image") {
@@ -104,7 +104,7 @@ export class Dot {
             this.itemData.Platform +
             (this.itemData.Year ? ", " + this.itemData.Year : "") +
             "]</div>" +
-            this.itemData.Description +
+            highlightText(this.itemData.Description, this.itemData.Highlights) +
             "</div>"
         );
       }
@@ -134,10 +134,6 @@ export class Dot {
     fill(this.color);
     rect(this.pos.x, this.pos.y, this.radius + 3); //rect per disegnare il bordo, + 3 per disegnarlo esterno
 
-    // if (this.isHovered) {
-    //image(this.image, this.pos.x, this.pos.y, this.radius, this.radius);
-    // }
-
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // handling what appears during narration
 
@@ -148,17 +144,14 @@ export class Dot {
         if (this.isHovered) {
           if (!playing) {
             // avoiding any other div appearing while audio is playing
-
             this.div.style("display", "block");
             this.div.style("animation", "appear 0.5s forwards");
           }
 
           // positioning the divs relating to the screen needs to happen when the div is "displayed"
-
           this.positioning();
 
-          // narration
-
+          // PLAYING
           if (this.sound && !playing) {
             // avoiding errors from non-existing sounds and from audio playing while another is
 
@@ -171,7 +164,6 @@ export class Dot {
 
             if (!this.sound.isPlaying()) {
               // keep div open while sound plays
-
               this.div.style("animation", "disappear 0.5s forwards");
             }
           } else {
@@ -368,4 +360,23 @@ export class Dot {
     if (!currentPose) return false;
     return this.itemData.Pose == currentPose;
   }
+}
+
+// Function to escape special characters in string for regex
+function escapeRegExp(string) {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+// Function to highlight text within HTML safely
+function highlightText(description, highlights) {
+  if (!highlights || !description) return description;
+
+  // Escape the highlights text for regex
+  const escapedHighlights = escapeRegExp(highlights);
+
+  // Create a regex that matches the exact phrase
+  const regex = new RegExp(`(${escapedHighlights})`, "gi");
+
+  // Replace matching text with highlighted version
+  return description.replace(regex, '<span class="highlight">$1</span>');
 }
