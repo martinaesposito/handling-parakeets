@@ -65,7 +65,8 @@ let tutorial = document.getElementById("tutorial");
 export let tutorialEnd = tutorial ? false : undefined;
 
 tutorial?.addEventListener("ended", () => {
-  tutorial.classList.remove("show");
+  // tutorial.classList.remove("show");
+  tutorial.style.animation = "disappear 0.5s forwards";
   tutorialEnd = true;
 });
 
