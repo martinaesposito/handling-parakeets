@@ -16,11 +16,11 @@
   --bg-grey: #eeeeee;
   --transparent: 255, 0, 0, 0;
 
-  --testi: 1rem;
-  --info: 0.75rem;
-  --instruction: 1.25rem;
-  --subtitle: 1.75rem;
-  --subtitle-eng: 1.5rem;
+  --testi: 0.9rem;
+  --info: 0.7rem;
+  --instruction: 1.1rem;
+  --subtitle: 1.5rem;
+  --subtitle-eng: 1.2rem;
 
   --mini-spacer: 0.25vw;
   --spacer1: 1vh;
@@ -61,7 +61,7 @@ img {
 }
 p {
   font-size: var(--testi);
-  line-height: 110%;
+  line-height: 120%;
 }
 
 /* CANVAS */
@@ -74,12 +74,6 @@ p {
   z-index: -10;
 
   background-color: var(--bg-grey);
-  /* background: linear-gradient(
-    180deg,
-    var(--bg-grey) 0%,
-    rgba(238, 238, 238, 1) 85%,
-    var(--prak) 100%
-  ); */
 }
 .container {
   position: relative;
@@ -239,11 +233,12 @@ canvas {
 }
 .instructions > p {
   font-size: var(--instruction);
+  font-family: IBMplex-mono;
   margin: 0;
 }
 
 .eng.tree {
-  font-size: var(--text);
+  font-size: var(--testi);
   width: 100%;
 }
 
