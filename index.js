@@ -1,22 +1,25 @@
 let font;
-let imagePromises = [];
-let images = [];
 
-let imgPoints = [];
+let container = document.querySelector(".container");
+let p5, canvas;
+
+// TITOLONE
+let imgPoints = []; //array dei punti dei titoli
 let time = 0;
 let targetPositions = []; // Store target positions for easing
 let currentPositions = []; // Store current positions for easing
 let velocities = []; // Store velocities for each point
 
-let container = document.querySelector(".container");
-let p5, canvas;
-
 let points = [];
-const prak = "#C9FF4C";
 let fontSize = 200;
 
 let bounds1, bounds2;
 let subTitle;
+
+//immaginine
+let images = [];
+
+// colori dei rettangolini alernativi alle immagini
 const colors = [
   "#87BDF3",
   "#7DE44A",
@@ -39,7 +42,7 @@ import {
 window.preload = async () => {
   font = loadFont("assets/fonts/IBM_Plex_Sans/IBMPlexSans-Regular.ttf");
 
-  //Use Promise.all with batched loading to prevent memory spikes
+  //immaginine piccole
   const BATCH_SIZE = 50;
   for (let batch = 0; batch < Math.ceil(885 / BATCH_SIZE); batch++) {
     const batchPromises = [];
@@ -65,7 +68,7 @@ window.preload = async () => {
   detectPreload();
 };
 
-// Setup
+// SETUP
 window.setup = async () => {
   // CANVAS
   p5 = createCanvas(windowWidth, windowHeight, WEBGL);
@@ -94,15 +97,14 @@ window.setup = async () => {
 
   // Initialize positions and velocities
   points.forEach((p, i) => {
-    let immg =
-      i < images.length ? images[i] : images[floor(random(images.length))];
     let img = {
-      img: immg,
+      img: i < images.length ? images[i] : images[floor(random(images.length))], //prima prende le immagini in ordine ma se finiscono ne prende altre a caso,
       size: random(12.5, 15),
       c: random(colors),
       type: random() > 0.5 ? "image" : "rect",
     };
     imgPoints.push(img);
+
     // Initialize positions
     currentPositions[i] = createVector(p.x, p.y);
     targetPositions[i] = createVector(p.x, p.y);
@@ -165,6 +167,7 @@ window.draw = () => {
     currentPositions[i].y += velocities[i].y;
 
     noStroke();
+    // VERSIONE CON IMMAGINI + RECT
     // if (imgPoints[i].type == "image") {
     //   // Draw image
     //   image(
@@ -185,6 +188,7 @@ window.draw = () => {
     //   );
     // }
 
+    // VERSIONE CON SOLO IMMAGINI
     // Draw image at current position
     // image(
     //   imgPoints[i].img,
@@ -194,6 +198,8 @@ window.draw = () => {
     //   imgPoints[i].size
     // );
     // noStroke();
+
+    // VERSIONE CON SOLO RETTANGOLINI
     fill(imgPoints[i].c);
     rect(
       currentPositions[i].x + xOffset / 100,
@@ -205,15 +211,15 @@ window.draw = () => {
   translate(0, 0, 1);
   detectDraw(false);
 
-  // Add proper error handling for handimages
-  if (!detectCursor && handimages?.[4]?.width) {
-    const handImage = handimages[4];
-    image(
-      handImage,
-      0,
-      (bounds1.h * 4) / 3.2,
-      (handImage.width / 3) * 2,
-      (handImage.height / 3) * 2
-    );
-  }
+  // TOLGO LA PARTE DEL CURSORE
+  // if (!detectCursor && handimages?.[4]?.width) {
+  //   const handImage = handimages[4];
+  //   image(
+  //     handImage,
+  //     0,
+  //     (bounds1.h * 4) / 3.2,
+  //     (handImage.width / 3) * 2,
+  //     (handImage.height / 3) * 2
+  //   );
+  // }
 };

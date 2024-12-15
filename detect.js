@@ -1,5 +1,6 @@
+// MEDIAPIPE
 import {
-  ImageSegmenter,
+  // ImageSegmenter,  per adesso tolgo l'import di questa ai
   HandLandmarker,
   FilesetResolver,
 } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.0";
@@ -9,14 +10,15 @@ import { Hand } from "./hand.js"; //importa l'oggetto mano definito nel javascri
 
 let handLandmarker, imageSegmenter, labels;
 
-let container = document.querySelector(".container");
-let hands = [];
+let hands = []; //mano detectata da mediapipe
 
-let handsData; //json
+let handsData; //json con le pose
 
+// VIDEO DELLA PERSONA AL CENTRO
 export let video;
 export let videoSize;
 
+// POSE
 const handPoses = [
   "FingerPerch",
   "Grip",
@@ -37,18 +39,16 @@ let counters = [
   0, //TouchingTips
 ];
 
+// RESTART E BACK
 let restart = false;
 let market = false;
-let restartImg;
-let treeImg;
-
 let restartImgSrc;
 let treeImgSrc;
 
-let backtostart; // id: ins-2, button / div to go back to screensaver
-let backtotree; // id: ins-1, button / div to go back to stories
-
-let leftgradient; // that one that may need to be toggled
+// getting the elements
+let backtotree = document.getElementById("ins-1");
+let backtostart = document.getElementById("ins-2");
+let leftgradient = document.getElementById("gradient-left");
 
 let escapeCounters = [
   0, // from Tree when inactivity
@@ -56,34 +56,23 @@ let escapeCounters = [
   0, // from Story
 ];
 
-let debugTimer = 0;
-
-export let handimages = [];
-let similarHand;
-let font;
-
-let handimagessrc = [];
-
 const prak = "#C9FF4C";
 
-// instructions
-// let instructions = document.getElementById("instructions");
-// export let ita = document.getElementById("ita");
-// export let eng = document.getElementById("eng");
-// export let itaO = ita.innerHTML;
-// export let engO = eng.innerHTML;
+export let handimages = []; //!!! per ora questa non si può togliere
+let handimagessrc = []; // svg di tutte le pose
 
-export let cursor;
+let similarHand;
 export let selectedPose;
+
 export let zoomFactor;
 
-// DOM cursor
-
+// CURSOR
+export let cursor;
 let loadingcircle;
 let loadingrects = [];
 
-let cursorcontainer;
-let cursorimage;
+let cursorcontainer = document.getElementById("loading-circle-container"); //div che contiene l'immagine con il cerchio di caricamento
+let cursorImage = document.getElementById("cursor-image"); //div che contiene l'immagine
 
 /////////////////////////////////////////////
 
@@ -104,26 +93,14 @@ async function createHandLandmarker() {
 
 //PRELOAD
 export async function preload() {
-  //font
-  font = loadFont("assets/fonts/IBM_Plex_Sans/IBMPlexSans-Regular.ttf");
-
   for (let i = 1; i <= handPoses.length; i++) {
-    const img = loadImage(
-      `assets/cursor/${i}.svg`,
-      () => {
-        handimages[i] = img;
-        handimagessrc[i] = `assets/cursor/${i}.svg`;
-      },
-      console.warn(`Failed to load image: ${i}.svg`) //warn + fallback if fails
-    );
+    handimagessrc[i] = `assets/cursor/${i}.svg`;
   }
 
   //json
   handsData = await importJSON("json/training.json");
 
-  restartImg = loadImage("assets/instructions/restart2.svg");
-  treeImg = loadImage("assets/instructions/back2.svg");
-
+  // back e restart
   restartImgSrc = "assets/instructions/restart2.svg";
   treeImgSrc = "assets/instructions/back2.svg";
 }
@@ -143,17 +120,10 @@ export function setup() {
 
   createHandLandmarker(); //hand detector mediapipe
 
-  // getting the elements
-
-  backtotree = document.getElementById("ins-1");
-  backtostart = document.getElementById("ins-2");
-  leftgradient = document.getElementById("gradient-left");
-
   if (backtotree) backtotree.style.visibility = "hidden";
   if (leftgradient) leftgradient.style.visibility = "hidden";
 
-  // setting up the loading circle
-
+  // LOADING CIRCLE
   let precision = 64;
   let radius = 40;
   loadingcircle = document.getElementById("loading-circle");
@@ -170,44 +140,8 @@ export function setup() {
       ","
     )})`;
 
-  for (let i = 0; i < 4; i++)
+  for (let i = 0; i < 4; i++) {
     loadingrects[i] = document.getElementById("rect-" + (i + 1));
-
-  cursorcontainer = document.getElementById("loading-circle-container");
-  cursorimage = document.getElementById("cursor-image");
-}
-
-function goingBackToStart() {
-  let maxCounter = 200;
-  counters = counters.map(() => 0); // Reset all counters in the counters array
-  // selectedPose = undefined; // Reset the selected pose
-
-  drawArc(escapeCounters[1], 45 * zoomFactor, maxCounter); // Draw the new arc
-  drawDOMArc(escapeCounters[1], maxCounter);
-
-  if (escapeCounters[1] < maxCounter) {
-    escapeCounters[1]++;
-    for (let i = 0; i < counters.length; i++) {
-      // stasis of counters
-
-      if (counters[i] > 0) counters[i]--;
-    }
-  } else {
-    if (!isRedirecting) backToStart();
-  }
-}
-
-function goingBackToTree() {
-  let maxCounter = 150;
-
-  drawArc(escapeCounters[2], 45 * zoomFactor, maxCounter); // Draw the new arc
-  drawDOMArc(escapeCounters[2], maxCounter);
-  if (escapeCounters[2] < maxCounter) {
-    escapeCounters[2]++;
-  } else {
-    counters = counters.map(() => 0);
-    selectedPose = undefined;
-    escapeCounters[2] = 0;
   }
 }
 
@@ -242,8 +176,6 @@ export function draw(shouldDrawHand = true) {
     cursor.y *= scale * zoomFactor;
 
     push();
-    imageMode(CENTER);
-
     if (!shouldDrawHand) {
       //nella home disegno la mano in posa 3
       similarHand = 3;
@@ -257,46 +189,27 @@ export function draw(shouldDrawHand = true) {
       lock: !!selectedPose,
     });
 
-    let imggg = restart
-      ? restartImg
-      : market
-      ? treeImg
-      : handimages[similarHand + 1];
-
     let imgggSrc = restart
       ? restartImgSrc
       : market
       ? treeImgSrc
       : handimagessrc[similarHand + 1];
-
-    // let imgHtml= document.getElementById("imgCursor")
-    // imgHtml.src=imggg
-
-    // console.log(restart, market); // old way to draw the cursor image
-    // image(
-    //   imggg,
-    //   cursor.x,
-    //   cursor.y,
-    //   (imggg.width / 3) * 2 * zoomFactor,
-    //   (imggg.height / 3) * 2 * zoomFactor
-    // );
-
-    cursorimage.innerHTML = "<img src='" + imgggSrc + "'>" // new way to do it
-
+    cursorImage.src = imgggSrc;
     pop();
 
-    fill(prak);
-    noStroke();
-    ellipse(cursor.x, cursor.y, 5);
+    // fill(prak);
+    // noStroke();
+    // ellipse(cursor.x, cursor.y, 5);
   }
 
-  // if (counters.every((c) => c === 0)) {
-  //   selectedPose = undefined;
-  // }
+  if (counters.every((c) => c === 0)) {
+    selectedPose = undefined;
+  }
 
+  // se non c'è la mano e nessuna posa è selezionata e il video tutorial è finito
   if (!selectedPose && !hands[0] && tutorialEnd) {
     if (counters.every((c) => c === 0)) {
-      escapeTree();
+      escapeTree(600); //10 secondi
     }
   } else {
     escapeCounters[0] = 0; //counter di uscita si riavvia e il warning scompare
@@ -304,12 +217,11 @@ export function draw(shouldDrawHand = true) {
     warning ? (warning.style.display = "none") : null;
   }
 
-  // onhover of the divs that control going back to the start or to the tree
+  // //////////////////////////////////////////////////////////////////////////
+  // BACK E RESTART
   if (backtotree && backtostart) {
-    // console.log(escapeCounters);
-
     if (cursor) {
-      //se c'è il cursore e si trova sopra il coso destro
+      //restart
       if (
         cursor.x >
           (windowWidth / 2 - windowWidth / 50 - backtostart.offsetWidth) *
@@ -318,14 +230,13 @@ export function draw(shouldDrawHand = true) {
           backtostart.offsetHeight -
             (windowHeight / 2 - windowHeight / 25) * zoomFactor
       ) {
-        goingBackToStart();
+        goingBackToStart(200);
         restart = true;
-        //console.log(escapeCounters[1]);
       } else {
         restart = false;
         if (escapeCounters[1] > 0) escapeCounters[1] = 0;
       }
-
+      //goback
       if (
         selectedPose &&
         cursor.x <
@@ -335,19 +246,15 @@ export function draw(shouldDrawHand = true) {
           backtotree.offsetHeight -
             (windowHeight / 2 - windowHeight / 25) * zoomFactor // aumento leggermente il margine in alto - che sarebbe wisth/50= 2vw così da avere più margine per lo spostamento
       ) {
-        goingBackToTree();
+        goingBackToTree(150);
         market = true;
-        //console.log(escapeCounters[2]);
       } else {
         market = false;
         if (escapeCounters[2] > 0) escapeCounters[2] = 0; //se esco dal counter scende
-        console.log(escapeCounters[2]);
-        // console.log("escapeCounters[2]" + escapeCounters[2]);
       }
     }
 
     // Applying animations for the going back divs
-
     if (selectedPose) {
       backtotree.style.visibility = "visible";
       backtotree.style.animation = "appear 1s forwards";
@@ -360,8 +267,14 @@ export function draw(shouldDrawHand = true) {
     }
   }
 
-  // moving the DOM cursor
+  // displaying the cursor itself
+  if (hands[0] || !shouldDrawHand) {
+    cursorcontainer.style.display = "block";
+  } else {
+    cursorcontainer.style.display = "none";
+  }
 
+  //HTML CURSOR
   if (cursor)
     cursorcontainer.style.transform =
       "translate(" +
@@ -370,22 +283,12 @@ export function draw(shouldDrawHand = true) {
       cursor.y / zoomFactor +
       "px)";
 
-  // displaying the cursor itself
-  if (hands[0]) {
-
-    (cursorcontainer.style.display = "block");
-  } else {
-
-    (cursorcontainer.style.display = "none");
-  }
-
   // reset the counter when no action
-
   loadingrects.forEach((rect, r) => {
-
-    if (selectedPose && !market && !restart) rect.style.transform =
-    "rotate(" + (270 - 90 * r) + "deg) skew(" + (-90) + "deg)";
-  })
+    if (selectedPose && !market && !restart)
+      rect.style.transform =
+        "rotate(" + (270 - 90 * r) + "deg) skew(" + -90 + "deg)";
+  });
 }
 
 //DISEGNO LE MANI
@@ -428,122 +331,7 @@ const drawHands = (shouldDrawHand) => {
   }
 };
 
-// HAND COUNTER
-let isRedirecting = false; //flag per fare una sola call quando cambia pagina
-function handCounter({ detectedHand, shouldDrawHand, lock }) {
-  const maxCounter = 150; // Maximum counter value
-  const loadingRadius = 45 * zoomFactor; // Radius of the loading circle
-  // console.log(lock);
-  if (tutorialEnd === false || lock) return;
-
-  counters.forEach((e, i) => {
-    if (hands[0]) {
-      //se la mano non c'è o sta andando il tutorial blocco il counter
-      //console.log("counter va");
-      if (detectedHand == i) {
-        // Only increment if not already at max
-        if (counters[detectedHand] < maxCounter) {
-          counters[detectedHand]++;
-        }
-
-        drawArc(counters[detectedHand], loadingRadius, maxCounter);
-        drawDOMArc(counters[detectedHand], maxCounter);
-
-        if (counters[detectedHand] >= maxCounter) {
-          selectedPose = handPoses[i]; //se il counter raggiunge il massimo di una delle pose segnala questa come la posa detectata
-
-          if (!shouldDrawHand && !isRedirecting) {
-            //se sono nella home allora apre la pagina tree
-            window.location.href = "tree.html";
-            isRedirecting = true; //redirecting cambia così da fare un solo rindizziramento
-          }
-        }
-      } else if (counters[i] > 0) {
-        counters[i]--;
-      }
-    } else if (counters[i] > 0) {
-      counters[i]--;
-    }
-  });
-}
-
-function drawArc(value, loadingRadius, maxCounter) {
-  // const angleOffset = -HALF_PI; // Start from the top
-  // // Always draw full arc if max is reached
-  // const arcAngle =
-  //   value >= maxCounter ? TWO_PI : map(value, 0, maxCounter, 0, TWO_PI);
-
-  // // Outer arc
-  // push();
-  // noFill();
-  // strokeWeight(8 * zoomFactor);
-  // stroke(prak);
-  // arc(
-  //   cursor.x,
-  //   cursor.y,
-  //   loadingRadius * 2,
-  //   loadingRadius * 2,
-  //   angleOffset,
-  //   angleOffset + arcAngle
-  // );
-  // pop();
-
-  // // Inner arc
-  // push();
-  // noFill();
-  // strokeWeight(1);
-  // stroke("black");
-  // arc(
-  //   cursor.x,
-  //   cursor.y,
-  //   loadingRadius * 2 - 7,
-  //   loadingRadius * 2 - 7,
-  //   angleOffset,
-  //   angleOffset + arcAngle
-  // );
-  // pop();
-}
-
-function drawDOMArc(value, maxCounter) {
-  // counters applied to the DOM cursor loading bar
-
-  let cMapped = map(value, 0, maxCounter, 0, 360);
-
-  loadingrects.forEach((rect, r) => {
-    let rot_degrees = 270 - 90 * r;
-
-    let new_skew = cMapped - 90 * r;
-
-    if (new_skew < 0) new_skew = -1;
-    if (new_skew >= 90) new_skew = 90;
-
-    rect.style.transform =
-      "rotate(" + rot_degrees + "deg) skew(" + (-89 + new_skew) + "deg)";
-  });
-}
-// COUNTER CHE FA ESCAPE DALLA PAGINA NEL CASO IN CUI NESSUNA MANO è DETECTATA
-function escapeTree() {
-  escapeCounters[0]++;
-
-  let maxCounter = 300;
-
-  if (escapeCounters[0] < maxCounter) {
-    if (escapeCounters[0] > maxCounter / 2) {
-      //quando sono a metà del counter
-      // warning.style.animation = "appear 1s forwards";
-      warning ? (warning.style.display = "flex") : null;
-      // warning.style.opacity = "0.4";
-      endCounter ? (endCounter.innerHTML = escapeCounters[0]) : null;
-    }
-  } else if (!isRedirecting) backToStart();
-}
-
-function backToStart() {
-  isRedirecting = true;
-  window.location.href = "./index.html";
-}
-
-//confronto con i LANDMARKS usando gli angoli
+//DETECT HAND - confronto con i LANDMARKS usando gli angoli
 function calculateDifferences(dataSet) {
   const calculateAngleDifferences = (userAngles, refAngles) => {
     return userAngles.map((userAngle, index) =>
@@ -575,6 +363,113 @@ function calculateDifferences(dataSet) {
     return combinedScore;
   });
 }
+
+// HAND COUNTER
+let isRedirecting = false; //flag per fare una sola call quando cambia pagina
+function handCounter({ detectedHand, shouldDrawHand, lock }) {
+  const maxCounter = 150; // Maximum counter value
+  const loadingRadius = 45 * zoomFactor; // Radius of the loading circle
+  // console.log(lock);
+  if (tutorialEnd === false || lock) return;
+
+  counters.forEach((e, i) => {
+    if (hands[0]) {
+      //se la mano non c'è o sta andando il tutorial blocco il counter
+      //console.log("counter va");
+      if (detectedHand == i) {
+        // Only increment if not already at max
+        if (counters[detectedHand] < maxCounter) {
+          counters[detectedHand]++;
+        }
+
+        drawDOMArc(counters[detectedHand], maxCounter);
+
+        if (counters[detectedHand] >= maxCounter) {
+          selectedPose = handPoses[i]; //se il counter raggiunge il massimo di una delle pose segnala questa come la posa detectata
+
+          if (!shouldDrawHand && !isRedirecting) {
+            //se sono nella home allora apre la pagina tree
+            window.location.href = "tree.html";
+            isRedirecting = true; //redirecting cambia così da fare un solo rindizziramento
+          }
+        }
+      } else if (counters[i] > 0) {
+        counters[i]--;
+      }
+    } else if (counters[i] > 0) {
+      counters[i]--;
+    }
+  });
+}
+
+function drawDOMArc(value, maxCounter) {
+  // counters applied to the DOM cursor loading bar
+
+  let cMapped = map(value, 0, maxCounter, 0, 360);
+
+  loadingrects.forEach((rect, r) => {
+    let rot_degrees = 270 - 90 * r;
+
+    let new_skew = cMapped - 90 * r;
+
+    if (new_skew < 0) new_skew = -1;
+    if (new_skew >= 90) new_skew = 90;
+
+    rect.style.transform =
+      "rotate(" + rot_degrees + "deg) skew(" + (-89 + new_skew) + "deg)";
+  });
+}
+// RESTART E GO BACK
+// restart
+function goingBackToStart(maxCounter) {
+  !selectedPose ? (counters = counters.map(() => 0)) : null; // Reset all counters in the counters array
+  // selectedPose = undefined; // Reset the selected pose
+
+  console.log(counters, selectedPose);
+  drawDOMArc(escapeCounters[1], maxCounter);
+
+  if (escapeCounters[1] < maxCounter) {
+    escapeCounters[1]++;
+  } else {
+    if (!isRedirecting) backToStart();
+  }
+}
+//go back
+function goingBackToTree(maxCounter) {
+  drawDOMArc(escapeCounters[2], maxCounter);
+  if (escapeCounters[2] < maxCounter) {
+    escapeCounters[2]++;
+  } else {
+    counters = counters.map(() => 0);
+    selectedPose = undefined;
+    escapeCounters[2] = 0;
+  }
+}
+
+// COUNTER CHE FA ESCAPE DALLA PAGINA NEL CASO IN CUI NESSUNA MANO è DETECTATA
+function escapeTree(maxCounter) {
+  escapeCounters[0]++;
+  if (escapeCounters[0] < maxCounter) {
+    if (escapeCounters[0] > maxCounter / 2) {
+      //quando sono a metà del counter
+      // warning.style.animation = "appear 1s forwards";
+      warning ? (warning.style.display = "flex") : null;
+      // warning.style.opacity = "0.4";
+
+      endCounter
+        ? (endCounter.innerHTML = 10 - Math.floor(escapeCounters[0] / 60))
+        : null;
+    }
+  } else if (!isRedirecting) backToStart();
+}
+
+function backToStart() {
+  isRedirecting = true;
+  window.location.href = "./index.html";
+}
+
+// //////////////////////////////////////////////////////////////////////////
+
 //rimappo le coordinate del video rispetto allo schermo
 function mapCoords(point, v) {
   //rimappo le coordinate dei punti della mano rispetto alla dimensione del video e alla dimensione della canva

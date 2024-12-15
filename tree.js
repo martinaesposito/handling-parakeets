@@ -5,7 +5,6 @@ import {
   selectedPose,
   video,
   videoSize,
-  zoomFactor,
 } from "./detect.js";
 
 let branchPositions = [];

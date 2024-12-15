@@ -71,14 +71,15 @@ p {
   left: 0;
   width: 100%;
   height: 100vh;
-  z-index: -500;
+  z-index: -10;
 
-  background: linear-gradient(
+  background-color: var(--bg-grey);
+  /* background: linear-gradient(
     180deg,
     var(--bg-grey) 0%,
     rgba(238, 238, 238, 1) 85%,
     var(--prak) 100%
-  );
+  ); */
 }
 .container {
   position: relative;
@@ -86,7 +87,7 @@ p {
   justify-content: center;
 }
 canvas {
-  z-index: 2;
+  z-index: 0;
 }
 
 /* LOADING */
@@ -106,7 +107,7 @@ canvas {
 
   gap: var(--spacer3);
 
-  z-index: 750;
+  z-index: 10;
 }
 #loading-img {
   height: var(--img-height);
@@ -124,7 +125,7 @@ canvas {
   height: 100vh;
 
   object-fit: cover;
-  z-index: 1000;
+  z-index: 15;
 }
 #tutorial.show {
   display: block;
@@ -150,7 +151,7 @@ canvas {
   position: absolute;
   left: 50%;
   top: 50%;
-  z-index: 10;
+  z-index: 15;
 }
 #loading-circle {
   width: 7vw;
@@ -161,7 +162,6 @@ canvas {
   transform: translate(-50%, -50%);
   border-radius: 50%;
   overflow: hidden;
-  z-index: 10;
   background: transparent;
 }
 
@@ -177,16 +177,12 @@ canvas {
 }
 
 #rect-1 {
-  
 }
 #rect-2 {
-  
 }
 #rect-3 {
-  
 }
 #rect-4 {
-  
 }
 
 #cursor-image {
@@ -204,7 +200,7 @@ canvas {
   position: fixed;
   left: 50%;
   transform: translate(-50%, 0%);
-
+  z-index: 5;
   width: 100%;
 }
 #ins-container.bottom {
@@ -283,7 +279,8 @@ canvas {
   top: 0px;
   width: 60%;
   height: 30%;
-  z-index: -1;
+  z-index: 4;
+  /* lo metto leggermente sotto alle ins ma comunque sopra la canvas */
 
   background: radial-gradient(
     ellipse at top right,
@@ -291,6 +288,20 @@ canvas {
     /* #87bdf3 20%, */ rgba(0, 0, 0, 0) 50%
   );
 }
+#gradient-bottom {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  height: 25vh;
+  width: 100%;
+  z-index: 4;
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0) 50% 0%,
+    var(--prak) 100%
+  );
+}
+
 /* PLATFORM */
 .platform {
   background-color: #ffffff;
@@ -310,7 +321,7 @@ canvas {
   left: 0;
   width: 100%;
   height: 100vh;
-  z-index: 300;
+  z-index: 15;
 }
 #warning-bg {
   position: fixed;
@@ -320,7 +331,7 @@ canvas {
   height: 100vh;
   background-color: black;
   opacity: 0.4;
-  z-index: 300;
+  z-index: 10;
 }
 .overlaybox {
   display: block;
@@ -330,7 +341,7 @@ canvas {
   width: auto;
   height: auto;
   padding: var(--spacer1);
-  z-index: 450;
+  z-index: 5;
 }
 #endCounter {
   font-size: var(--subtitle);
@@ -355,7 +366,7 @@ canvas {
 .storycontainer {
   width: var(--img-story);
   position: absolute;
-  z-index: 250;
+  z-index: 15;
 
   border: solid var(--mini-spacer) var(--prak);
   background: #ffffff;
@@ -389,10 +400,6 @@ canvas {
   text-align: left;
   font-size: var(--testi);
 }
-/* .intro > .eng {
-  font-size: var(--info);
-  line-height: 0;
-} */
 
 .gap {
   gap: 1vh;
