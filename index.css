@@ -19,8 +19,8 @@
   --testi: 0.9rem;
   --info: 0.7rem;
   --instruction: 1.1rem;
+  --subtitle-eng: 1.3rem; /* this style is also used for the stories */
   --subtitle: 1.5rem;
-  --subtitle-eng: 1.2rem;
 
   --mini-spacer: 0.25vw;
   --spacer1: 1vh;
@@ -401,7 +401,7 @@ canvas {
   z-index: 100;
   border: none;
   width: var(--intro-story);
-  font-size: var(--instruction);
+  font-size: var(--subtitle-eng);
   text-align: center;
   gap: var(--spacer3);
   line-height: 110%;
