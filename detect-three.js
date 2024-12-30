@@ -90,7 +90,7 @@ let introWave = true;
 
 let prev_timestamp;
 let delta_time;
-let texture, videoMesh;
+let videoMesh;
 
 /////////////////////////////////////////////
 
@@ -159,9 +159,9 @@ export function setup() {
 
           console.log(video.videoWidth, video.videoHeight);
           const material = new THREE.MeshBasicMaterial({ map: texture });
-          const mesh = new THREE.Mesh(geometry, material);
+          videoMesh = new THREE.Mesh(geometry, material);
 
-          scene.add(mesh);
+          scene.add(videoMesh);
         });
       })
       .catch(function (error) {
@@ -225,6 +225,10 @@ export function draw(shouldDrawHand = true) {
       ? (canvasH / video.videoHeight) * video.videoWidth
       : canvasW,
   };
+
+  if (videoMesh) {
+    videoMesh.visible = !selectedPose;
+  }
 
   //DISEGNO LE MANI
   drawHands(selectedPose ? false : shouldDrawHand);
@@ -478,7 +482,7 @@ function handCounter({ detectedHand, shouldDrawHand, lock }) {
 
         if (counters[detectedHand] >= maxCounter) {
           selectedPose = handPoses[i]; //se il counter raggiunge il massimo di una delle pose segnala questa come la posa detectata
-          console.log(selectedPose);
+
           if (!shouldDrawHand && !isRedirecting) {
             //se sono nella home allora apre la pagina tree
             window.location.href = "tree.html";

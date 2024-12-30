@@ -44,6 +44,7 @@ export class Dot {
       finalPosition.y,
     ]);
 
+    this.texture = img;
     this.finalPosition = finalPosition;
     this.branch = branch.index;
     // Base position along the branch (without offset)
@@ -63,7 +64,13 @@ export class Dot {
 
     // three
     const geometry = new THREE.PlaneGeometry(this.radius, this.radius);
-    const material = new THREE.MeshBasicMaterial({ color: this.color });
+    const material = new THREE.MeshBasicMaterial({
+      ...(!this.texture && {
+        color: this.color,
+      }),
+      map: this.texture,
+      transparent: true,
+    });
     this.mesh = new THREE.Mesh(geometry, material);
     this.mesh.position.set(this.pos.x, this.pos.y, this.pos.z);
 

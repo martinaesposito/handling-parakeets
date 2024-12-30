@@ -120,25 +120,28 @@ window.setup = async () => {
 };
 
 async function preload() {
-  // const imagePromises = [];
+  const imagePromises = [];
 
-  // for (let i = 2; i < 887; i++) {
-  //   const imagePromise = new Promise((resolve) => {
-  //     loadImage(
-  //       `assets/image_ultra-compress/${i}.webp`,
-  //       (img) => {
-  //         imageMap[Number(i)] = img; // Store with numeric keys
-  //         resolve();
-  //       },
-  //       (e) => {
-  //         resolve(); // Resolve even if the image fails
-  //       }
-  //     );
-  //   });
-  //   imagePromises.push(imagePromise);
-  // }
+  for (let i = 2; i < 887; i++) {
+    const imagePromise = new Promise((resolve) => {
+      new THREE.TextureLoader().load(
+        `assets/image_ultra-compress/${i}.webp`,
+        (img) => {
+          imageMap[Number(i)] = img; // Store with numeric keys
+          resolve();
+        },
+        () => {},
+        (e) => {
+          resolve(); // Resolve even if the image fails
+        }
+      );
+    });
+    imagePromises.push(imagePromise);
+  }
 
-  // await Promise.all(imagePromises);
+  await Promise.all(imagePromises);
+
+  console.log(imageMap);
 
   // prendo tutti i listings dal json
   try {
@@ -162,7 +165,9 @@ async function preload() {
     }));
   }
 
-  stories = fetch("./json/stories.json").then((response) => response.json());
+  stories = await fetch("./json/stories.json").then((response) =>
+    response.json()
+  );
 
   detectPreload(); // detect hand in detect.js
 }
@@ -271,6 +276,18 @@ function draw() {
     dot.draw(selectedPose);
   });
 
+  if (!storyIntro) {
+    storyIntro = createDiv();
+    storyIntro.style("display", "none");
+    storyIntro.addClass("introcontainer flex-column");
+  }
+
+  if (selectedPose) {
+    changeStory();
+  } else {
+    storyIntro.style("display", "none");
+  }
+
   detectDraw();
 
   renderer.render(scene, camera);
@@ -326,4 +343,34 @@ function generateBranchDots(branches) {
     allDots.push(...branchDots);
   });
   return allDots;
+}
+
+function changeStory() {
+  let intro;
+  let n;
+  let s;
+
+  for (let i = 0; i < Object.keys(stories).length; i++) {
+    if (stories[i].Pose == selectedPose) {
+      intro = stories[i];
+      s = i + 1;
+    }
+  }
+
+  if (intro && !n) {
+    storyIntro.html(
+      "<div class='overlaybox' id='title'>" +
+        intro.TitleIta +
+        "</br><span class='eng'>" +
+        intro.TitleEng +
+        "</span></div><div class='overlaybox intro gap'>" +
+        intro.DescriptionIta +
+        "</br><span class='eng'>" +
+        intro.DescriptionEng +
+        "</span></div>"
+    );
+    n = true;
+  }
+
+  storyIntro.style("display", "flex");
 }
