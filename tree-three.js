@@ -1,3 +1,6 @@
+import * as THREE from "three";
+import { sceneToScreen, screenToScene } from "./utils.js";
+import { Dot } from "./listings-three.js";
 import {
   preload as detectPreload,
   setup as detectSetup,
@@ -5,8 +8,7 @@ import {
   selectedPose,
   video,
   videoSize,
-} from "./detect.js";
-import { Dot } from "./listings.js";
+} from "./detect-three.js";
 
 let branchPositions = [];
 
@@ -21,17 +23,27 @@ let imgLoading = document.getElementById("loading-img");
 // progressbar
 let progressBar = document.getElementById("progress");
 
-imgLoading.src =
-  "assets/loading/" + Math.floor(Math.random() * 8 + 1).toString() + ".gif";
+if (imgLoading) {
+  imgLoading.src =
+    "assets/loading/" + Math.floor(Math.random() * 8 + 1).toString() + ".gif";
+}
 
+window.setup = () => {
+  start();
+};
+window.draw = () => {
+  draw();
+};
 //P5
-let p5, canvas;
+export let scene;
+let p5, canvas, renderer, camera;
 let canvasReady = false;
 
 //BRANCHES
 let branchesss = [];
 let plat;
 let platforms = [];
+export let canvasW, canvasH;
 
 const branchPlatform = [
   { value: 149, start: 0.6, end: 0.63, name: "usato.it" },
@@ -97,29 +109,26 @@ let storyIntro;
 //stories
 let stories;
 
-////////////////////////////////////////////////////////////////
+async function preload() {
+  // const imagePromises = [];
 
-///PRELOAD
-window.preload = async () => {
-  const imagePromises = [];
+  // for (let i = 2; i < 887; i++) {
+  //   const imagePromise = new Promise((resolve) => {
+  //     loadImage(
+  //       `assets/image_ultra-compress/${i}.webp`,
+  //       (img) => {
+  //         imageMap[Number(i)] = img; // Store with numeric keys
+  //         resolve();
+  //       },
+  //       (e) => {
+  //         resolve(); // Resolve even if the image fails
+  //       }
+  //     );
+  //   });
+  //   imagePromises.push(imagePromise);
+  // }
 
-  for (let i = 2; i < 887; i++) {
-    const imagePromise = new Promise((resolve) => {
-      loadImage(
-        `assets/image_ultra-compress/${i}.webp`,
-        (img) => {
-          imageMap[Number(i)] = img; // Store with numeric keys
-          resolve();
-        },
-        (e) => {
-          resolve(); // Resolve even if the image fails
-        }
-      );
-    });
-    imagePromises.push(imagePromise);
-  }
-
-  await Promise.all(imagePromises);
+  // await Promise.all(imagePromises);
 
   // prendo tutti i listings dal json
   try {
@@ -146,58 +155,58 @@ window.preload = async () => {
     listingsDataReady = true;
   }
 
-  stories = loadJSON("./json/stories.json");
+  stories = fetch("./json/stories.json").then((response) => response.json());
 
   detectPreload();
-};
+}
 
-//SETUP
-window.setup = async () => {
-  if (!listingsDataReady) {
-    //aspetta il json e continua a cercare di disegnare la funzione finchè non è pronto
-    setTimeout(window.setup, 10);
-    return;
-  }
+function setup() {
+  canvasW = window.innerWidth;
+  canvasH = window.innerHeight;
 
-  //legenda
-  for (let i = 1; i < handPoses.length + 1; i++) {
-    let hand = document.createElement("img");
-    hand.src = "assets/legend/" + i + ".svg";
-    hand.className = "hand";
-    handLegend.appendChild(hand);
-  }
+  scene = new THREE.Scene();
+  scene.background = new THREE.Color().setHex(0xffffff);
 
-  //disegno la canvas
-  p5 = createCanvas(windowWidth, windowHeight, WEBGL);
-  pixelDensity(1);
-  rectMode(CENTER);
-  imageMode(CENTER);
+  camera = new THREE.OrthographicCamera(
+    canvasW / -2,
+    canvasW / 2,
+    canvasH / 2,
+    canvasH / -2,
+    1,
+    1000
+  );
+  camera.position.z = 10;
 
-  canvas = p5.canvas;
-  container.appendChild(canvas);
+  renderer = new THREE.WebGLRenderer();
+  renderer.setSize(canvasW, canvasH);
+  document.body.appendChild(renderer.domElement);
 
-  // ANGLES
   const totalDots = window.listingsData.reduce(
     (acc, { value }) => acc + value,
     0
   );
   const angles = window.listingsData.map(
-    ({ value }) => Math.max(0.15, 2 * PI * (value / totalDots)) //distribuisco i rami in maniera proporzionale rispetto al totale, imponendo un angolo minimo di 0.15
+    ({ value }) => Math.max(0.15, 2 * Math.PI * (value / totalDots)) //distribuisco i rami in maniera proporzionale rispetto al totale, imponendo un angolo minimo di 0.15
   );
   let total = 0;
 
   angles.forEach((a, index) => {
     const angle = total + a / 2 + (index > 0 ? angles[index - 1] / 2 : 0);
 
+    const center = {
+      x: canvasW / 2,
+      y: canvasH / 2,
+    };
+
     const bounds = {
       //punti di partenza e arrivo del ramo, calcolato a partire dal seno e coseno dell'angolo corrispondente
       start: {
-        x: 0,
-        y: 0,
+        x: center.x,
+        y: center.y,
       },
       end: {
-        x: 0 + (width / 2.2) * cos(angle),
-        y: 0 + (height / 2.6) * sin(angle),
+        x: center.x + (canvasW / 2.2) * Math.cos(angle),
+        y: center.y + (canvasH / 2.6) * Math.sin(angle),
       },
     };
 
@@ -228,7 +237,25 @@ window.setup = async () => {
   canvasReady = true;
 
   detectSetup();
-  loading.style.display = "none"; //nascondo il loading
+  // loading.style.display = "none"; //nascondo il loading
+
+  // const tests = [
+  //   [0, 0],
+  //   [canvasW / 2, canvasH / 2],
+  //   [canvasW, canvasH],
+  // ];
+
+  // tests.forEach((test) => {
+  //   const coords = screenToScene(camera, test);
+
+  //   const geometry = new THREE.PlaneGeometry(100, 100);
+  //   const material = new THREE.MeshBasicMaterial({ color: 0xff00 });
+  //   const mesh = new THREE.Mesh(geometry, material);
+  //   mesh.position.set(coords.x, coords.y, coords.z);
+  //   console.log(coords);
+
+  //   scene.add(mesh);
+  // });
 
   branchPlatform.forEach((branch, index) => {
     plat = createDiv();
@@ -237,71 +264,33 @@ window.setup = async () => {
     plat.id(branch.name);
     platforms.push(plat);
   });
-};
+}
 
-///DRAW
-window.draw = () => {
-  // background(bg);
-  clear();
-  targetZ = selectedPose ? 450 : 800;
-  if (branchPositions.length > 0) {
-    branchesss.forEach(({ bounds: { start, end } }, index) => {
-      platforms[index].position(
-        width / 2 +
-          branchPositions[index].x * (800 / z) -
-          platforms[index].width / 2,
-        height / 2 +
-          branchPositions[index].y * (800 / z) -
-          platforms[index].height / 2
-      );
-      selectedPose
-        ? platforms[index].style("animation", "disappear 1s forwards")
-        : platforms[index].style("animation", "appear 1s forwards");
-    });
-  }
+function draw() {
+  if (!scene || !camera || !renderer) return;
 
-  z += (targetZ - z) * 0.1;
-  if (canvasReady) {
-    camera(0, 0, z); // Adjust z as needed
-  }
+  // targetZ = selectedPose ? 25 : 50;
+  // z += (targetZ - z) * 0.1;
+  // if (canvasReady) {
+  //   camera(0, 0, z); // Adjust z as needed
+  // }
 
-  // Update and draw dots
   dots.forEach((dot) => {
-    dot.move(dots, selectedPose, z); // Single iteration per frame for smooth animation
-    // dot.draw(selectedPose); //passo l'immagine corrispondente
+    dot.move(dots, undefined, z); // Single iteration per frame for smooth animation
+    // dot.draw(undefined); //passo l'immagine corrispondente
   });
 
-  let cH = height / 4.5;
-  let cW = (cH / 3) * 4;
-
-  // create and position the stories central description's container
-  if (!storyIntro) {
-    storyIntro = createDiv();
-    storyIntro.style("display", "none");
-    storyIntro.addClass("introcontainer flex-column");
-  }
-
-  if (selectedPose) {
-    changeStory();
-  } else {
-    storyIntro.style("display", "none");
-
-    push();
-    if (video && videoSize) {
-      scale(-1, 1); //rifletto il video in modo da vederlo correttamente
-      stroke("black");
-      noFill();
-      strokeWeight(2);
-      image(video, 0, 0, videoSize.w, videoSize.h);
-
-      rect(0, 0, videoSize.w, videoSize.h); //disegno un rettangolo in modo che abbia il bordo
-    }
-    pop();
-  }
-
-  translate(0, 0, 1);
   detectDraw();
-};
+
+  renderer.render(scene, camera);
+}
+
+async function start() {
+  await preload();
+  setup();
+}
+
+// start();
 
 function generateBranchDots(branches) {
   const allDots = [];
@@ -310,11 +299,11 @@ function generateBranchDots(branches) {
     const branchDots = [];
     const items = window.listingsData[bIndex].items;
 
-    const branchAngle = atan2(
+    const branchAngle = Math.atan2(
       branch.bounds.end.y - branch.bounds.start.y,
       branch.bounds.end.x - branch.bounds.start.x
     );
-    const perpAngle = branchAngle + HALF_PI;
+    const perpAngle = branchAngle + Math.PI / 2;
 
     // Generate a single t value for this entire branch
     const branchT = random(
@@ -326,26 +315,32 @@ function generateBranchDots(branches) {
     const baseX = lerp(branch.bounds.start.x, branch.bounds.end.x, branchT);
     const baseY = lerp(branch.bounds.start.y, branch.bounds.end.y, branchT);
 
+    const sceneBasePos = screenToScene(camera, [baseX, baseY]);
+
     // Final position with perpendicular offset
     const offset = randomGaussian() * 50;
-    const commonX = baseX + cos(perpAngle) * offset;
-    const commonY = baseY + sin(perpAngle) * offset;
+    const commonX = baseX + Math.cos(perpAngle) * offset;
+    const commonY = baseY + Math.sin(perpAngle) * offset;
+
+    const sceneCommonPos = screenToScene(camera, [commonX, commonY]);
 
     // Store the final position in branchPositions
-    branchPositions.push({ x: baseX, y: baseY });
+    branchPositions.push({ x: sceneBasePos.x, y: sceneBasePos.y });
 
     // Create dots
     items.forEach((item, i) => {
       const dot = new Dot(
         { ...branch, index: bIndex, branchT },
         allDots.length + branchDots.length,
-        random(12.5, 15),
+        random(10, 15),
         item,
         imageMap[item.Image_num],
-        { x: baseX, y: baseY }, // Base position
-        { x: commonX, y: commonY } // Final position
+        { x: sceneBasePos.x, y: sceneBasePos.y }, // Base position
+        { x: sceneCommonPos.x, y: sceneCommonPos.y } // Final position
       );
       branchDots.push(dot);
+
+      scene.add(dot.mesh);
     });
 
     allDots.push(...branchDots);
@@ -353,52 +348,10 @@ function generateBranchDots(branches) {
   return allDots;
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////
 export function isPlaying() {
   playing = true;
 }
 
 export function hasPlayed() {
   playing = false;
-}
-
-export function changeStory() {
-  let intro;
-  let n;
-  let s;
-  for (let i = 0; i < Object.keys(stories).length; i++) {
-    if (stories[i].Pose == selectedPose) {
-      intro = stories[i];
-      s = i + 1;
-    }
-  }
-
-  if (intro && !n) {
-    storyIntro.html(
-      //PROVA CON IMMAGINE IN ALTO
-      // "<img src='/assets/cursor/" +
-      // s +
-      // ".svg' class='explore' > <div class='overlaybox' id='title'>" +
-      // intro.TitleIta +
-      // "</br><span class='eng'>" +
-      // intro.TitleEng +
-      // "</span></div><div class='overlaybox intro gap'>" +
-      // intro.DescriptionIta +
-      // "</br><span class='eng'>" +
-      // intro.DescriptionEng +
-      // "</span></div>"
-      "<div class='overlaybox' id='title'>" +
-        intro.TitleIta +
-        "</br><span class='eng'>" +
-        intro.TitleEng +
-        "</span></div><div class='overlaybox intro gap'>" +
-        intro.DescriptionIta +
-        "</br><span class='eng'>" +
-        intro.DescriptionEng +
-        "</span></div>"
-    );
-    n = true;
-  }
-
-  storyIntro.style("display", "flex");
 }

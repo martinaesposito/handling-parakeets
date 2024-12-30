@@ -37,6 +37,11 @@
   --intro-story: 50vh;
 }
 
+main,
+video {
+  display: none;
+}
+
 /* //////////////////// */
 
 /* general */

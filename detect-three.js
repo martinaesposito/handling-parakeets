@@ -1,11 +1,20 @@
 // MEDIAPIPE
+import * as THREE from "three";
 import {
   // ImageSegmenter,  per adesso tolgo l'import di questa ai
   HandLandmarker,
   FilesetResolver,
 } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.0";
 
-import { z, warning, endCounter, tutorialEnd } from "./tree-three.js";
+import {
+  z,
+  canvasW,
+  canvasH,
+  scene,
+  warning,
+  endCounter,
+  tutorialEnd,
+} from "./tree-three.js";
 import { Hand } from "./hand.js"; //importa l'oggetto mano definito nel javascript precedente
 
 let handLandmarker, imageSegmenter, labels;
@@ -81,6 +90,7 @@ let introWave = true;
 
 let prev_timestamp;
 let delta_time;
+let texture, videoMesh;
 
 /////////////////////////////////////////////
 
@@ -121,10 +131,44 @@ async function importJSON(path) {
 
 //SETUP
 export function setup() {
-  //video
-  video = createCapture(VIDEO);
-  video.elt.id = "camera";
-  video.hide();
+  video = document.getElementById("capture");
+
+  const texture = new THREE.VideoTexture(video);
+  texture.wrapS = THREE.RepeatWrapping;
+  texture.repeat.x = -1;
+  texture.colorSpace = THREE.SRGBColorSpace;
+
+  if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+    const constraints = {
+      video: { facingMode: "user" },
+    };
+
+    navigator.mediaDevices
+      .getUserMedia(constraints)
+      .then(function (stream) {
+        // apply the stream to the video element used in the texture
+        video.srcObject = stream;
+        video.play();
+        video.addEventListener("playing", () => {
+          const scale = 0.4;
+
+          const geometry = new THREE.PlaneGeometry(
+            video.videoWidth * scale,
+            video.videoHeight * scale
+          );
+
+          const material = new THREE.MeshBasicMaterial({ map: texture });
+          const mesh = new THREE.Mesh(geometry, material);
+
+          scene.add(mesh);
+        });
+      })
+      .catch(function (error) {
+        console.error("Unable to access the camera/webcam.", error);
+      });
+  } else {
+    console.error("MediaDevices interface not available.");
+  }
 
   createHandLandmarker(); //hand detector mediapipe
 
@@ -170,8 +214,8 @@ export function draw(shouldDrawHand = true) {
   //VIDEO
   videoSize = {
     //calcolo le dimensioni del video proporzionalmente alle dimensioni dello schermo
-    h: height / 4.5,
-    w: (height / 4.5 / video.height) * video.width,
+    h: canvasH / 4.5,
+    w: (canvasH / 4.5 / video.videoHeight) * video.videoWidth,
   };
 
   //DISEGNO LE MANI
@@ -186,9 +230,9 @@ export function draw(shouldDrawHand = true) {
     zoomFactor = z / 800;
 
     const scale =
-      videoSize.w / videoSize.h > width / height
-        ? height / videoSize.h
-        : width / videoSize.w;
+      videoSize.w / videoSize.h > canvasW / canvasH
+        ? canvasH / videoSize.h
+        : canvasW / videoSize.w;
 
     cursor.x *= scale * zoomFactor;
     cursor.y *= scale * zoomFactor;
@@ -335,7 +379,7 @@ export function draw(shouldDrawHand = true) {
 const drawHands = (shouldDrawHand) => {
   if (handLandmarker && video && handsData) {
     //video
-    const video = document.querySelector("#camera");
+    const video = document.getElementById("capture");
 
     let startTimeMs = performance.now(); //ritorna un timestamp del video che mi serve da mandare a mediapipe per il riconoscimento dell'immagine
     if (video.currentTime) {
@@ -526,8 +570,8 @@ function backToStart() {
 function mapCoords(point, v) {
   //rimappo le coordinate dei punti della mano rispetto alla dimensione del video e alla dimensione della canva
   return {
-    x: width - point.x * v.w + (v.w - width) / 2 - width / 2,
-    y: point.y * v.h - (v.h - height) / 2 - height / 2,
+    x: canvasW - point.x * v.w + (v.w - canvasW) / 2 - canvasW / 2,
+    y: point.y * v.h - (v.h - canvasH) / 2 - canvasH / 2,
     z: 0,
   };
 }

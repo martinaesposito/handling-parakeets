@@ -1,5 +1,6 @@
-import { cursor, zoomFactor, selectedPose } from "./detect-three.js";
-import { playing, isPlaying, hasPlayed } from "./tree.js";
+import * as THREE from "three";
+import { cursor, zoomFactor, selectedPose } from "./detect.js";
+import { playing, isPlaying, hasPlayed } from "./tree-three.js";
 
 export let platX;
 export let platY;
@@ -30,23 +31,30 @@ export class Dot {
   ) {
     this.branch = branch.index;
     // Base position along the branch (without offset)
-    this.basePos = createVector(basePosition.x, basePosition.y);
+    this.basePos = new THREE.Vector3(basePosition.x, basePosition.y, 0);
 
     // Final position with offset applied
-    this.pos = createVector(finalPosition.x, finalPosition.y);
+    this.pos = new THREE.Vector3(finalPosition.x, finalPosition.y, 0);
 
     // Original position copy
-    this.originalPos = this.basePos.copy();
+    this.originalPos = this.basePos.clone();
     // PROPERTIES
     this.index = index;
     this.color = Dot.colors[Math.floor(random(Dot.colors.length))];
+    let maxRadius = 2;
+    this.baseRadius = radius;
+    this.radius = radius;
 
     if (img && !Dot.cachedImages[itemData.Image_num]) {
-      let maxRadius = 120;
       let graphics = createGraphics(maxRadius, maxRadius);
       graphics.image(img, 0, 0, maxRadius, maxRadius);
       Dot.cachedImages[itemData.Image_num] = graphics;
     }
+
+    const geometry = new THREE.PlaneGeometry(this.radius, this.radius);
+    const material = new THREE.MeshBasicMaterial({ color: this.color });
+    this.mesh = new THREE.Mesh(geometry, material);
+    this.mesh.position.set(this.pos.x, this.pos.y, this.pos.z);
 
     this.sameBranchDots = [];
     this.samePoseDots = [];
@@ -69,7 +77,7 @@ export class Dot {
     };
 
     // Velocity vector
-    this.vel = createVector(0, 0);
+    this.vel = new THREE.Vector3(0, 0, 0);
 
     // Noise offset and random pre-generation
     this.noiseOffset = random(1000);
@@ -124,6 +132,167 @@ export class Dot {
     if (this.sound) {
       this.sound.onended(hasPlayed);
     }
+  }
+
+  //MOVE
+  move(dots, currentPose) {
+    if (!this.sameBranchDots.length) {
+      this.sameBranchDots = dots.filter(
+        (d) => d.branch === this.branch && d !== this
+      );
+    }
+    if (!this.samePoseDots.length && this.itemData.Pose) {
+      this.samePoseDots = dots.filter(
+        (d) => d.shouldHighlight(this.itemData.Pose) && d !== this
+      );
+    }
+
+    // RESET BASE POSITION
+    // if (!this.shouldHighlight(currentPose) && currentPose) {
+    //   this.basePos = this.originalPos.multiplyScalar(2);
+    //   this.radius = this.baseRadius;
+    // } else if (!currentPose) {
+    //   this.basePos = this.originalPos;
+    // }
+
+    // Attraction
+    let attraction = this.basePos.clone().sub(this.pos);
+    attraction.multiplyScalar(this.config.attractionForce);
+
+    // Noise
+    let n = (noise(this.noiseOffset) - 0.5) * this.config.noiseStrength;
+    let noiseForce = new THREE.Vector3(n, n, 0);
+    this.noiseOffset += this.config.noiseStep;
+
+    // Separation
+    let separation = new THREE.Vector3(0, 0, 0);
+
+    const filteredDots = this.shouldHighlight(currentPose)
+      ? this.samePoseDots
+      : this.sameBranchDots;
+
+    // other DOTS
+    for (const other of filteredDots) {
+      //   let diff = p5.Vector.sub(this.pos, other.pos);
+      let diff = this.pos.clone().sub(other.pos);
+      let distance = diff.length();
+      let minDistance = this.radius + other.radius + 1.5;
+
+      if (this.shouldHighlight(currentPose)) {
+        minDistance += this.randomC * 3; //se sono tra i punti con la posa selezionata impongo una minimum distance maggiore
+      }
+
+      if (distance < minDistance) {
+        diff.normalize();
+        diff.multiplyScalar(
+          this.config.separationForce * (minDistance - distance)
+        );
+        separation.add(diff);
+      }
+    }
+
+    // MOUSE INTERACTION
+    // Scala le coordinate del mouse in base al fattore di zoom
+
+    if (frameCount % 2 === 0) {
+      // Check hover every 2 frames
+      const hoverThreshold = this.baseRadius * 2;
+      const d = dist(cursor?.x, cursor?.y, this.pos.x, this.pos.y);
+      this.isHovered = d < hoverThreshold;
+    }
+
+    const targetRadius = this.isHovered ? this.baseRadius * 5 : this.baseRadius; //se l'oggetto viene hoverato aumentail raggio
+    this.radius += (targetRadius - this.radius) * 0.1;
+
+    //POSA
+    // calcolo delle forze e dei limiti di posizionamento specifico per i punti della posa
+    if (this.shouldHighlight(currentPose)) {
+      let h = windowHeight / 4.5;
+      const halfWidth = ((h / 3) * 4) / 4 + this.baseRadius;
+      const halfHeight = h / 4 + this.baseRadius;
+
+      const center = new THREE.Vector3(0, 0, 0);
+      const centerAttraction = center.sub(this.pos);
+
+      // Rectangular distance calculation
+      const distanceX =
+        this.pos.x - constrain(this.pos.x, -halfWidth, halfWidth);
+      const distanceY =
+        this.pos.y - constrain(this.pos.y, -halfHeight, halfHeight);
+      const distanceSquared = distanceX * distanceX + distanceY * distanceY;
+      const distance = sqrt(distanceSquared);
+
+      // Enhanced noise effect
+      const time = millis() * 0.001;
+      const individualNoise = noise(
+        this.pos.x * 0.01 + time,
+        this.pos.y * 0.01 + time,
+        this.index * 0.1
+      );
+
+      // definisco la zona in cui staranno gli elementi intorno al quadrato centrale
+      const outerRepulsionZone =
+        this.baseRadius + Math.max(halfWidth, halfHeight) * 3; //margini più ampi per l'esterno
+      const innerRepulsionZone =
+        this.baseRadius + Math.min(halfWidth, halfHeight);
+
+      if (distance < outerRepulsionZone) {
+        //forza di repulsione tre gli elementi
+        let repulsionStrength = map(
+          distance * (1 + individualNoise * 0.5),
+          innerRepulsionZone,
+          outerRepulsionZone,
+          this.config.separationForce * 10,
+          this.config.separationForce * 0.1
+        );
+        let repulsionVector = new THREE.Vector3(distanceX, distanceY, 0);
+        repulsionVector.normalize();
+        // repulsionVector.rotate(individualNoise * PI * 0.25);
+        repulsionVector.rotate(
+          new THREE.Vector3(0, 0, 1),
+          individualNoise * PI * 0.25
+        );
+        repulsionVector.multiplyScalar(repulsionStrength);
+        //sommo forze di separazione
+        separation.add(repulsionVector);
+        separation.add(
+          new THREE.Vector3(
+            individualNoise - 0.5,
+            individualNoise - 0.5,
+            0
+          ).multiplyScalar(this.config.noiseStrength * 3)
+        );
+
+        //forza di attrazione tre gli elementi
+        const attractionStrength = map(
+          distance,
+          innerRepulsionZone,
+          outerRepulsionZone,
+          0.005,
+          0.05
+        );
+        centerAttraction.multiplyScalar(attractionStrength);
+      }
+      //sommo forze di attrazione
+      attraction.add(centerAttraction);
+
+      // radius increment
+      this.radius += (this.baseRadius * this.randomC - this.radius) * 0.1;
+    }
+
+    //SOMMO TUTTE LE FORZE
+    this.vel.add(attraction);
+    this.vel.add(separation);
+    this.vel.add(noiseForce);
+
+    // Damping and velocity limit
+    this.vel.multiplyScalar(this.config.damping);
+    this.vel.clampLength(0, this.config.maxSpeed);
+
+    // Update position
+    this.pos.add(this.vel);
+
+    this.mesh.position.set(this.pos.x, this.pos.y, this.pos.z);
   }
 
   //DRAW
@@ -225,170 +394,6 @@ export class Dot {
         (screenPos.y + divyoffset) +
         "px)"
     );
-  }
-
-  //MOVE
-  move(dots, currentPose) {
-    if (!this.sameBranchDots.length) {
-      this.sameBranchDots = dots.filter(
-        (d) => d.branch === this.branch && d !== this
-      );
-    }
-    if (!this.samePoseDots.length && this.itemData.Pose) {
-      this.samePoseDots = dots.filter(
-        (d) => d.shouldHighlight(this.itemData.Pose) && d !== this
-      );
-    }
-
-    // RESET BASE POSITION
-    if (!this.shouldHighlight(currentPose) && currentPose) {
-      this.basePos = p5.Vector.mult(this.originalPos, 2);
-      this.radius = this.baseRadius;
-    } else if (!currentPose) {
-      this.basePos = p5.Vector.mult(this.originalPos, 1);
-    }
-
-    // Attraction
-    let attraction = p5.Vector.sub(this.basePos, this.pos);
-    attraction.mult(this.config.attractionForce);
-
-    // Noise
-    let n = (noise(this.noiseOffset) - 0.5) * this.config.noiseStrength;
-    let noiseForce = createVector(n, n);
-    this.noiseOffset += this.config.noiseStep;
-
-    // Separation
-    let separation = createVector(0, 0);
-
-    const filteredDots = this.shouldHighlight(currentPose)
-      ? this.samePoseDots
-      : this.sameBranchDots;
-
-    // const filteredDots = dots.filter(
-    //   (d) =>
-    //     this.shouldHighlight(currentPose)
-    //       ? d.shouldHighlight(currentPose)
-    //       : // controlla solo punti appartenenti allo stesso branch
-    //         d.branch === this.branch
-
-    // controlla anche punti dei branch adiacenti
-    // : ((d.branch >= this.branch - 1 && d.branch <= this.branch + 1) ||
-    //     (this.branch === 0 && d.branch === 15) ||
-    //     (this.branch === 15 && d.branch === 0)) &&
-    //   d !== this
-    // );
-
-    // other DOTS
-    for (const other of filteredDots) {
-      let diff = p5.Vector.sub(this.pos, other.pos);
-      let distance = diff.mag();
-      let minDistance = this.radius + other.radius + 1.5;
-
-      if (this.shouldHighlight(currentPose)) {
-        minDistance += this.randomC * 3; //se sono tra i punti con la posa selezionata impongo una minimum distance maggiore
-      }
-
-      if (distance < minDistance) {
-        diff.normalize();
-        diff.mult(this.config.separationForce * (minDistance - distance));
-        separation.add(diff);
-      }
-    }
-
-    // MOUSE INTERACTION
-    // Scala le coordinate del mouse in base al fattore di zoom
-
-    if (frameCount % 2 === 0) {
-      // Check hover every 2 frames
-      const hoverThreshold = this.baseRadius * 2;
-      const d = dist(cursor?.x, cursor?.y, this.pos.x, this.pos.y);
-      this.isHovered = d < hoverThreshold;
-    }
-
-    const targetRadius = this.isHovered ? this.baseRadius * 5 : this.baseRadius; //se l'oggetto viene hoverato aumentail raggio
-    this.radius += (targetRadius - this.radius) * 0.1;
-
-    //POSA
-    // calcolo delle forze e dei limiti di posizionamento specifico per i punti della posa
-    if (this.shouldHighlight(currentPose)) {
-      let h = windowHeight / 4.5;
-      const halfWidth = ((h / 3) * 4) / 4 + this.baseRadius;
-      const halfHeight = h / 4 + this.baseRadius;
-
-      const center = createVector(0, 0);
-      const centerAttraction = p5.Vector.sub(center, this.pos);
-
-      // Rectangular distance calculation
-      const distanceX =
-        this.pos.x - constrain(this.pos.x, -halfWidth, halfWidth);
-      const distanceY =
-        this.pos.y - constrain(this.pos.y, -halfHeight, halfHeight);
-      const distanceSquared = distanceX * distanceX + distanceY * distanceY;
-      const distance = sqrt(distanceSquared);
-
-      // Enhanced noise effect
-      const time = millis() * 0.001;
-      const individualNoise = noise(
-        this.pos.x * 0.01 + time,
-        this.pos.y * 0.01 + time,
-        this.index * 0.1
-      );
-
-      // definisco la zona in cui staranno gli elementi intorno al quadrato centrale
-      const outerRepulsionZone =
-        this.baseRadius + Math.max(halfWidth, halfHeight) * 3; //margini più ampi per l'esterno
-      const innerRepulsionZone =
-        this.baseRadius + Math.min(halfWidth, halfHeight);
-
-      if (distance < outerRepulsionZone) {
-        //forza di repulsione tre gli elementi
-        let repulsionStrength = map(
-          distance * (1 + individualNoise * 0.5),
-          innerRepulsionZone,
-          outerRepulsionZone,
-          this.config.separationForce * 10,
-          this.config.separationForce * 0.1
-        );
-        let repulsionVector = createVector(distanceX, distanceY);
-        repulsionVector.normalize();
-        repulsionVector.rotate(individualNoise * PI * 0.25);
-        repulsionVector.mult(repulsionStrength);
-        //sommo forze di separazione
-        separation.add(repulsionVector);
-        separation.add(
-          createVector(individualNoise - 0.5, individualNoise - 0.5).mult(
-            this.config.noiseStrength * 3
-          )
-        );
-
-        //forza di attrazione tre gli elementi
-        const attractionStrength = map(
-          distance,
-          innerRepulsionZone,
-          outerRepulsionZone,
-          0.005,
-          0.05
-        );
-        centerAttraction.mult(attractionStrength);
-      }
-      //sommo forze di attrazione
-      attraction.add(centerAttraction);
-
-      // radius increment
-      this.radius += (this.baseRadius * this.randomC - this.radius) * 0.1;
-    }
-
-    //SOMMO TUTTE LE FORZE
-    this.vel.add(attraction);
-    this.vel.add(separation);
-    this.vel.add(noiseForce);
-
-    // Damping and velocity limit
-    this.vel.mult(this.config.damping);
-    this.vel.limit(this.config.maxSpeed);
-
-    // Update position
-    this.pos.add(this.vel);
   }
 
   shouldHighlight(pose) {
