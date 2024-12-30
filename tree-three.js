@@ -121,13 +121,15 @@ window.setup = async () => {
 
 async function preload() {
   const imagePromises = [];
+  const loader = new THREE.TextureLoader();
 
   for (let i = 2; i < 887; i++) {
     const imagePromise = new Promise((resolve) => {
-      new THREE.TextureLoader().load(
+      loader.load(
         `assets/image_ultra-compress/${i}.webp`,
-        (img) => {
-          imageMap[Number(i)] = img; // Store with numeric keys
+        (texture) => {
+          texture.colorSpace = THREE.SRGBColorSpace;
+          imageMap[Number(i)] = texture; // Store with numeric keys
           resolve();
         },
         () => {},
