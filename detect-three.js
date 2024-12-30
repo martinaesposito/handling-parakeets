@@ -7,7 +7,7 @@ import {
 } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.0";
 
 import {
-  z,
+  zoom,
   canvasW,
   canvasH,
   scene,
@@ -81,7 +81,7 @@ export let cursor;
 let loadingcircles;
 let loadingrects = [];
 
-let cursorcontainer = document.getElementById("loading-circle-container"); //div che contiene l'immagine con il cerchio di caricamento
+let cursorcontainer = document.getElementById("cursor-container"); //div che contiene l'immagine con il cerchio di caricamento
 let cursorImages = document.getElementsByClassName("cursor-image"); //div che contiene l'immagine
 
 let introWave = true;
@@ -157,6 +157,7 @@ export function setup() {
             video.videoHeight * scale
           );
 
+          console.log(video.videoWidth, video.videoHeight);
           const material = new THREE.MeshBasicMaterial({ map: texture });
           const mesh = new THREE.Mesh(geometry, material);
 
@@ -211,11 +212,18 @@ export function draw(shouldDrawHand = true) {
 
   if (!video) return; //se non c'è il video non va
 
+  const videoMoreHorizontalThanScreen =
+    video.videoWidth / video.videoHeight > canvasW / canvasH;
+
   //VIDEO
+  //calcolo le dimensioni del video proporzionalmente alle dimensioni dello schermo
   videoSize = {
-    //calcolo le dimensioni del video proporzionalmente alle dimensioni dello schermo
-    h: canvasH / 4.5,
-    w: (canvasH / 4.5 / video.videoHeight) * video.videoWidth,
+    h: videoMoreHorizontalThanScreen
+      ? canvasH
+      : (canvasW / video.videoWidth) * video.videoHeight,
+    w: videoMoreHorizontalThanScreen
+      ? (canvasH / video.videoHeight) * video.videoWidth
+      : canvasW,
   };
 
   //DISEGNO LE MANI
@@ -227,15 +235,17 @@ export function draw(shouldDrawHand = true) {
     if (!cursor) return;
 
     // Calculate zoom factor based on current z
-    zoomFactor = z / 800;
+    zoomFactor = zoom;
 
     const scale =
       videoSize.w / videoSize.h > canvasW / canvasH
         ? canvasH / videoSize.h
         : canvasW / videoSize.w;
 
-    cursor.x *= scale * zoomFactor;
-    cursor.y *= scale * zoomFactor;
+    cursor.y = cursor.y * scale * zoomFactor;
+    cursor.x = cursor.x * scale * zoomFactor;
+
+    // console.log(Math.round(cursor.x), Math.round(cursor.y));
 
     push();
     if (!shouldDrawHand) {
@@ -256,12 +266,7 @@ export function draw(shouldDrawHand = true) {
       image.style.display = i == index ? "block" : "none";
     });
 
-    // console.log(cursorImage);
     pop();
-
-    // fill(prak);
-    // noStroke();
-    // ellipse(cursor.x, cursor.y, 5);
   }
 
   if (counters.every((c) => c === 0)) {
@@ -340,13 +345,11 @@ export function draw(shouldDrawHand = true) {
   // introductory wave
 
   if (introWave) {
-    cursorcontainer.style.top = "90%";
-    cursorcontainer.style.left = "75%";
+    // cursorcontainer.style.top = "90%";
+    // cursorcontainer.style.left = "75%";
     cursorcontainer.style.animation = "wave 3s infinite";
     loadingrects.forEach((rect) => (rect.style.visibility = "hidden"));
   } else if (introWave == false) {
-    cursorcontainer.style.top = "50%";
-    cursorcontainer.style.left = "50%";
     cursorcontainer.style.animation = "none";
   }
 
@@ -475,7 +478,7 @@ function handCounter({ detectedHand, shouldDrawHand, lock }) {
 
         if (counters[detectedHand] >= maxCounter) {
           selectedPose = handPoses[i]; //se il counter raggiunge il massimo di una delle pose segnala questa come la posa detectata
-
+          console.log(selectedPose);
           if (!shouldDrawHand && !isRedirecting) {
             //se sono nella home allora apre la pagina tree
             window.location.href = "tree.html";
@@ -570,8 +573,8 @@ function backToStart() {
 function mapCoords(point, v) {
   //rimappo le coordinate dei punti della mano rispetto alla dimensione del video e alla dimensione della canva
   return {
-    x: canvasW - point.x * v.w + (v.w - canvasW) / 2 - canvasW / 2,
-    y: point.y * v.h - (v.h - canvasH) / 2 - canvasH / 2,
+    x: canvasW - point.x * v.w + (v.w - canvasW) / 2,
+    y: point.y * v.h - (v.h - canvasH) / 2,
     z: 0,
   };
 }

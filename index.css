@@ -161,10 +161,10 @@ canvas {
 }
 
 /* CURSOR */
-#loading-circle-container {
+#cursor-container {
   position: absolute;
-  left: 50%;
-  top: 50%;
+  left: 0px;
+  top: 0px;
   z-index: 15;
   transition: transform 0.1s ease-out;
 }

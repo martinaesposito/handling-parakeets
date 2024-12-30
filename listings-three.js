@@ -1,6 +1,14 @@
 import * as THREE from "three";
-import { cursor, zoomFactor, selectedPose } from "./detect.js";
-import { playing, isPlaying, hasPlayed } from "./tree-three.js";
+import { sceneToScreen, screenToScene } from "./utils.js";
+import { cursor, zoomFactor, selectedPose, video } from "./detect-three.js";
+import {
+  camera,
+  audioPlaying,
+  scene,
+  toggleAudio,
+  canvasW,
+  canvasH,
+} from "./tree-three.js";
 
 export let platX;
 export let platY;
@@ -17,8 +25,6 @@ export class Dot {
     "#00755F",
   ];
 
-  static cachedImages = {};
-
   //CONTSTRUCTOR
   constructor(
     branch,
@@ -29,12 +35,22 @@ export class Dot {
     basePosition,
     finalPosition
   ) {
+    const sceneBasePos = screenToScene(camera, [
+      basePosition.x,
+      basePosition.y,
+    ]);
+    const sceneFinalPos = screenToScene(camera, [
+      finalPosition.x,
+      finalPosition.y,
+    ]);
+
+    this.finalPosition = finalPosition;
     this.branch = branch.index;
     // Base position along the branch (without offset)
-    this.basePos = new THREE.Vector3(basePosition.x, basePosition.y, 0);
+    this.basePos = new THREE.Vector3(sceneBasePos.x, sceneBasePos.y, 0);
 
     // Final position with offset applied
-    this.pos = new THREE.Vector3(finalPosition.x, finalPosition.y, 0);
+    this.pos = new THREE.Vector3(sceneFinalPos.x, sceneFinalPos.y, 0);
 
     // Original position copy
     this.originalPos = this.basePos.clone();
@@ -45,12 +61,7 @@ export class Dot {
     this.baseRadius = radius;
     this.radius = radius;
 
-    if (img && !Dot.cachedImages[itemData.Image_num]) {
-      let graphics = createGraphics(maxRadius, maxRadius);
-      graphics.image(img, 0, 0, maxRadius, maxRadius);
-      Dot.cachedImages[itemData.Image_num] = graphics;
-    }
-
+    // three
     const geometry = new THREE.PlaneGeometry(this.radius, this.radius);
     const material = new THREE.MeshBasicMaterial({ color: this.color });
     this.mesh = new THREE.Mesh(geometry, material);
@@ -59,7 +70,7 @@ export class Dot {
     this.sameBranchDots = [];
     this.samePoseDots = [];
 
-    this.image = Dot.cachedImages[itemData.Image_num];
+    // this.image = Dot.cachedImages[itemData.Image_num];
 
     this.baseRadius = radius;
     this.radius = radius;
@@ -130,7 +141,7 @@ export class Dot {
 
     // adding audio functionalities
     if (this.sound) {
-      this.sound.onended(hasPlayed);
+      this.sound.onended(toggleAudio);
     }
   }
 
@@ -148,12 +159,14 @@ export class Dot {
     }
 
     // RESET BASE POSITION
-    // if (!this.shouldHighlight(currentPose) && currentPose) {
-    //   this.basePos = this.originalPos.multiplyScalar(2);
-    //   this.radius = this.baseRadius;
-    // } else if (!currentPose) {
-    //   this.basePos = this.originalPos;
-    // }
+    if (!this.shouldHighlight(currentPose) && currentPose) {
+      //quando una posa viene detectata si allontanano
+
+      this.basePos = this.originalPos.clone().multiplyScalar(2);
+      this.radius = this.baseRadius;
+    } else if (!currentPose) {
+      this.basePos = this.originalPos;
+    }
 
     // Attraction
     let attraction = this.basePos.clone().sub(this.pos);
@@ -197,7 +210,14 @@ export class Dot {
     if (frameCount % 2 === 0) {
       // Check hover every 2 frames
       const hoverThreshold = this.baseRadius * 2;
-      const d = dist(cursor?.x, cursor?.y, this.pos.x, this.pos.y);
+
+      const sceneCursor = screenToScene(
+        camera,
+        [cursor?.x, cursor?.y],
+        this.index == 0
+      );
+
+      const d = dist(sceneCursor?.x, sceneCursor?.y, this.pos.x, this.pos.y);
       this.isHovered = d < hoverThreshold;
     }
 
@@ -207,7 +227,7 @@ export class Dot {
     //POSA
     // calcolo delle forze e dei limiti di posizionamento specifico per i punti della posa
     if (this.shouldHighlight(currentPose)) {
-      let h = windowHeight / 4.5;
+      let h = video.videoHeight * 0.4;
       const halfWidth = ((h / 3) * 4) / 4 + this.baseRadius;
       const halfHeight = h / 4 + this.baseRadius;
 
@@ -247,11 +267,7 @@ export class Dot {
         );
         let repulsionVector = new THREE.Vector3(distanceX, distanceY, 0);
         repulsionVector.normalize();
-        // repulsionVector.rotate(individualNoise * PI * 0.25);
-        repulsionVector.rotate(
-          new THREE.Vector3(0, 0, 1),
-          individualNoise * PI * 0.25
-        );
+
         repulsionVector.multiplyScalar(repulsionStrength);
         //sommo forze di separazione
         separation.add(repulsionVector);
@@ -297,25 +313,6 @@ export class Dot {
 
   //DRAW
   draw(currentPose) {
-    if (this.itemData.Hand == "Hand") {
-      stroke("black");
-      stroke("#C9FF4C"); //colora le immagini con la mano
-      strokeWeight(3);
-    } else {
-      noStroke(); //se non ce l'hanno niente
-    }
-
-    if (!this.shouldHighlight(currentPose)) {
-      fill(this.color);
-      rect(this.pos.x, this.pos.y, this.radius); //rect per disegnare il bordo, + 3 per disegnarlo esterno
-    } else if (this.image) {
-      stroke("#C9FF4C"); //colora le immagini con la mano
-      strokeWeight(2);
-      noFill();
-      rect(this.pos.x, this.pos.y, this.radius + 0.5);
-      image(this.image, this.pos.x, this.pos.y, this.radius, this.radius);
-    }
-
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // handling what appears during narration
 
@@ -324,20 +321,20 @@ export class Dot {
         // on hover
 
         if (this.isHovered) {
-          if (!playing) {
+          if (!audioPlaying) {
             // avoiding any other div appearing while audio is playing
             this.div.style("display", "block");
             this.div.style("animation", "appear 0.5s forwards");
           }
 
           // positioning the divs relating to the screen needs to happen when the div is "displayed"
-          this.positioning();
+          this.positionStoryCard();
 
           // PLAYING
-          if (this.sound && !playing) {
+          if (this.sound && !audioPlaying) {
             // avoiding errors from non-existing sounds and from audio playing while another is
 
-            isPlaying();
+            toggleAudio();
             this.sound.play(); // play sound if it's not already
           }
         } else {
@@ -358,12 +355,12 @@ export class Dot {
     }
   }
 
-  positioning() {
+  positionStoryCard() {
     // positioning the divs relating to the screen
 
     let screenPos = {
-      x: cursor?.x / zoomFactor + width / 2,
-      y: cursor?.y / zoomFactor + height / 2,
+      x: cursor?.x / zoomFactor,
+      y: cursor?.y / zoomFactor,
     };
 
     let divh = this.div.size().height;
@@ -374,12 +371,12 @@ export class Dot {
     let divyoffset = -divh / 2;
 
     //sotto
-    if (screenPos.y > height / 2) {
-      if (screenPos.y + divh / 2 > height) {
-        divyoffset += height - (screenPos.y + divh / 2);
+    if (screenPos.y > canvasH / 2) {
+      if (screenPos.y + divh / 2 > canvasH) {
+        divyoffset += canvasH - (screenPos.y + divh / 2);
       }
       //sopra
-    } else if (screenPos.y <= height / 2) {
+    } else if (screenPos.y <= canvasH / 2) {
       if (screenPos.y - divh / 2 < 0) {
         divyoffset += divh / 2 - screenPos.y;
       }

@@ -29,14 +29,13 @@ export class Dot {
     finalPosition
   ) {
     this.branch = branch.index;
-    // Base position along the branch (without offset)
-    this.basePos = createVector(basePosition.x, basePosition.y);
 
-    // Final position with offset applied
-    this.pos = createVector(finalPosition.x, finalPosition.y);
+    this.basePos = createVector(basePosition.x, basePosition.y); // Base position along the branch (without offset)
+    this.pos = createVector(finalPosition.x, finalPosition.y); // Final position with offset applied
 
     // Original position copy
     this.originalPos = this.basePos.copy();
+
     // PROPERTIES
     this.index = index;
     this.color = Dot.colors[Math.floor(random(Dot.colors.length))];
@@ -128,24 +127,24 @@ export class Dot {
 
   //DRAW
   draw(currentPose) {
-    if (this.itemData.Hand == "Hand") {
-      stroke("black");
-      stroke("#C9FF4C"); //colora le immagini con la mano
-      strokeWeight(3);
-    } else {
-      noStroke(); //se non ce l'hanno niente
-    }
+    // if (this.itemData.Hand == "Hand") {
+    //   stroke("black");
+    //   stroke("#C9FF4C"); //colora le immagini con la mano
+    //   strokeWeight(3);
+    // } else {
+    //   noStroke(); //se non ce l'hanno niente
+    // }
 
-    if (!this.shouldHighlight(currentPose)) {
-      fill(this.color);
-      rect(this.pos.x, this.pos.y, this.radius); //rect per disegnare il bordo, + 3 per disegnarlo esterno
-    } else if (this.image) {
-      stroke("#C9FF4C"); //colora le immagini con la mano
-      strokeWeight(2);
-      noFill();
-      rect(this.pos.x, this.pos.y, this.radius + 0.5);
-      image(this.image, this.pos.x, this.pos.y, this.radius, this.radius);
-    }
+    // if (!this.shouldHighlight(currentPose)) {
+    //   fill(this.color);
+    //   rect(this.pos.x, this.pos.y, this.radius); //rect per disegnare il bordo, + 3 per disegnarlo esterno
+    // } else if (this.image) {
+    //   stroke("#C9FF4C"); //colora le immagini con la mano
+    //   strokeWeight(2);
+    //   noFill();
+    //   rect(this.pos.x, this.pos.y, this.radius + 0.5);
+    //   image(this.image, this.pos.x, this.pos.y, this.radius, this.radius);
+    // }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // handling what appears during narration

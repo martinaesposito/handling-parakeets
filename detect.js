@@ -72,7 +72,7 @@ export let cursor;
 let loadingcircles;
 let loadingrects = [];
 
-let cursorcontainer = document.getElementById("loading-circle-container"); //div che contiene l'immagine con il cerchio di caricamento
+let cursorcontainer = document.getElementById("cursor-container"); //div che contiene l'immagine con il cerchio di caricamento
 let cursorImages = document.getElementsByClassName("cursor-image"); //div che contiene l'immagine
 
 let introWave = true;

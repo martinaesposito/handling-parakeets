@@ -1,17 +1,20 @@
 import * as THREE from "three";
 
-export function screenToScene(camera, coords = [0, 0]) {
+export function screenToScene(camera, coords = [0, 0], shouldLog) {
   const origin = new THREE.Vector3();
   const direction = new THREE.Vector3();
 
   if (camera instanceof THREE.OrthographicCamera) {
     // Orthographic camera case
-    const width = camera.right - camera.left;
-    const height = camera.top - camera.bottom;
+    const width = (camera.right - camera.left) / camera.zoom;
+    const height = (camera.top - camera.bottom) / camera.zoom;
 
     // Normalize the screen coordinates to [-1, 1] range for both axes
-    const normalizedX = (coords[0] / width) * 2 - 1;
-    const normalizedY = -((coords[1] / height) * 2 - 1); // Invert Y for Three.js standard
+    const normalizedX = (coords[0] / camera.zoom / window.innerWidth) * 2 - 1;
+    const normalizedY = -(
+      (coords[1] / camera.zoom / window.innerHeight) * 2 -
+      1
+    ); // Invert Y for Three.js standard
 
     // Map the normalized screen coordinates to world coordinates
     const x = (normalizedX * width) / 2;
@@ -19,8 +22,6 @@ export function screenToScene(camera, coords = [0, 0]) {
 
     // Assuming z = 0 for world-space (you can adjust this based on your scene depth)
     origin.set(x, y, 0);
-    // direction.set(0, 0, -1); // Direction is along the z-axis for orthographic views
-    // direction.applyMatrix4(camera.matrixWorld); // Transform by the camera's world matrix
   } else if (camera instanceof THREE.PerspectiveCamera) {
     // Perspective camera case
     direction.set(normalizedX, normalizedY, 0.5); // Start at the middle of the near plane
