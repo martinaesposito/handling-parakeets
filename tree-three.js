@@ -120,6 +120,7 @@ window.setup = async () => {
 };
 
 async function preload() {
+  // immagini
   const imagePromises = [];
   const loader = new THREE.TextureLoader();
 
@@ -142,8 +143,6 @@ async function preload() {
   }
 
   await Promise.all(imagePromises);
-
-  console.log(imageMap);
 
   // prendo tutti i listings dal json
   try {
@@ -257,6 +256,11 @@ function setup() {
     plat.id(branch.name);
     platforms.push(plat);
   });
+
+  // intro storyContainer
+  storyIntro = createDiv();
+  storyIntro.style("display", "none");
+  storyIntro.addClass("introcontainer flex-column");
 }
 
 //
@@ -274,19 +278,31 @@ function draw() {
     camera.updateProjectionMatrix();
   }
 
+  // nomi delle platform
+  if (branchPositions.length > 0) {
+    branchesss.forEach((e, index) => {
+      platforms[index].position(
+        canvasW / 2 +
+          (branchPositions[index].x - canvasW / 2) * zoom * zoom -
+          platforms[index].width / 2,
+        canvasH / 2 +
+          (branchPositions[index].y - canvasH / 2) * zoom * zoom -
+          platforms[index].height / 2
+      );
+
+      selectedPose
+        ? platforms[index].style("animation", "disappear 3s forwards")
+        : platforms[index].style("animation", "appear 3s forwards");
+    });
+  }
+
   dots.forEach((dot) => {
     dot.move(dots, selectedPose);
     dot.draw(selectedPose);
   });
 
-  if (!storyIntro) {
-    storyIntro = createDiv();
-    storyIntro.style("display", "none");
-    storyIntro.addClass("introcontainer flex-column");
-  }
-
   if (selectedPose) {
-    changeStory();
+    changeStory(stories.findIndex((s) => s.Pose == selectedPose)); //gli passo l'indice della storia giusta
   } else {
     storyIntro.style("display", "none");
   }
@@ -348,32 +364,19 @@ function generateBranchDots(branches) {
   return allDots;
 }
 
-function changeStory() {
-  let intro;
-  let n;
-  let s;
-
-  for (let i = 0; i < Object.keys(stories).length; i++) {
-    if (stories[i].Pose == selectedPose) {
-      intro = stories[i];
-      s = i + 1;
-    }
-  }
-
-  if (intro && !n) {
-    storyIntro.html(
-      "<div class='overlaybox' id='title'>" +
-        intro.TitleIta +
-        "</br><span class='eng'>" +
-        intro.TitleEng +
-        "</span></div><div class='overlaybox intro gap'>" +
-        intro.DescriptionIta +
-        "</br><span class='eng'>" +
-        intro.DescriptionEng +
-        "</span></div>"
-    );
-    n = true;
-  }
+function changeStory(indexStory) {
+  let intro = stories[indexStory];
+  storyIntro.html(
+    "<img> <div class='overlaybox' id='title'>" +
+      intro.TitleIta +
+      "</br><span class='eng'>" +
+      intro.TitleEng +
+      "</span></div><div class='overlaybox intro gap'>" +
+      intro.DescriptionIta +
+      "</br><span class='eng'>" +
+      intro.DescriptionEng +
+      "</span></div>"
+  );
 
   storyIntro.style("display", "flex");
 }

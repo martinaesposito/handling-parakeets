@@ -61,14 +61,19 @@ export class Dot {
     let maxRadius = 2;
     this.baseRadius = radius;
     this.radius = radius;
+    this.scale = 1;
 
     // three
     const geometry = new THREE.PlaneGeometry(this.radius, this.radius);
     const material = new THREE.MeshBasicMaterial({
       ...(!this.texture && {
-        color: this.color,
+        // color: this.color,
+        color: new THREE.Color().setRGB(1, 1, 1),
       }),
-      map: this.texture,
+      ...(this.texture && {
+        map: this.texture,
+      }),
+
       transparent: true,
     });
     this.mesh = new THREE.Mesh(geometry, material);
@@ -79,8 +84,6 @@ export class Dot {
 
     // this.image = Dot.cachedImages[itemData.Image_num];
 
-    this.baseRadius = radius;
-    this.radius = radius;
     this.itemData = itemData;
     this.isHovered = false;
 
@@ -115,7 +118,7 @@ export class Dot {
         this.div.html(
           "<div class='box'><div class='info'>[" +
             this.itemData.Platform +
-            (this.itemData.Year ? ", " + this.itemData.Year : "") +
+            (this.itemData.Year ? ", " + this.itemData.Year : "") + //se c'è l'anno scrivo l'anno
             "]</div>" +
             highlightText(this.itemData.Description, this.itemData.Highlights) +
             "</div>"
@@ -228,15 +231,17 @@ export class Dot {
       this.isHovered = d < hoverThreshold;
     }
 
-    const targetRadius = this.isHovered ? this.baseRadius * 5 : this.baseRadius; //se l'oggetto viene hoverato aumentail raggio
+    const targetRadius = this.isHovered
+      ? this.baseRadius * 5
+      : this.baseRadius * this.scale; //se l'oggetto viene hoverato aumentail raggio
     this.radius += (targetRadius - this.radius) * 0.1;
 
     //POSA
     // calcolo delle forze e dei limiti di posizionamento specifico per i punti della posa
     if (this.shouldHighlight(currentPose)) {
       let h = video.videoHeight * 0.4;
-      const halfWidth = ((h / 3) * 4) / 4 + this.baseRadius;
-      const halfHeight = h / 4 + this.baseRadius;
+      const halfWidth = ((h / 3) * 4) / 4 + this.baseRadius / 2;
+      const halfHeight = h / 4 + this.baseRadius / 2;
 
       const center = new THREE.Vector3(0, 0, 0);
       const centerAttraction = center.sub(this.pos);
@@ -298,9 +303,6 @@ export class Dot {
       }
       //sommo forze di attrazione
       attraction.add(centerAttraction);
-
-      // radius increment
-      this.radius += (this.baseRadius * this.randomC - this.radius) * 0.1;
     }
 
     //SOMMO TUTTE LE FORZE
@@ -319,13 +321,13 @@ export class Dot {
   }
 
   //DRAW
+  //regola le interazioni al momento della storia
   draw(currentPose) {
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // handling what appears during narration
+    let targetScale = 1;
 
     if (this.div) {
       if (this.itemData.Pose == selectedPose) {
-        // on hover
+        targetScale = 3;
 
         if (this.isHovered) {
           if (!audioPlaying) {
@@ -334,23 +336,17 @@ export class Dot {
             this.div.style("animation", "appear 0.5s forwards");
           }
 
-          // positioning the divs relating to the screen needs to happen when the div is "displayed"
-          this.positionStoryCard();
+          this.positionStoryCard(); // positioning the divs relating to the screen needs to happen when the div is "displayed"
 
           // PLAYING
           if (this.sound && !audioPlaying) {
-            // avoiding errors from non-existing sounds and from audio playing while another is
-
             toggleAudio();
             this.sound.play(); // play sound if it's not already
           }
         } else {
           if (this.sound) {
-            // avoiding errors from non-existing sounds
-
             if (!this.sound.isPlaying()) {
-              // keep div open while sound plays
-              this.div.style("animation", "disappear 0.5s forwards");
+              this.div.style("animation", "disappear 0.5s forwards"); // keep div open while sound plays
             }
           } else {
             this.div.style("animation", "disappear 0.5s forwards");
@@ -358,13 +354,14 @@ export class Dot {
         }
       } else {
         this.div.style("display", "none");
+        targetScale = 1;
       }
     }
+    this.scale += (targetScale - this.scale) * 0.1;
+    this.mesh.scale.set(this.scale, this.scale, this.scale);
   }
 
   positionStoryCard() {
-    // positioning the divs relating to the screen
-
     let screenPos = {
       x: cursor?.x / zoomFactor,
       y: cursor?.y / zoomFactor,
@@ -372,8 +369,6 @@ export class Dot {
 
     let divh = this.div.size().height;
     let divw = this.div.size().width;
-
-    // let divxoffset = screenPos.x > width / 2 ? divw: 0;
     let divxoffset = -divw / 2;
     let divyoffset = -divh / 2;
 
