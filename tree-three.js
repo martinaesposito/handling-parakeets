@@ -25,8 +25,8 @@ if (imgLoading) {
 
 // TUTORIAL
 let tutorial = document.getElementById("tutorial");
-let tutorialEnd = tutorial ? false : undefined;
 // tutorialEnd = true; // RIMUOVERE, PER TESTING
+let tutorialEnd = tutorial ? false : undefined;
 // progressbar
 let progressBar = document.getElementById("progress");
 if (tutorial) {
@@ -174,6 +174,14 @@ async function preload() {
 }
 
 function setup() {
+  //legenda
+  for (let i = 1; i < handPoses.length + 1; i++) {
+    let hand = document.createElement("img");
+    hand.src = "assets/legend/" + i + ".svg";
+    hand.className = "hand";
+    handLegend.appendChild(hand);
+  }
+
   //finto setup che avvia three
   canvasW = window.innerWidth;
   canvasH = window.innerHeight;
@@ -247,7 +255,9 @@ function setup() {
   dots = generateBranchDots(branchesss);
 
   detectSetup();
-  // loading.style.display = "none"; //nascondo il loading
+  if (scene && camera && renderer) {
+    loading.style.display = "none"; //nascondo il loading
+  }
 
   branchPlatform.forEach((branch, index) => {
     plat = createDiv();
