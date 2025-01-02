@@ -4,6 +4,9 @@ import {
   draw as detectDraw,
   cursor as detectCursor,
   handimages,
+  canvasW,
+  canvasH,
+  video,
 } from "./detect-three.js";
 
 import { sceneToScreen, screenToScene } from "./utils.js";
@@ -11,7 +14,6 @@ import { sceneToScreen, screenToScene } from "./utils.js";
 import * as THREE from "three";
 // THREE
 let scene, camera, renderer;
-let canvasW, canvasH;
 
 // TITOLONE
 let font;
@@ -76,8 +78,6 @@ async function preload() {
 // SETUP
 function setup() {
   //finto setup che avvia three
-  canvasW = window.innerWidth;
-  canvasH = window.innerHeight;
 
   // three
   scene = new THREE.Scene();
@@ -144,8 +144,9 @@ function setup() {
   subTitle = document.getElementById("subtitle");
   subTitle.style.top = `${canvasH / 2 + (bounds1.h * 3) / 4}px`; // Adjust as needed
 
-  // loading.style.display = "none"; //nascondo il loading
+  loading.style.display = "none"; //nascondo il loading
   detectSetup();
+  video ? (video.style.display = "none") : null;
 }
 
 window.draw = () => {

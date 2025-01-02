@@ -107,8 +107,6 @@ export {
   tutorialEnd,
   warning,
   endCounter,
-  canvasW,
-  canvasH,
   audioPlaying,
   toggleAudio,
 };

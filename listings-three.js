@@ -1,14 +1,14 @@
 import * as THREE from "three";
 import { sceneToScreen, screenToScene } from "./utils.js";
-import { cursor, zoomFactor, selectedPose, video } from "./detect-three.js";
 import {
-  camera,
-  audioPlaying,
-  scene,
-  toggleAudio,
+  cursor,
+  zoomFactor,
+  selectedPose,
+  video,
   canvasW,
   canvasH,
-} from "./tree-three.js";
+} from "./detect-three.js";
+import { camera, audioPlaying, scene, toggleAudio } from "./tree-three.js";
 
 export let platX;
 export let platY;

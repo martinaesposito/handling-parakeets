@@ -6,16 +6,11 @@ import {
   FilesetResolver,
 } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.0";
 
-import {
-  zoom,
-  canvasW,
-  canvasH,
-  scene,
-  warning,
-  endCounter,
-  tutorialEnd,
-} from "./tree-three.js";
+import { zoom, scene, warning, endCounter, tutorialEnd } from "./tree-three.js";
 import { Hand } from "./hand.js"; //importa l'oggetto mano definito nel javascript precedente
+
+export let canvasW = window.innerWidth;
+export let canvasH = window.innerHeight;
 
 let handLandmarker, imageSegmenter, labels;
 
@@ -24,9 +19,7 @@ let hands = []; //mano detectata da mediapipe
 let handsData = []; //json con le pose
 
 // VIDEO DELLA PERSONA AL CENTRO
-export let video;
-export let videoSize;
-export let videoExists = false;
+export let video, videoSize, videoExists;
 
 // POSE
 const handPoses = [
@@ -241,7 +234,7 @@ export function draw(shouldDrawHand = true) {
     if (!cursor) return;
 
     // Calculate zoom factor based on current z
-    zoomFactor = zoom;
+    zoomFactor = zoom ? zoom : 1;
 
     const scale =
       videoSize.w / videoSize.h > canvasW / canvasH
@@ -250,8 +243,6 @@ export function draw(shouldDrawHand = true) {
 
     cursor.y = cursor.y * scale * zoomFactor;
     cursor.x = cursor.x * scale * zoomFactor;
-
-    // console.log(Math.round(cursor.x), Math.round(cursor.y));
 
     push();
     if (!shouldDrawHand) {
@@ -360,13 +351,14 @@ export function draw(shouldDrawHand = true) {
   }
 
   //HTML CURSOR
-  if (cursor)
+  if (cursor) {
     cursorcontainer.style.transform =
       "translate(" +
       cursor.x / zoomFactor +
       "px," +
       cursor.y / zoomFactor +
       "px)";
+  }
 
   // reset the counter when no action
   loadingrects.forEach((rect, r) => {
