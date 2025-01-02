@@ -26,6 +26,7 @@ let handsData = []; //json con le pose
 // VIDEO DELLA PERSONA AL CENTRO
 export let video;
 export let videoSize;
+export let videoExists = false;
 
 // POSE
 const handPoses = [
@@ -150,18 +151,19 @@ export function setup() {
         video.srcObject = stream;
         video.play();
         video.addEventListener("playing", () => {
-          const scale = 0.4;
+          // const scale = 0.4;
 
-          const geometry = new THREE.PlaneGeometry(
-            video.videoWidth * scale,
-            video.videoHeight * scale
-          );
+          // const geometry = new THREE.PlaneGeometry(
+          //   video.videoWidth * scale,
+          //   video.videoHeight * scale
+          // );
 
-          console.log(video.videoWidth, video.videoHeight);
-          const material = new THREE.MeshBasicMaterial({ map: texture });
-          videoMesh = new THREE.Mesh(geometry, material);
+          // console.log(video.videoWidth, video.videoHeight);
+          // const material = new THREE.MeshBasicMaterial({ map: texture });
+          // videoMesh = new THREE.Mesh(geometry, material);
 
-          scene.add(videoMesh);
+          // scene.add(videoMesh);
+          setTimeout((videoExists = true), 1);
         });
       })
       .catch(function (error) {
@@ -226,9 +228,9 @@ export function draw(shouldDrawHand = true) {
       : canvasW,
   };
 
-  if (videoMesh) {
-    videoMesh.visible = !selectedPose;
-  }
+  // if (videoMesh) {
+  //   videoMesh.visible = !selectedPose;
+  // }
 
   //DISEGNO LE MANI
   drawHands(selectedPose ? false : shouldDrawHand);
@@ -385,9 +387,6 @@ export function draw(shouldDrawHand = true) {
 //DISEGNO LE MANI
 const drawHands = (shouldDrawHand) => {
   if (handLandmarker && video && handsData) {
-    //video
-    const video = document.getElementById("capture");
-
     let startTimeMs = performance.now(); //ritorna un timestamp del video che mi serve da mandare a mediapipe per il riconoscimento dell'immagine
     if (video.currentTime) {
       const handLandmarkerResult = handLandmarker.detectForVideo(

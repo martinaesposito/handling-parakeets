@@ -29,17 +29,32 @@
 
   --ins-margin: 2vw;
   --icon: 4vw;
+
+  --video: 16vw;
   --hand: 5vh;
   --explore: 7.5vh;
 
   --img-height: 25vh;
-  --img-story: 25vw;
+  --img-storyIntro: 6vw;
+  --img-story: 24vw;
   --intro-story: 50vh;
 }
 
-main,
+/* main,
 video {
   display: none;
+} */
+main {
+  display: none;
+}
+video {
+  position: fixed;
+  bottom: var(--ins-margin);
+  right: var(--ins-margin);
+  width: var(--video);
+  height: auto;
+  border: var(--prak) var(--mini-spacer) solid;
+  transform: scale(-1, 1);
 }
 
 /* //////////////////// */
@@ -48,8 +63,8 @@ video {
 
 body {
   width: 100%;
-  /* height: 100vh;
-  overflow: hidden; */
+  height: 100vh;
+  overflow: hidden;
 }
 
 * {
@@ -238,6 +253,7 @@ canvas {
 .icon {
   width: 4vh;
 }
+
 .instructions {
   gap: 1vw;
   justify-content: center;
@@ -250,6 +266,16 @@ canvas {
   flex-direction: column;
   gap: 0;
   text-align: left;
+}
+
+#ins-centr {
+  height: 100vh;
+  width: 100%;
+  position: absolute;
+}
+
+#ins-centr .instructions.tree {
+  text-align: center;
 }
 .instructions > p {
   font-size: var(--instruction);
@@ -406,10 +432,10 @@ canvas {
   z-index: 100;
   border: none;
   width: var(--intro-story);
-  font-size: var(--subtitle-eng);
+  font-size: var(--subtitle);
   text-align: center;
   gap: var(--spacer3);
-  line-height: 110%;
+  /* line-height: 110%; */
   z-index: 1;
 }
 
@@ -417,6 +443,9 @@ canvas {
   background-color: var(--prak);
   padding: 0;
   width: 100%;
+}
+#img-introS {
+  width: var(--img-storyIntro);
 }
 #title > .eng {
   font-size: var(--testi);

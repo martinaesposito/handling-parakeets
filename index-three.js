@@ -1,35 +1,3 @@
-let font;
-
-let container = document.querySelector(".container");
-let p5, canvas;
-
-// TITOLONE
-let imgPoints = []; //array dei punti dei titoli
-let time = 0;
-let targetPositions = []; // Store target positions for easing
-let currentPositions = []; // Store current positions for easing
-let velocities = []; // Store velocities for each point
-
-let points = [];
-let fontSize = 200;
-
-let bounds1, bounds2;
-let subTitle;
-
-//immaginine
-let images = [];
-
-// colori dei rettangolini alernativi alle immagini
-const colors = [
-  // "#D4FF5F",
-  "#B0FF7B",
-  "#68EA28",
-  "#34DC74",
-  "#1EBF2B",
-  "#198E3E",
-  "#00755F",
-];
-
 import {
   preload as detectPreload,
   setup as detectSetup,
@@ -37,58 +5,100 @@ import {
   cursor as detectCursor,
   handimages,
 } from "./detect-three.js";
+
+import { sceneToScreen, screenToScene } from "./utils.js";
+
 import * as THREE from "three";
+// THREE
+let scene, camera, renderer;
+let canvasW, canvasH;
+
+// TITOLONE
+let font;
+let imgPoints = []; //array dei punti dei titoli
+let time = 0;
+let targetPositions = []; // Store target positions for easing
+let currentPositions = []; // Store current positions for easing
+let velocities = []; // Store velocities for each point
+
+let points = [];
+let fontSize = 180;
+
+let bounds1, bounds2;
+let subTitle;
+
+//immaginine
+let images = [];
 
 // loading
-
 let loading = document.getElementById("loading");
-
 let imgLoading = document.getElementById("loading-img");
+// imgLoading.src =
+//   "assets/loading/" + Math.floor(Math.random() * 8 + 1).toString() + ".gif";
 
-imgLoading.src =
-  "assets/loading/" + Math.floor(Math.random() * 8 + 1).toString() + ".gif";
+////////////////////////////////////////////////////////////////////
 
-// //////////////////////////////////////////////////////////////////////////
-window.preload = async () => {
+window.setup = async () => {
+  //setup di p5 - che chiama il finto preload e il finto setup
+  await preload();
+  setup();
+};
+async function preload() {
   font = loadFont("assets/fonts/IBM_Plex_Sans/IBMPlexSans-Regular.ttf");
 
   //immaginine piccole
-  // const BATCH_SIZE = 50;
-  // for (let batch = 0; batch < Math.ceil(885 / BATCH_SIZE); batch++) {
-  //   const batchPromises = [];
-  //   const start = batch * BATCH_SIZE + 2;
-  //   const end = Math.min(start + BATCH_SIZE, 887);
+  const imagePromises = [];
+  const loader = new THREE.TextureLoader();
 
-  //   for (let i = start; i < end; i++) {
-  //     const imagePromise = new Promise((resolve) => {
-  //       // OPTIMIZATION: Use smaller image formats and sizes when possible
-  //       loadImage(
-  //         `assets/image_ultra-compress/${i}.webp`,
-  //         (img) => resolve(img),
-  //         () => resolve(null)
-  //       );
-  //     });
-  //     batchPromises.push(imagePromise);
-  //   }
+  for (let i = 2; i < 887; i++) {
+    const imagePromise = new Promise((resolve) => {
+      loader.load(
+        `assets/image_ultra-compress/${i}.webp`,
+        (texture) => {
+          texture.colorSpace = THREE.SRGBColorSpace;
+          images.push(texture); // Store with numeric keys
+          resolve();
+        },
+        () => {},
+        (e) => {
+          resolve(); // Resolve even if the image fails
+        }
+      );
+    });
+    imagePromises.push(imagePromise);
+  }
 
-  //   const batchResults = await Promise.all(batchPromises);
-  //   images.push(...batchResults.filter((img) => img !== null));
-  // }
-
-  // detectPreload();
-};
+  await Promise.all(imagePromises);
+  // console.log(images);
+  detectPreload();
+}
 
 // SETUP
-window.setup = () => {
-  detectSetup();
-  // CANVAS
-  p5 = createCanvas(windowWidth, windowHeight, WEBGL);
-  pixelDensity(1);
-  canvas = p5.canvas;
-  container.appendChild(canvas);
+function setup() {
+  //finto setup che avvia three
+  canvasW = window.innerWidth;
+  canvasH = window.innerHeight;
 
-  imageMode(CENTER);
-  rectMode(CENTER);
+  // three
+  scene = new THREE.Scene();
+  // scene.background = new THREE.Color().setHex(0xffffff);
+
+  camera = new THREE.OrthographicCamera(
+    canvasW / -2,
+    canvasW / 2,
+    canvasH / 2,
+    canvasH / -2,
+    1,
+    1000
+  );
+  camera.position.z = 1;
+
+  console.log(scene, camera);
+
+  renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  renderer.setPixelRatio(window.devicePixelRatio);
+  renderer.setSize(canvasW, canvasH);
+  document.body.appendChild(renderer.domElement);
 
   // TITOLONE
   // Measure text bounds
@@ -96,7 +106,7 @@ window.setup = () => {
   bounds2 = font.textBounds("Parakeets", 0, 0, fontSize);
   const sampleFactor = 0.175;
 
-  // Get points with translation and add points to array
+  // // Get points with translation and add points to array
   points = [
     ...font.textToPoints("Handling", -bounds1.w / 2, -bounds1.h / 2, fontSize, {
       sampleFactor,
@@ -105,134 +115,165 @@ window.setup = () => {
       sampleFactor,
     }),
   ];
-
+  console.log(images);
   // Initialize positions and velocities
   points.forEach((p, i) => {
-    let img = {
-      img: i < images.length ? images[i] : images[floor(random(images.length))], //prima prende le immagini in ordine ma se finiscono ne prende altre a caso,
-      size: random(12.5, 15),
-      c: random(colors),
-      type: random() > 0.9 ? "image" : "rect",
-    };
-    imgPoints.push(img);
+    let size = random(10, 15);
+    const geometry = new THREE.PlaneGeometry(size, size);
+
+    const material = new THREE.MeshBasicMaterial({
+      transparent: true,
+      // color: new THREE.Color().setRGB(0, 0, 0),
+      map: i < images.length ? images[i] : images[floor(random(images.length))],
+    });
+    const mesh = new THREE.Mesh(geometry, material);
+    let coords = screenToScene(camera, [p.x + canvasW / 2, p.y + canvasH / 2]);
+    mesh.position.set(coords.x, coords.y, 0);
+
+    imgPoints.push(mesh);
+    scene.add(mesh);
 
     // Initialize positions
-    currentPositions[i] = createVector(p.x, p.y);
-    targetPositions[i] = createVector(p.x, p.y);
-    velocities[i] = createVector(0, 0);
+    currentPositions[i] = new THREE.Vector3(coords.x, coords.y, 0);
+    targetPositions[i] = new THREE.Vector3(coords.x, coords.y, 0);
+    velocities[i] = new THREE.Vector3(0, 0, 0);
   });
+  // console.log(imgPoints);
 
-  // SUBTITLE
+  // // SUBTITLE
   subTitle = document.getElementById("subtitle");
-  subTitle.style.top = `${height / 2 + (bounds1.h * 3) / 4}px`; // Adjust as needed
+  subTitle.style.top = `${canvasH / 2 + (bounds1.h * 3) / 4}px`; // Adjust as needed
 
-  loading.style.display = "none"; //nascondo il loading
-};
-
-// Easing function
-function easeOutCubic(t) {
-  return 1 - pow(1 - t, 2);
+  // loading.style.display = "none"; //nascondo il loading
+  detectSetup();
 }
 
 window.draw = () => {
-  // background("#F5F5F5");
-  clear();
+  draw();
+};
+function draw() {
+  if (!scene || !camera || !renderer) return;
+
   time += 0.01;
 
   points.forEach((p, i) => {
     // Calculate noise-based movement
-    let xOffset = map(noise(i, time * 0.5), 0, 1, -12, 12);
-    let yOffset = map(noise(i, (time + 300) * 0.5), 0, 1, -12, 12);
+    let xOffset = map(
+      noise(i, time * 0.5) * 0.4 + noise(i + 200, time * 0.01) * 0.4,
+      0,
+      1,
+      -20,
+      20
+    );
+    let yOffset = map(
+      noise(i, (time + 100) * 0.7) * 0.4 + noise(i + 400, time * 0.01) * 0.4,
+      0,
+      1,
+      -20,
+      20
+    );
 
-    // Calculate mouse interaction
-    let dx = detectCursor ? p.x - detectCursor.x : p.x;
-    let dy = detectCursor ? p.y - detectCursor.y : p.y;
-    let distance = sqrt(dx * dx + dy * dy);
+    // Vector math for cursor distance
+    const cursorVec = new THREE.Vector2(
+      detectCursor ? detectCursor.x : p.x,
+      detectCursor ? detectCursor.y : p.y
+    );
+    const pointVec = new THREE.Vector2(p.x, -p.y);
+    const distance = cursorVec.distanceTo(pointVec);
 
     // Update target position
-    targetPositions[i].x = p.x + xOffset;
-    targetPositions[i].y = p.y + yOffset;
+    targetPositions[i].set(p.x + xOffset, -(p.y + yOffset), 0);
 
-    // Apply mouse repulsion
-    let repulsionRadius = imgPoints[i].size * 4;
+    // Mouse repulsion
+    const repulsionRadius = imgPoints[i].geometry.parameters.width * 4;
     if (detectCursor && distance < repulsionRadius) {
-      let repulsionForce = map(distance, 0, repulsionRadius, 1, 0);
-      repulsionForce = easeOutCubic(repulsionForce) * (imgPoints[i].size * 2);
-      let angle = atan2(dy, dx);
-      targetPositions[i].x += cos(angle) * repulsionForce;
-      targetPositions[i].y += sin(angle) * repulsionForce;
+      const repulsionForce =
+        (1 - distance / repulsionRadius) ** 2 *
+        imgPoints[i].geometry.parameters.width *
+        2;
+      const angle = Math.atan2(p.y - detectCursor.y, p.x - detectCursor.x);
+      targetPositions[i].x += Math.cos(angle) * repulsionForce;
+      targetPositions[i].y += Math.sin(angle) * repulsionForce;
     }
 
-    // Smooth movement towards target position
-    let easing = 0.3; // Adjust this value to control smoothness (lower = smoother)
-    let dx2 = targetPositions[i].x - currentPositions[i].x;
-    let dy2 = targetPositions[i].y - currentPositions[i].y;
+    // Smooth movement
+    const easing = 0.3;
+    velocities[i].lerp(
+      new THREE.Vector3(
+        (targetPositions[i].x - currentPositions[i].x) * easing,
+        (targetPositions[i].y - currentPositions[i].y) * easing,
+        0
+      ),
+      1
+    );
 
-    // Apply easing to velocity
-    velocities[i].x = lerp(velocities[i].x, dx2 * easing, 1);
-    velocities[i].y = lerp(velocities[i].y, dy2 * easing, 1);
-
-    // Update current position with velocity
-    currentPositions[i].x += velocities[i].x;
-    currentPositions[i].y += velocities[i].y;
-
-    // VERSIONE CON IMMAGINI + RECT
-    // if (imgPoints[i].type == "image") {
-    //   // Draw image
-    //   image(
-    //     imgPoints[i].img,
-    //     currentPositions[i].x + xOffset / 100,
-    //     currentPositions[i].y + yOffset / 100,
-    //     imgPoints[i].size,
-    //     imgPoints[i].size
-    //   );
-    // } else {
-    //   // Draw colored rect
-    //   fill(imgPoints[i].c);
-    //   rect(
-    //     currentPositions[i].x + xOffset / 100,
-    //     currentPositions[i].y + yOffset / 100,
-    //     imgPoints[i].size,
-    //     imgPoints[i].size
-    //   );
-    // }
-
-    // VERSIONE CON SOLO IMMAGINI
-    // Draw image at current position
-    // image(
-    //   imgPoints[i].img,
-    //   currentPositions[i].x + xOffset / 100,
-    //   currentPositions[i].y + yOffset / 100,
-    //   imgPoints[i].size,
-    //   imgPoints[i].size
-    // );
-    // noStroke();
-    if (imgPoints[i].type == "image") {
-      stroke("#C9FF4C");
-      strokeWeight(3);
-    } else noStroke();
-
-    // VERSIONE CON SOLO RETTANGOLINI
-    fill(imgPoints[i].c);
-    rect(
-      currentPositions[i].x + xOffset / 100,
-      currentPositions[i].y + yOffset / 100,
-      imgPoints[i].size
+    currentPositions[i].add(velocities[i]);
+    imgPoints[i].position.set(
+      currentPositions[i].x,
+      currentPositions[i].y,
+      currentPositions[i].z
     );
   });
 
-  translate(0, 0, 1);
-  detectDraw(false);
+  renderer.render(scene, camera);
 
-  // TOLGO LA PARTE DEL CURSORE
-  // if (!detectCursor && handimages?.[4]?.width) {
-  //   const handImage = handimages[4];
-  //   image(
-  //     handImage,
-  //     0,
-  //     (bounds1.h * 4) / 3.2,
-  //     (handImage.width / 3) * 2,
-  //     (handImage.height / 3) * 2
-  //   );
-  // }
-};
+  detectDraw(false);
+}
+// VERSIONE CON IMMAGINI + RECT
+// if (imgPoints[i].type == "image") {
+//   // Draw image
+//   image(
+//     imgPoints[i].img,
+//     currentPositions[i].x + xOffset / 100,
+//     currentPositions[i].y + yOffset / 100,
+//     imgPoints[i].size,
+//     imgPoints[i].size
+//   );
+// } else {
+//   // Draw colored rect
+//   fill(imgPoints[i].c);
+//   rect(
+//     currentPositions[i].x + xOffset / 100,
+//     currentPositions[i].y + yOffset / 100,
+//     imgPoints[i].size,
+//     imgPoints[i].size
+//   );
+// }
+
+// VERSIONE CON SOLO IMMAGINI
+// Draw image at current position
+// image(
+//   imgPoints[i].img,
+//   currentPositions[i].x + xOffset / 100,
+//   currentPositions[i].y + yOffset / 100,
+//   imgPoints[i].size,
+//   imgPoints[i].size
+// );
+// noStroke();
+//   if (imgPoints[i].type == "image") {
+//     stroke("#C9FF4C");
+//     strokeWeight(3);
+//   } else noStroke();
+
+//   // VERSIONE CON SOLO RETTANGOLINI
+//   fill(imgPoints[i].c);
+//   rect(
+//     currentPositions[i].x + xOffset / 100,
+//     currentPositions[i].y + yOffset / 100,
+//     imgPoints[i].size
+//   );
+
+// translate(0, 0, 1);
+
+// TOLGO LA PARTE DEL CURSORE
+// if (!detectCursor && handimages?.[4]?.width) {
+//   const handImage = handimages[4];
+//   image(
+//     handImage,
+//     0,
+//     (bounds1.h * 4) / 3.2,
+//     (handImage.width / 3) * 2,
+//     (handImage.height / 3) * 2
+//   );
+// }
+// }

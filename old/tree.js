@@ -6,7 +6,7 @@ import {
   video,
   videoSize,
 } from "./detect.js";
-import { Dot } from "./listings.js";
+import { Dot } from "../listings.js";
 
 let branchPositions = [];
 

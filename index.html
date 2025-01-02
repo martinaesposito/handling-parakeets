@@ -21,15 +21,23 @@
 
     <script src="libraries/p5.min.js"></script>
     <script src="libraries/p5.sound.min.js"></script>
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://cdn.jsdelivr.net/npm/three@v0.171.0/build/three.module.js",
+          "three/addons/": "https://cdn.jsdelivr.net/npm/three@v0.171.0/examples/jsm/"
+        }
+      }
+    </script>
 
     <link rel="stylesheet" href="index.css" />
   </head>
   <body>
-      LOADING
-      <div id="loading">
+      <!-- LOADING -->
+      <!-- <div id="loading">
         <img id="loading-img" />
         <div id="loading-text">loading...</div>
-      </div>
+      </div> -->
 
     <!-- CONTANER DI TUTTO -->
     <div class="bg"></div>
@@ -107,7 +115,7 @@
       <img class="cursor-image" src="assets/cursor/8.svg">
     </div>
 
-    <script src="index.js" type="module"></script>
-    <script src="listings.js" type="module"></script>
+    <script src="index-three.js" type="module"></script>
+    <!-- <script src="listings-three.js" type="module"></script> -->
   </body>
 </html>

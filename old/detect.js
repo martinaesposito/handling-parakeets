@@ -5,8 +5,8 @@ import {
   FilesetResolver,
 } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.0";
 
-import { z, warning, endCounter, tutorialEnd } from "./tree-three.js";
-import { Hand } from "./hand.js"; //importa l'oggetto mano definito nel javascript precedente
+import { z, warning, endCounter, tutorialEnd } from "../tree-three.js";
+import { Hand } from "../hand.js"; //importa l'oggetto mano definito nel javascript precedente
 
 let handLandmarker, imageSegmenter, labels;
 

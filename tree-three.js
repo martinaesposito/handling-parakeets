@@ -5,9 +5,11 @@ import {
   setup as detectSetup,
   draw as detectDraw,
   selectedPose,
+  videoExists,
 } from "./detect-three.js";
 
 // HTMLS
+let insCenter = document.getElementById("ins-centr");
 let handLegend = document.getElementById("hands-legend");
 let container = document.querySelector(".container");
 
@@ -173,6 +175,7 @@ async function preload() {
   detectPreload(); // detect hand in detect.js
 }
 
+//finto setup che avvia three
 function setup() {
   //legenda
   for (let i = 1; i < handPoses.length + 1; i++) {
@@ -182,7 +185,6 @@ function setup() {
     handLegend.appendChild(hand);
   }
 
-  //finto setup che avvia three
   canvasW = window.innerWidth;
   canvasH = window.innerHeight;
 
@@ -255,9 +257,6 @@ function setup() {
   dots = generateBranchDots(branchesss);
 
   detectSetup();
-  if (scene && camera && renderer) {
-    loading.style.display = "none"; //nascondo il loading
-  }
 
   branchPlatform.forEach((branch, index) => {
     plat = createDiv();
@@ -279,6 +278,10 @@ window.draw = () => {
 };
 function draw() {
   if (!scene || !camera || !renderer) return;
+
+  if (videoExists) {
+    loading.style.display = "none"; //nascondo il loading
+  }
 
   targetZoom = selectedPose ? 1.8 : 1;
   zoom += (targetZoom - zoom) * 0.1;
@@ -315,6 +318,7 @@ function draw() {
     changeStory(stories.findIndex((s) => s.Pose == selectedPose)); //gli passo l'indice della storia giusta
   } else {
     storyIntro.style("display", "none");
+    insCenter.style.display = "flex";
   }
 
   detectDraw();
@@ -377,7 +381,9 @@ function generateBranchDots(branches) {
 function changeStory(indexStory) {
   let intro = stories[indexStory];
   storyIntro.html(
-    "<img> <div class='overlaybox' id='title'>" +
+    "<img id='img-introS' src='assets/cursor/" +
+      (indexStory + 1) +
+      ".svg'> <div class='overlaybox' id='title'>" +
       intro.TitleIta +
       "</br><span class='eng'>" +
       intro.TitleEng +
@@ -389,4 +395,5 @@ function changeStory(indexStory) {
   );
 
   storyIntro.style("display", "flex");
+  insCenter.style.display = "none";
 }
