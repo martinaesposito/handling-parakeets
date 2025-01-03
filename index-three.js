@@ -38,6 +38,9 @@ let imgLoading = document.getElementById("loading-img");
 // imgLoading.src =
 //   "assets/loading/" + Math.floor(Math.random() * 8 + 1).toString() + ".gif";
 
+let cursorCtn = document.getElementById("cursor-container");
+let cursorImage = document.getElementById("pos8");
+
 ////////////////////////////////////////////////////////////////////
 
 window.setup = async () => {
@@ -152,8 +155,22 @@ function setup() {
 window.draw = () => {
   draw();
 };
+let first;
 function draw() {
   if (!scene || !camera || !renderer) return;
+
+  if (!detectCursor && !first) {
+    cursorCtn.style.display = "block";
+    cursorImage.style.display = "block";
+    cursorCtn.style.left = "80vw";
+    cursorCtn.style.top = "90vh";
+    cursorCtn.style.animation = "wave 3s infinite";
+  } else {
+    first = true;
+    cursorCtn.style.top = "0px";
+    cursorCtn.style.left = "0px";
+    cursorCtn.style.animation = "none";
+  }
 
   time += 0.01;
 
@@ -181,7 +198,7 @@ function draw() {
     );
     const pointVec = new THREE.Vector2(p.x, -p.y);
     const distance = cursorVec.distanceTo(pointVec);
-
+    console.log;
     // Update target position
     targetPositions[i].set(p.x + xOffset, -(p.y + yOffset), 0);
 

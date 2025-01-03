@@ -74,17 +74,13 @@ export let cursor;
 
 let loadingcircles;
 let loadingrects = [];
-
 let cursorcontainer = document.getElementById("cursor-container"); //div che contiene l'immagine con il cerchio di caricamento
 let cursorImages = document.getElementsByClassName("cursor-image"); //div che contiene l'immagine
-
-let introWave = true;
 
 // time and space
 
 let prev_timestamp;
 let delta_time;
-let videoMesh;
 
 /////////////////////////////////////////////
 
@@ -200,7 +196,6 @@ export function draw(shouldDrawHand = true) {
   let index;
 
   // time and space
-
   let curr_timestamp = Date.now();
   delta_time = prev_timestamp ? curr_timestamp - prev_timestamp : 0;
   prev_timestamp = curr_timestamp;
@@ -331,27 +326,9 @@ export function draw(shouldDrawHand = true) {
     }
   }
 
-  // displaying the cursor itself
-  if (hands[0]) {
-    introWave = introWave ? false : null;
-    cursorcontainer.style.display = "block";
-  } else if (!introWave) {
-    cursorcontainer.style.display = "none";
-  }
-
-  // introductory wave
-
-  if (introWave) {
-    // cursorcontainer.style.top = "90%";
-    // cursorcontainer.style.left = "75%";
-    cursorcontainer.style.animation = "wave 3s infinite";
-    loadingrects.forEach((rect) => (rect.style.visibility = "hidden"));
-  } else if (introWave == false) {
-    cursorcontainer.style.animation = "none";
-  }
-
   //HTML CURSOR
   if (cursor) {
+    // cursorcontainer.style.display = "block";
     cursorcontainer.style.transform =
       "translate(" +
       cursor.x / zoomFactor +
@@ -359,6 +336,7 @@ export function draw(shouldDrawHand = true) {
       cursor.y / zoomFactor +
       "px)";
   }
+  // else cursorcontainer.style.display = "none";
 
   // reset the counter when no action
   loadingrects.forEach((rect, r) => {

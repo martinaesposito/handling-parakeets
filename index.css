@@ -178,10 +178,14 @@ canvas {
 /* CURSOR */
 #cursor-container {
   position: absolute;
-  left: 0px;
-  top: 0px;
+  left: 0;
+  top: 0;
   z-index: 15;
   transition: transform 0.1s ease-out;
+}
+
+#cursor-container > #pos8 {
+  display: block;
 }
 
 .loading-circle {
