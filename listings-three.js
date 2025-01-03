@@ -82,8 +82,6 @@ export class Dot {
     this.sameBranchDots = [];
     this.samePoseDots = [];
 
-    // this.image = Dot.cachedImages[itemData.Image_num];
-
     this.itemData = itemData;
     this.isHovered = false;
 
@@ -240,8 +238,8 @@ export class Dot {
     // calcolo delle forze e dei limiti di posizionamento specifico per i punti della posa
     if (this.shouldHighlight(currentPose)) {
       let h = video.videoHeight * 0.4;
-      const halfWidth = ((h / 3) * 4) / 4 + this.baseRadius / 2;
-      const halfHeight = h / 4 + this.baseRadius / 2;
+      const halfWidth = ((h / 3) * 4) / 4 + this.baseRadius;
+      const halfHeight = h / 4 + this.baseRadius;
 
       const center = new THREE.Vector3(0, 0, 0);
       const centerAttraction = center.sub(this.pos);
