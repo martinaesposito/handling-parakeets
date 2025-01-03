@@ -121,7 +121,7 @@ function setup() {
   console.log(images);
   // Initialize positions and velocities
   points.forEach((p, i) => {
-    let size = random(10, 15);
+    let size = random(12.5, 17.5);
     const geometry = new THREE.PlaneGeometry(size, size);
 
     const material = new THREE.MeshBasicMaterial({

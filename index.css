@@ -30,13 +30,14 @@
   --ins-margin: 2vw;
   --icon: 4vw;
 
-  --video: 16vw;
+  --camera: 15vw;
   --hand: 5vh;
   --explore: 7.5vh;
 
-  --img-height: 25vh;
-  --img-storyIntro: 6vw;
-  --img-story: 24vw;
+  --imgLoading: 25vh;
+
+  --img-storyIntro: 5vw;
+  --img-story: 22.5vw;
   --intro-story: 50vh;
 }
 
@@ -51,7 +52,7 @@ video {
   position: fixed;
   bottom: var(--ins-margin);
   right: var(--ins-margin);
-  width: var(--video);
+  width: var(--camera);
   height: auto;
   border: var(--prak) var(--mini-spacer) solid;
   transform: scale(-1, 1);
@@ -124,7 +125,7 @@ canvas {
   z-index: 20;
 }
 #loading-img {
-  height: var(--img-height);
+  height: var(--imgLoading);
   width: auto;
 }
 /* VIDEO TUTORIAL */
@@ -440,7 +441,7 @@ canvas {
   text-align: center;
   gap: var(--spacer3);
   /* line-height: 110%; */
-  z-index: 1;
+  z-index: -1;
 }
 
 .introcontainer > .overlaybox {

@@ -200,7 +200,7 @@ export class Dot {
       let minDistance = this.radius + other.radius + 1.5;
 
       if (this.shouldHighlight(currentPose)) {
-        minDistance += this.randomC * 3; //se sono tra i punti con la posa selezionata impongo una minimum distance maggiore
+        minDistance += 4; //se sono tra i punti con la posa selezionata impongo una minimum distance maggiore
       }
 
       if (distance < minDistance) {
@@ -217,7 +217,7 @@ export class Dot {
 
     if (frameCount % 2 === 0) {
       // Check hover every 2 frames
-      const hoverThreshold = this.baseRadius * 2;
+      const hoverThreshold = this.baseRadius * 3;
 
       const sceneCursor = screenToScene(
         camera,
@@ -230,7 +230,7 @@ export class Dot {
     }
 
     const targetRadius = this.isHovered
-      ? this.baseRadius * 5
+      ? this.baseRadius * 3
       : this.baseRadius * this.scale; //se l'oggetto viene hoverato aumentail raggio
     this.radius += (targetRadius - this.radius) * 0.1;
 
@@ -238,8 +238,8 @@ export class Dot {
     // calcolo delle forze e dei limiti di posizionamento specifico per i punti della posa
     if (this.shouldHighlight(currentPose)) {
       let h = video.videoHeight * 0.4;
-      const halfWidth = ((h / 3) * 4) / 4 + this.baseRadius;
-      const halfHeight = h / 4 + this.baseRadius;
+      const halfWidth = ((h / 3) * 4) / 4 + this.baseRadius * 2;
+      const halfHeight = h / 4 + this.baseRadius * 2;
 
       const center = new THREE.Vector3(0, 0, 0);
       const centerAttraction = center.sub(this.pos);
@@ -264,7 +264,7 @@ export class Dot {
       const outerRepulsionZone =
         this.baseRadius + Math.max(halfWidth, halfHeight) * 3; //margini più ampi per l'esterno
       const innerRepulsionZone =
-        this.baseRadius + Math.min(halfWidth, halfHeight);
+        this.baseRadius + Math.min(halfWidth, halfHeight) * 1.5;
 
       if (distance < outerRepulsionZone) {
         //forza di repulsione tre gli elementi
@@ -325,7 +325,7 @@ export class Dot {
 
     if (this.div) {
       if (this.itemData.Pose == selectedPose) {
-        targetScale = 3;
+        targetScale = 4;
 
         if (this.isHovered) {
           if (!audioPlaying) {

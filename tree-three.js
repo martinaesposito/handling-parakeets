@@ -360,7 +360,7 @@ function generateBranchDots(branches) {
       const dot = new Dot(
         { ...branch, index: bIndex, branchT },
         allDots.length + branchDots.length,
-        random(10, 15),
+        random(12.5, 17.5),
         item,
         imageMap[item.Image_num],
         { x: baseX, y: baseY }, // Base position
