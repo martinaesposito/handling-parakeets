@@ -24,10 +24,11 @@
 
   --mini-spacer: 0.25vw;
   --spacer1: 1vh;
-  --spacer2: 1.25;
+  --spacer2: 1.25vw;
   --spacer3: 2.5vh;
 
   --ins-margin: 2vw;
+  --ins-marginBottom: 6vw;
   --icon: 4vw;
 
   --camera: 15vw;
@@ -243,7 +244,8 @@ canvas {
   width: 100%;
 }
 #ins-container.bottom {
-  bottom: var(--ins-margin);
+  bottom: var(--ins-marginBottom);
+  font-size-adjust: var(--subtitle);
 }
 #ins-container.top {
   top: var(--ins-margin);
@@ -260,13 +262,18 @@ canvas {
 }
 
 .instructions {
-  gap: 1vw;
   justify-content: center;
   align-items: center;
   color: black;
   display: flex;
   flex-direction: row;
+  gap: var(--spacer2);
 }
+#home {
+  flex-direction: column;
+  gap: 0;
+}
+
 .instructions.tree {
   flex-direction: column;
   gap: 0;
@@ -346,11 +353,11 @@ canvas {
   height: 25vh;
   width: 100%;
   z-index: 4;
-  background: linear-gradient(
+  /* background: linear-gradient(
     180deg,
     rgba(0, 0, 0, 0) 50% 0%,
     var(--prak) 100%
-  );
+  ); */
 }
 
 /* PLATFORM */

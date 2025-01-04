@@ -3,13 +3,12 @@ import {
   setup as detectSetup,
   draw as detectDraw,
   cursor as detectCursor,
-  handimages,
   canvasW,
   canvasH,
   video,
 } from "./detect-three.js";
 
-import { sceneToScreen, screenToScene } from "./utils.js";
+import { random, sceneToScreen, screenToScene } from "./utils.js";
 
 import * as THREE from "three";
 // THREE
@@ -24,7 +23,7 @@ let currentPositions = []; // Store current positions for easing
 let velocities = []; // Store velocities for each point
 
 let points = [];
-let fontSize = 180;
+let fontSize = 200;
 
 let bounds1, bounds2;
 let subTitle;
@@ -39,7 +38,7 @@ let imgLoading = document.getElementById("loading-img");
 //   "assets/loading/" + Math.floor(Math.random() * 8 + 1).toString() + ".gif";
 
 let cursorCtn = document.getElementById("cursor-container");
-let cursorImage = document.getElementById("pos8");
+let cursorImage = document.getElementById("wave");
 
 ////////////////////////////////////////////////////////////////////
 
@@ -109,6 +108,17 @@ function setup() {
   bounds2 = font.textBounds("Parakeets", 0, 0, fontSize);
   const sampleFactor = 0.175;
 
+  let randomPoints = [];
+
+  for (let i = 0; i < 30; i++) {
+    randomPoints.push({
+      x: random(-canvasW / 2, canvasW / 2),
+      y: random(-canvasH / 2, canvasH / 2),
+      z: 0,
+    });
+  }
+  console.log(randomPoints);
+
   // // Get points with translation and add points to array
   points = [
     ...font.textToPoints("Handling", -bounds1.w / 2, -bounds1.h / 2, fontSize, {
@@ -117,6 +127,7 @@ function setup() {
     ...font.textToPoints("Parakeets", -bounds2.w / 2, bounds1.h / 2, fontSize, {
       sampleFactor,
     }),
+    ...randomPoints,
   ];
   console.log(images);
   // Initialize positions and velocities
@@ -144,8 +155,8 @@ function setup() {
   // console.log(imgPoints);
 
   // // SUBTITLE
-  subTitle = document.getElementById("subtitle");
-  subTitle.style.top = `${canvasH / 2 + (bounds1.h * 3) / 4}px`; // Adjust as needed
+  // subTitle = document.getElementById("subtitle");
+  // subTitle.style.top = `${canvasH / 2 + (bounds1.h * 3) / 4}px`; // Adjust as needed
 
   loading.style.display = "none"; //nascondo il loading
   detectSetup();
@@ -159,14 +170,12 @@ let first;
 function draw() {
   if (!scene || !camera || !renderer) return;
 
-  if (!detectCursor && !first) {
+  if (!detectCursor) {
     cursorCtn.style.display = "block";
     cursorImage.style.display = "block";
-    cursorCtn.style.left = "80vw";
-    cursorCtn.style.top = "90vh";
+    console.log(cursorCtn);
     cursorCtn.style.animation = "wave 3s infinite";
   } else {
-    first = true;
     cursorCtn.style.top = "0px";
     cursorCtn.style.left = "0px";
     cursorCtn.style.animation = "none";
@@ -174,33 +183,47 @@ function draw() {
 
   time += 0.01;
 
+  let sceneCursor = screenToScene(camera, [detectCursor?.x, detectCursor?.y]);
+
   points.forEach((p, i) => {
     // Calculate noise-based movement
     let xOffset = map(
       noise(i, time * 0.5) * 0.4 + noise(i + 200, time * 0.01) * 0.4,
       0,
       1,
-      -20,
-      20
+      -25,
+      25
     );
     let yOffset = map(
       noise(i, (time + 100) * 0.7) * 0.4 + noise(i + 400, time * 0.01) * 0.4,
       0,
       1,
-      -20,
-      20
+      -25,
+      25
     );
 
     // Vector math for cursor distance
     const cursorVec = new THREE.Vector2(
-      detectCursor ? detectCursor.x : p.x,
-      detectCursor ? detectCursor.y : p.y
+      detectCursor ? sceneCursor.x : currentPositions[i].x,
+      detectCursor ? -sceneCursor.y : currentPositions[i].y
     );
-    const pointVec = new THREE.Vector2(p.x, -p.y);
+    const pointVec = new THREE.Vector2(
+      currentPositions[i].x,
+      -currentPositions[i].y
+    );
     const distance = cursorVec.distanceTo(pointVec);
-    console.log;
+
+    const originalPos = screenToScene(camera, [
+      p.x + canvasW / 2,
+      -p.y + canvasH / 2,
+    ]);
+    // console.log(Math.round(distance));
     // Update target position
-    targetPositions[i].set(p.x + xOffset, -(p.y + yOffset), 0);
+    targetPositions[i].set(
+      originalPos.x + xOffset,
+      -(originalPos.y + yOffset),
+      0
+    );
 
     // Mouse repulsion
     const repulsionRadius = imgPoints[i].geometry.parameters.width * 4;
@@ -208,14 +231,19 @@ function draw() {
       const repulsionForce =
         (1 - distance / repulsionRadius) ** 2 *
         imgPoints[i].geometry.parameters.width *
-        2;
-      const angle = Math.atan2(p.y - detectCursor.y, p.x - detectCursor.x);
+        100;
+      const angle = Math.atan2(
+        currentPositions[i].y - sceneCursor.y,
+        currentPositions[i].x - sceneCursor.x
+      );
       targetPositions[i].x += Math.cos(angle) * repulsionForce;
       targetPositions[i].y += Math.sin(angle) * repulsionForce;
+      targetPositions[i].x += xOffset;
+      targetPositions[i].y += yOffset;
     }
 
     // Smooth movement
-    const easing = 0.3;
+    const easing = 0.05;
     velocities[i].lerp(
       new THREE.Vector3(
         (targetPositions[i].x - currentPositions[i].x) * easing,
@@ -226,6 +254,7 @@ function draw() {
     );
 
     currentPositions[i].add(velocities[i]);
+
     imgPoints[i].position.set(
       currentPositions[i].x,
       currentPositions[i].y,
@@ -237,61 +266,3 @@ function draw() {
 
   detectDraw(false);
 }
-// VERSIONE CON IMMAGINI + RECT
-// if (imgPoints[i].type == "image") {
-//   // Draw image
-//   image(
-//     imgPoints[i].img,
-//     currentPositions[i].x + xOffset / 100,
-//     currentPositions[i].y + yOffset / 100,
-//     imgPoints[i].size,
-//     imgPoints[i].size
-//   );
-// } else {
-//   // Draw colored rect
-//   fill(imgPoints[i].c);
-//   rect(
-//     currentPositions[i].x + xOffset / 100,
-//     currentPositions[i].y + yOffset / 100,
-//     imgPoints[i].size,
-//     imgPoints[i].size
-//   );
-// }
-
-// VERSIONE CON SOLO IMMAGINI
-// Draw image at current position
-// image(
-//   imgPoints[i].img,
-//   currentPositions[i].x + xOffset / 100,
-//   currentPositions[i].y + yOffset / 100,
-//   imgPoints[i].size,
-//   imgPoints[i].size
-// );
-// noStroke();
-//   if (imgPoints[i].type == "image") {
-//     stroke("#C9FF4C");
-//     strokeWeight(3);
-//   } else noStroke();
-
-//   // VERSIONE CON SOLO RETTANGOLINI
-//   fill(imgPoints[i].c);
-//   rect(
-//     currentPositions[i].x + xOffset / 100,
-//     currentPositions[i].y + yOffset / 100,
-//     imgPoints[i].size
-//   );
-
-// translate(0, 0, 1);
-
-// TOLGO LA PARTE DEL CURSORE
-// if (!detectCursor && handimages?.[4]?.width) {
-//   const handImage = handimages[4];
-//   image(
-//     handImage,
-//     0,
-//     (bounds1.h * 4) / 3.2,
-//     (handImage.width / 3) * 2,
-//     (handImage.height / 3) * 2
-//   );
-// }
-// }

@@ -54,9 +54,9 @@ let plat;
 const branchPlatform = [
   { value: 149, start: 0.6, end: 0.63, name: "usato.it" },
   { value: 14, start: 0.6, end: 0.8, name: "TrovaPet" },
-  { value: 3, start: 0.9, end: 1, name: "petpappagalli" },
+  { value: 3, start: 0.95, end: 1, name: "petpappagalli" },
   { value: 44, start: 0.6, end: 0.65, name: "Telegram" },
-  { value: 7, start: 0.9, end: 1, name: "animalissimo" },
+  { value: 7, start: 0.95, end: 1, name: "animalissimo" },
   { value: 12, start: 0.6, end: 0.7, name: "Trovalosubito" },
   { value: 11, start: 0.9, end: 1, name: "likesx" },
   { value: 149, start: 0.8, end: 0.85, name: "FB pages" },

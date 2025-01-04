@@ -17,7 +17,7 @@
       crossorigin="anonymous"
     ></script>
 
-    <link rel="manifest" href="/manifest.json">
+    <link rel="manifest" href="/manifest.json" />
 
     <script src="libraries/p5.min.js"></script>
     <script src="libraries/p5.sound.min.js"></script>
@@ -33,35 +33,30 @@
     <link rel="stylesheet" href="index.css" />
   </head>
   <body>
-      <!-- LOADING -->
-      <div id="loading">
-        <img id="loading-img" />
-        <div id="loading-text">loading...</div>
-      </div>
+    <!-- LOADING -->
+    <div id="loading">
+      <img id="loading-img" />
+      <div id="loading-text">loading...</div>
+    </div>
 
     <!-- CONTANER DI TUTTO -->
     <div class="bg"></div>
-      <div class="container full"></div>
+    <div class="container full"></div>
 
-    
     <!-- SUBTITLE -->
-    <p id="subtitle">
+    <!-- <p id="subtitle">
       La relazione uomo-parrocchetto all'interno della compravendita online </br>
       <span class="eng">
         The human-parakeet relationship in the italian online trading market
       </span>
-    </p>
+    </p> -->
 
     <!-- INSTRUCTIONS -->
-     <div id="gradient-bottom"></div>
+    <div id="gradient-bottom"></div>
     <div id="ins-container" class="flex-row single bottom">
-
-      <div class="instructions" class="flex-row">
-        [
+      <div class="instructions flex-column" id="home">
         <p id="ita">Inquadra la mano e muovila per iniziare</p>
-        /
         <p id="eng" class="eng">Show your hand and move it to start</p>
-        ]
       </div>
     </div>
 
@@ -106,16 +101,16 @@
       <img class="cursor-image" src="assets/cursor/1.svg" />
       <img class="cursor-image" src="assets/cursor/2.svg" />
       <img class="cursor-image" src="assets/cursor/3.svg" />
-      <img class="cursor-image" src="assets/cursor/4.svg" />
+      <img class="cursor-image" id="wave" src="assets/cursor/4.svg" />
       <img class="cursor-image" src="assets/cursor/5.svg" />
       <img class="cursor-image" src="assets/cursor/6.svg" />
       <img class="cursor-image" src="assets/cursor/7.svg" />
       <img class="cursor-image" src="assets/instructions/back2.svg" />
       <img class="cursor-image" src="assets/instructions/restart2.svg" />
-      <img class="cursor-image" id="pos8" src="assets/cursor/8.svg" />
+      <img class="cursor-image" src="assets/cursor/8.svg" />
     </div>
 
- <video id="capture"></video>
+    <video id="capture"></video>
 
     <script src="index-three.js" type="module"></script>
   </body>

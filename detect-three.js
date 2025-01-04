@@ -6,16 +6,15 @@ import {
   FilesetResolver,
 } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.0";
 
-import { zoom, scene, warning, endCounter, tutorialEnd } from "./tree-three.js";
+import { zoom, warning, endCounter, tutorialEnd } from "./tree-three.js";
 import { Hand } from "./hand.js"; //importa l'oggetto mano definito nel javascript precedente
 
 export let canvasW = window.innerWidth;
 export let canvasH = window.innerHeight;
 
-let handLandmarker, imageSegmenter, labels;
+let handLandmarker;
 
 let hands = []; //mano detectata da mediapipe
-
 let handsData = []; //json con le pose
 
 // VIDEO DELLA PERSONA AL CENTRO
@@ -45,8 +44,6 @@ let counters = [
 // RESTART E BACK
 let restart = false;
 let market = false;
-let restartImgSrc;
-let treeImgSrc;
 
 // getting the elements
 let backtotree = document.getElementById("ins-1");
@@ -59,13 +56,8 @@ let escapeCounters = [
   0, // from Story
 ];
 
-const prak = "#C9FF4C";
-
-export let handimages = []; //!!! per ora questa non si può togliere
-// let handimagessrc = []; // svg di tutte le pose
-
-let similarHand;
 export let selectedPose;
+let similarHand;
 
 export let zoomFactor;
 
@@ -78,7 +70,6 @@ let cursorcontainer = document.getElementById("cursor-container"); //div che con
 let cursorImages = document.getElementsByClassName("cursor-image"); //div che contiene l'immagine
 
 // time and space
-
 let prev_timestamp;
 let delta_time;
 
@@ -101,16 +92,8 @@ async function createHandLandmarker() {
 
 //PRELOAD
 export async function preload() {
-  // for (let i = 1; i <= handPoses.length; i++) {
-  //   handimagessrc[i] = `assets/cursor/${i}.svg`;
-  // }
-
   //json
   handsData = await importJSON("json/training.json");
-
-  // back e restart
-  restartImgSrc = "assets/instructions/restart2.svg";
-  treeImgSrc = "assets/instructions/back2.svg";
 }
 
 async function importJSON(path) {
@@ -136,21 +119,18 @@ export function setup() {
     navigator.mediaDevices
       .getUserMedia(constraints)
       .then(function (stream) {
-        // apply the stream to the video element used in the texture
+        // VIDEO
         video.srcObject = stream;
         video.play();
         video.addEventListener("playing", () => {
+          // CREO VIDEO IN THREE
           // const scale = 0.4;
-
           // const geometry = new THREE.PlaneGeometry(
           //   video.videoWidth * scale,
           //   video.videoHeight * scale
           // );
-
-          // console.log(video.videoWidth, video.videoHeight);
           // const material = new THREE.MeshBasicMaterial({ map: texture });
           // videoMesh = new THREE.Mesh(geometry, material);
-
           // scene.add(videoMesh);
           setTimeout((videoExists = true), 1);
         });
@@ -216,10 +196,6 @@ export function draw(shouldDrawHand = true) {
       : canvasW,
   };
 
-  // if (videoMesh) {
-  //   videoMesh.visible = !selectedPose;
-  // }
-
   //DISEGNO LE MANI
   drawHands(selectedPose ? false : shouldDrawHand);
 
@@ -241,8 +217,6 @@ export function draw(shouldDrawHand = true) {
 
     push();
     if (!shouldDrawHand) {
-      //nella home disegno la mano in posa 3
-      similarHand = 3;
       restart = false;
       market = false;
     }
@@ -253,7 +227,7 @@ export function draw(shouldDrawHand = true) {
       lock: selectedPose !== undefined,
     });
 
-    index = restart ? 8 : market ? 7 : !shouldDrawHand ? 9 : similarHand;
+    index = restart ? 8 : market ? 7 : !shouldDrawHand ? 9 : similarHand; //se sono in over su restart oppure torna al mercato oppure nessuna mano è detectata se no mano riconosciuta
     cursorImages.forEach((image, i) => {
       image.style.display = i == index ? "block" : "none";
     });
@@ -264,15 +238,16 @@ export function draw(shouldDrawHand = true) {
   if (counters.every((c) => c === 0)) {
     selectedPose = undefined;
   }
-
   // se non c'è la mano e nessuna posa è selezionata e il video tutorial è finito
-  if (!selectedPose && !hands[0] && tutorialEnd) {
+  // if (!selectedPose && !hands[0] && tutorialEnd) {
+  if (!selectedPose && !hands[0]) {
     if (counters.every((c) => c === 0)) {
-      escapeTree(20000); //10 secondi
+      let escape = (escapeCounters[0] += delta_time);
+
+      escapeTree(20000, escape); //10 secondi
     }
   } else {
     escapeCounters[0] = 0; //counter di uscita si riavvia e il warning scompare
-    // warning ? (warning.style.animation = "disappear 0.5s forwards") : null;
     warning ? (warning.style.display = "none") : null;
   }
 
@@ -283,11 +258,9 @@ export function draw(shouldDrawHand = true) {
       //restart
       if (
         cursor.x >
-          (windowWidth / 2 - windowWidth / 50 - backtostart.offsetWidth) *
+          (windowWidth - (windowWidth / 50 + backtostart.offsetWidth)) *
             zoomFactor &&
-        cursor.y <
-          backtostart.offsetHeight -
-            (windowHeight / 2 - windowHeight / 25) * zoomFactor
+        cursor.y < (backtostart.offsetHeight + windowWidth / 50) * zoomFactor
       ) {
         goingBackToStart(5000);
         restart = true;
@@ -298,14 +271,10 @@ export function draw(shouldDrawHand = true) {
       //goback
       if (
         selectedPose &&
-        cursor.x <
-          (backtotree.offsetWidth - (windowWidth / 2 - windowWidth / 50)) *
-            zoomFactor &&
-        cursor.y <
-          backtotree.offsetHeight -
-            (windowHeight / 2 - windowHeight / 25) * zoomFactor // aumento leggermente il margine in alto - che sarebbe wisth/50= 2vw così da avere più margine per lo spostamento
+        cursor.x < (backtotree.offsetWidth + windowWidth / 50) * zoomFactor &&
+        cursor.y < (backtotree.offsetHeight + windowWidth / 50) * zoomFactor // aumento leggermente il margine in alto - che sarebbe wisth/50= 2vw così da avere più margine per lo spostamento
       ) {
-        goingBackToTree(2000);
+        goingBackToTree(2500);
         market = true;
       } else {
         market = false;
@@ -327,16 +296,18 @@ export function draw(shouldDrawHand = true) {
   }
 
   //HTML CURSOR
+  let first = false;
   if (cursor) {
-    // cursorcontainer.style.display = "block";
+    cursorcontainer.style.display = "block";
     cursorcontainer.style.transform =
       "translate(" +
       cursor.x / zoomFactor +
       "px," +
       cursor.y / zoomFactor +
       "px)";
+  } else {
+    cursorcontainer.style.display = "none";
   }
-  // else cursorcontainer.style.display = "none";
 
   // reset the counter when no action
   loadingrects.forEach((rect, r) => {
@@ -349,8 +320,6 @@ export function draw(shouldDrawHand = true) {
     } else if (shouldDrawHand)
       // making the loading invisible while in the 9th pose in all cases but the screensaver
       rect.style.opacity = 0;
-
-    //console.log(index);
   });
 }
 
@@ -398,73 +367,62 @@ const drawHands = (shouldDrawHand) => {
 
 //DETECT HAND - confronto con i LANDMARKS usando gli angoli
 function calculateDifferences(dataSet) {
-  const calculateAngleDifferences = (userAngles, refAngles) => {
-    return userAngles.map((userAngle, index) =>
-      Math.abs(userAngle - refAngles[index])
-    );
-  };
+  if (!hands[0]?.angles || !dataSet) return [];
 
-  return dataSet?.map((data) => {
-    const absoluteWeight = 0.2; // angoli assoluti - peso variabile
-    const relativeWeight = 0.8; // angoli relativi - peso maggiore
+  // Pre-calculate hand angles once
+  const handAbsoluteAngles = hands[0].angles.map((a) => a.absolute);
+  const handRelativeAngles = hands[0].angles.map((a) => a.relative);
 
-    const absoluteDifferences = calculateAngleDifferences(
-      hands[0].angles.map((a) => a.absolute),
-      data.angles.map((a) => a.absolute)
+  const weights = { absolute: 0.2, relative: 0.8 };
+
+  return dataSet.map((data) => {
+    const absoluteDiffs = handAbsoluteAngles.map((angle, i) =>
+      Math.abs(angle - data.angles[i].absolute)
     );
 
-    const relativeDifferences = calculateAngleDifferences(
-      hands[0].angles.map((a) => a.relative),
-      data.angles.map((a) => a.relative)
+    const relativeDiffs = handRelativeAngles.map((angle, i) =>
+      Math.abs(angle - data.angles[i].relative)
     );
 
-    const combinedScore = absoluteDifferences.reduce(
-      (sum, diff, index) =>
-        sum +
-        (diff * absoluteWeight + relativeDifferences[index] * relativeWeight),
+    return absoluteDiffs.reduce(
+      (sum, diff, i) =>
+        sum + (diff * weights.absolute + relativeDiffs[i] * weights.relative),
       0
     );
-
-    return combinedScore;
   });
 }
 
 // HAND COUNTER
 let isRedirecting = false; //flag per fare una sola call quando cambia pagina
 function handCounter({ detectedHand, shouldDrawHand, lock }) {
-  const maxCounter = 5000; // Maximum counter value
-  const loadingRadius = 45 * zoomFactor; // Radius of the loading circle
-  // console.log(lock);
+  const maxCounter = 5000;
+
   if (tutorialEnd === false || lock) return;
 
-  counters.forEach((e, i) => {
-    if (hands[0]) {
-      //se la mano non c'è o sta andando il tutorial blocco il counter
-      //console.log("counter va");
-      if (detectedHand == i) {
-        // Only increment if not already at max
-        if (counters[detectedHand] < maxCounter) {
-          counters[detectedHand] += delta_time;
-        }
+  // Only process if we have hands or existing counters
+  if (!hands[0] && counters.every((c) => c === 0)) return;
 
-        drawDOMArc(counters[detectedHand], maxCounter);
+  // Update only the relevant counter
+  if (hands[0] && detectedHand !== undefined) {
+    if (counters[detectedHand] < maxCounter) {
+      counters[detectedHand] += delta_time;
+      drawDOMArc(counters[detectedHand], maxCounter);
+    }
 
-        if (counters[detectedHand] >= maxCounter) {
-          selectedPose = handPoses[i]; //se il counter raggiunge il massimo di una delle pose segnala questa come la posa detectata
+    if (counters[detectedHand] >= maxCounter) {
+      selectedPose = handPoses[detectedHand];
 
-          if (!shouldDrawHand && !isRedirecting) {
-            //se sono nella home allora apre la pagina tree
-            window.location.href = "tree.html";
-            isRedirecting = true; //redirecting cambia così da fare un solo rindizziramento
-          }
-        }
-      } else if (counters[i] > 0) {
-        counters[i] -= delta_time;
-        counters[i] = Math.max(counters[i], 0);
+      if (!shouldDrawHand && !isRedirecting) {
+        window.location.href = "tree.html";
+        isRedirecting = true;
       }
-    } else if (counters[i] > 0) {
-      counters[i] -= delta_time;
-      counters[i] = Math.max(counters[i], 0);
+    }
+  }
+
+  // Decrease other counters
+  counters.forEach((val, i) => {
+    if (i !== detectedHand && val > 0) {
+      counters[i] = Math.max(0, val - delta_time);
     }
   });
 }
@@ -492,9 +450,7 @@ function drawDOMArc(value, maxCounter) {
 // restart
 function goingBackToStart(maxCounter) {
   !selectedPose ? (counters = counters.map(() => 0)) : null; // Reset all counters in the counters array
-  // selectedPose = undefined; // Reset the selected pose
 
-  // console.log(counters, selectedPose);
   drawDOMArc(escapeCounters[1], maxCounter);
 
   if (escapeCounters[1] < maxCounter) {
@@ -516,20 +472,16 @@ function goingBackToTree(maxCounter) {
 }
 
 // COUNTER CHE FA ESCAPE DALLA PAGINA NEL CASO IN CUI NESSUNA MANO è DETECTATA
-function escapeTree(maxCounter) {
-  escapeCounters[0] += delta_time;
-  // console.log(escapeCounters[0]);
-  if (escapeCounters[0] < maxCounter) {
-    if (escapeCounters[0] > maxCounter / 2) {
-      //quando sono a metà del counter
-      // warning.style.animation = "appear 1s forwards";
+function escapeTree(maxCounter, escapeCounter) {
+  if (escapeCounter < maxCounter) {
+    console.log("esco");
+    //quando sono a metà del counter
+    if (escapeCounter > maxCounter / 2) {
       warning ? (warning.style.display = "flex") : null;
-      // warning.style.opacity = "0.4";
 
       endCounter
         ? (endCounter.innerHTML =
-            Math.floor(maxCounter / 1000) -
-            Math.floor(escapeCounters[0] / 1000))
+            Math.floor(maxCounter / 1000) - Math.floor(escapeCounter / 1000))
         : null;
     }
   } else if (!isRedirecting) backToStart();
