@@ -239,8 +239,8 @@ export function draw(shouldDrawHand = true) {
     selectedPose = undefined;
   }
   // se non c'è la mano e nessuna posa è selezionata e il video tutorial è finito
-  // if (!selectedPose && !hands[0] && tutorialEnd) {
-  if (!selectedPose && !hands[0]) {
+  if (!selectedPose && !hands[0] && tutorialEnd) {
+    // if (!selectedPose && !hands[0]) {
     if (counters.every((c) => c === 0)) {
       let escape = (escapeCounters[0] += delta_time);
 
@@ -474,7 +474,7 @@ function goingBackToTree(maxCounter) {
 // COUNTER CHE FA ESCAPE DALLA PAGINA NEL CASO IN CUI NESSUNA MANO è DETECTATA
 function escapeTree(maxCounter, escapeCounter) {
   if (escapeCounter < maxCounter) {
-    console.log("esco");
+    // console.log("esco");
     //quando sono a metà del counter
     if (escapeCounter > maxCounter / 2) {
       warning ? (warning.style.display = "flex") : null;

@@ -173,7 +173,7 @@ function draw() {
   if (!detectCursor) {
     cursorCtn.style.display = "block";
     cursorImage.style.display = "block";
-    console.log(cursorCtn);
+    // console.log(cursorCtn);
     cursorCtn.style.animation = "wave 3s infinite";
   } else {
     cursorCtn.style.top = "0px";

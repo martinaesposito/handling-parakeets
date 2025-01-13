@@ -11,7 +11,6 @@ import {
 // HTMLS
 let insCenter = document.getElementById("ins-centr");
 let handLegend = document.getElementById("hands-legend");
-let container = document.querySelector(".container");
 
 // warning
 let warning = document.getElementById("warning");
@@ -34,6 +33,7 @@ let progressBar = document.getElementById("progress");
 if (tutorial) {
   tutorial.addEventListener("play", () => {
     const duration = tutorial.duration + "s";
+    console.log(duration);
     progressBar.style.animation = "pippo " + duration + " linear forwards";
   });
 
@@ -256,13 +256,13 @@ function setup() {
 
   detectSetup();
 
-  branchPlatform.forEach((branch, index) => {
-    plat = createDiv();
-    plat.class("platform");
-    plat.html(`${branch.name} [${branch.value}] `);
-    plat.id(branch.name);
-    platforms.push(plat);
-  });
+  // branchPlatform.forEach((branch, index) => {
+  //   plat = createDiv();
+  //   plat.class("platform");
+  //   plat.html(`${branch.name} [${branch.value}] `);
+  //   plat.id(branch.name);
+  //   platforms.push(plat);
+  // });
 
   // intro storyContainer
   storyIntro = createDiv();
@@ -290,22 +290,22 @@ function draw() {
   }
 
   // nomi delle platform
-  if (branchPositions.length > 0) {
-    branchesss.forEach((e, index) => {
-      platforms[index].position(
-        canvasW / 2 +
-          (branchPositions[index].x - canvasW / 2) * zoom * zoom -
-          platforms[index].width / 2,
-        canvasH / 2 +
-          (branchPositions[index].y - canvasH / 2) * zoom * zoom -
-          platforms[index].height / 2
-      );
+  // if (branchPositions.length > 0) {
+  //   branchesss.forEach((e, index) => {
+  //     platforms[index].position(
+  //       canvasW / 2 +
+  //         (branchPositions[index].x - canvasW / 2) * zoom * zoom -
+  //         platforms[index].width / 2,
+  //       canvasH / 2 +
+  //         (branchPositions[index].y - canvasH / 2) * zoom * zoom -
+  //         platforms[index].height / 2
+  //     );
 
-      selectedPose
-        ? platforms[index].style("animation", "disappear 3s forwards")
-        : platforms[index].style("animation", "appear 3s forwards");
-    });
-  }
+  //     selectedPose
+  //       ? platforms[index].style("animation", "disappear 3s forwards")
+  //       : platforms[index].style("animation", "appear 3s forwards");
+  //   });
+  // }
 
   dots.forEach((dot) => {
     dot.move(dots, selectedPose);
