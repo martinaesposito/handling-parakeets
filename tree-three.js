@@ -104,6 +104,8 @@ let audioPlaying = false;
 let scene, camera, renderer;
 let canvasW, canvasH;
 
+let p5Canvas;
+
 let zoom = 1;
 let targetZoom;
 
@@ -120,12 +122,18 @@ export {
   warning,
   endCounter,
   audioPlaying,
+  p5Canvas,
   toggleAudio,
 };
 
 ////////////////////////////////////////////////////////////////////
 
 window.setup = async () => {
+  let p5Containter = document.getElementById("p5-container");
+
+  p5Canvas = createCanvas(0.15 * windowWidth, (0.15 / 4) * 3 * windowWidth);
+  p5Containter.appendChild(p5Canvas.canvas);
+
   //setup di p5 - che chiama il finto preload e il finto setup
   await preload();
   setup();
@@ -289,9 +297,9 @@ window.draw = () => {
 function draw() {
   if (!scene || !camera || !renderer) return;
 
-  if (videoExists) {
-    loading.style.display = "none"; //nascondo il loading
-  }
+  // if (videoExists) {
+  //   loading.style.display = "none"; //nascondo il loading
+  // }
 
   targetZoom = selectedPose ? 1.8 : 1;
   zoom += (targetZoom - zoom) * 0.1;

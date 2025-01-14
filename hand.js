@@ -29,16 +29,17 @@ const Point = class {
 
 export const Hand = class {
   //crea la classe mano basata sulla classe punti che compongono la mano
-  constructor(data, type) {
+  constructor(data, type, p5Data) {
     this.points = [];
-    this.origin = null; //punto d'origine della mano
+    this.p5Points = [];
     this.type = type; //destra o sinistra - anche se per adesso non è implementato
 
-    this.draw(data, false);
+    this.draw(data, false, p5Data);
   }
 
-  draw(data, shouldDrawHand) {
+  draw(data, shouldDrawHand, p5Data) {
     let increment = 1;
+    console.log(p5Data);
 
     if (!data) {
       // Se data non esiste, utilizza this.points per il disegno
@@ -52,16 +53,20 @@ export const Hand = class {
       }
 
       for (let i = f; i < f + increment; i++) {
-        let point = data[i];
-        const coords = point;
-
         if (!this.points[i]) {
           // Se points non esiste allora lo crea
-          const newPoint = new Point(coords, i, this.type);
+          const newPoint = new Point(data[i], i, this.type);
           this.points[i] = newPoint;
+          if (p5Data) {
+            const newP5Point = new Point(p5Data[i], i, this.type);
+            this.p5Points[i] = newP5Point;
+          }
         } else {
           // Altrimenti aggiorna le coordinate
-          this.points[i].update(coords);
+          this.points[i].update(data[i]);
+          if (p5Data) {
+            this.p5Points[i].update(p5Data[i]);
+          }
         }
       }
     }
@@ -78,7 +83,7 @@ export const Hand = class {
 
         beginShape(); // Disegno una forma a partire dai punti del palmo
         for (let i = f; i < f + increment; i++) {
-          vertex(...Object.values(this.points[i].pos)); // Usa i punti aggiornati
+          vertex(...Object.values(this.p5Points[i].pos)); // Usa i punti aggiornati
         }
 
         strokeWeight(1);
@@ -89,7 +94,7 @@ export const Hand = class {
           // Disegna il palmo unendo specifici punti
           const palmPoints = [0, 1, 5, 9, 13, 17, 0];
           palmPoints.forEach((p) =>
-            vertex(...Object.values(this.points[p].pos))
+            vertex(...Object.values(this.p5Points[p].pos))
           );
         }
 
@@ -97,11 +102,10 @@ export const Hand = class {
       }
 
       // Disegna tutti i punti
-      for (let p = 0; p < this.points.length; p++) {
-        this.points[p].draw();
+      for (let p = 0; p < this.p5Points.length; p++) {
+        this.p5Points[p].draw();
       }
     }
-    this.origin = this.points[0]; // Aggiorna il punto di origine della mano
   }
 
   deselect() {

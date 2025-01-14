@@ -6,7 +6,13 @@ import {
   FilesetResolver,
 } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.0";
 
-import { zoom, warning, endCounter, tutorialEnd } from "./tree-three.js";
+import {
+  zoom,
+  warning,
+  endCounter,
+  tutorialEnd,
+  p5Canvas,
+} from "./tree-three.js";
 import { Hand } from "./hand.js"; //importa l'oggetto mano definito nel javascript precedente
 
 export let canvasW = window.innerWidth;
@@ -130,10 +136,10 @@ async function importJSON(path) {
 export function setup() {
   video = document.getElementById("capture");
 
-  const texture = new THREE.VideoTexture(video);
-  texture.wrapS = THREE.RepeatWrapping;
-  texture.repeat.x = -1;
-  texture.colorSpace = THREE.SRGBColorSpace;
+  // const texture = new THREE.VideoTexture(video);
+  // texture.wrapS = THREE.RepeatWrapping;
+  // texture.repeat.x = -1;
+  // texture.colorSpace = THREE.SRGBColorSpace;
 
   if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
     const constraints = {
@@ -218,7 +224,7 @@ export function draw(shouldDrawHand = true) {
   };
 
   //DISEGNO LE MANI
-  drawHands(selectedPose ? false : shouldDrawHand);
+  drawHands(shouldDrawHand);
 
   //CURSOR
   if (hands.length > 0 && hands[0]?.points) {
@@ -408,6 +414,8 @@ if (tutorialQuick) {
 
 //DISEGNO LE MANI
 const drawHands = (shouldDrawHand) => {
+  clear();
+
   if (handLandmarker && video && handsData) {
     let startTimeMs = performance.now(); //ritorna un timestamp del video che mi serve da mandare a mediapipe per il riconoscimento dell'immagine
     if (video.currentTime) {
@@ -425,13 +433,24 @@ const drawHands = (shouldDrawHand) => {
         cursor = undefined;
         return;
       }
-      let points = landmarks?.map((p) => mapCoords(p, videoSize)); //prende i punti della mano e li rimappa
+      let points = landmarks?.map((p) =>
+        mapCoords(p, videoSize, { w: canvasW, h: canvasH })
+      ); //prende i punti della mano e li rimappa
+      let p5Points;
+
+      if (p5Canvas) {
+        p5Points = landmarks?.map((p) => ({
+          x: lerp(0, p5Canvas.width, 1 - p.x),
+          y: lerp(0, p5Canvas.height, p.y),
+          z: 0,
+        }));
+      }
 
       if (!hands[0]) {
-        hands[0] = new Hand(points, 0); //creo un'istanza dell'oggetto mano con le coordinate dei punti ricavati
+        hands[0] = new Hand(points, 0, p5Points); //creo un'istanza dell'oggetto mano con le coordinate dei punti ricavati
       } else {
         //If there is already a hand object, updates the existing hand by calling its draw method with new points
-        hands[0].draw(points, shouldDrawHand);
+        hands[0].draw(points, shouldDrawHand, p5Points);
       }
 
       // chiamo funzione che confronta i LANDMARKS con quelli del json e mi restituisce la mano detectata

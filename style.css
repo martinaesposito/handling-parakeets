@@ -44,16 +44,28 @@
 main {
   display: none;
 }
-video {
+
+#p5-container {
   position: fixed;
   bottom: var(--ins-margin);
   right: var(--ins-margin);
   width: var(--camera);
   height: auto;
+  border: var(--prak) var(--mini-spacer) solid;
 }
+
+#p5-container #capture {
+  width: 100%;
+  height: auto;
+}
+
+#p5-container canvas {
+  position: absolute;
+  left: 0;
+}
+
 #capture {
   transform: scale(-1, 1);
-  border: var(--prak) var(--mini-spacer) solid;
 }
 
 /* //////////////////// */
