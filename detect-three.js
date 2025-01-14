@@ -44,16 +44,40 @@ let counters = [
 // RESTART E BACK
 let restart = false;
 let market = false;
+let skip = false;
+let info = false;
 
 // getting the elements
-let backtotree = document.getElementById("ins-1");
-let backtostart = document.getElementById("ins-2");
-let leftgradient = document.getElementById("gradient-left");
+let tutorial = document.getElementById("tutorial");
+let tutorialQuick = document.getElementById("quick-tutorial");
+let quickTutorialEnd, videoStarted;
+
+// Function to play or restart the video
+function handleVideoPlayback() {
+  if (!videoStarted || tutorialQuick.ended) {
+    // Restart the video if it hasn't started or has ended
+    tutorialQuick.currentTime = 0;
+    tutorialQuick.play();
+    videoStarted = true; // Mark the video as started
+  }
+}
+
+let noHandAndZeroCounters;
+
+let backtotree = document.getElementById("backtotree");
+let backtostart = document.getElementById("backtostart");
+
+let leftGradient = document.getElementById("gradient-left");
+let bottomGradient = document.getElementById("gradient-bottom");
+
+let infoEl = document.getElementById("info");
+let skipEl = document.getElementById("skip");
 
 let escapeCounters = [
   0, // from Tree when inactivity
   0, // from Tree when selected
   0, // from Story
+  0, //from tutorial
 ];
 
 export let selectedPose;
@@ -144,9 +168,6 @@ export function setup() {
 
   createHandLandmarker(); //hand detector mediapipe
 
-  if (backtotree) backtotree.style.visibility = "hidden";
-  if (leftgradient) leftgradient.style.visibility = "hidden";
-
   // LOADING CIRCLE
   let precision = 64;
   loadingcircles = document.getElementsByClassName("loading-circle");
@@ -227,7 +248,15 @@ export function draw(shouldDrawHand = true) {
       lock: selectedPose !== undefined,
     });
 
-    index = restart ? 8 : market ? 7 : !shouldDrawHand ? 9 : similarHand; //se sono in over su restart oppure torna al mercato oppure nessuna mano è detectata se no mano riconosciuta
+    index = restart
+      ? 8
+      : market
+      ? 7
+      : skip
+      ? 10
+      : !shouldDrawHand
+      ? 9
+      : similarHand; //se sono in over su restart oppure torna al mercato oppure nessuna mano è detectata se no mano riconosciuta
     cursorImages.forEach((image, i) => {
       image.style.display = i == index ? "block" : "none";
     });
@@ -252,10 +281,11 @@ export function draw(shouldDrawHand = true) {
   }
 
   // //////////////////////////////////////////////////////////////////////////
-  // BACK E RESTART
-  if (backtotree && backtostart) {
-    if (cursor) {
-      //restart
+  // BACK E RESTART E INFO E SKIP
+
+  if (cursor) {
+    //restart
+    if (backtostart) {
       if (
         cursor.x >
           (windowWidth - (windowWidth / 50 + backtostart.offsetWidth)) *
@@ -268,7 +298,46 @@ export function draw(shouldDrawHand = true) {
         restart = false;
         if (escapeCounters[1] > 0) escapeCounters[1] = 0;
       }
-      //goback
+    }
+    //skip
+    if (skipEl) {
+      if (
+        cursor.x >
+          (windowWidth - (windowWidth / 50 + skipEl.offsetWidth)) *
+            zoomFactor &&
+        cursor.y < (skipEl.offsetHeight + windowWidth / 50) * zoomFactor
+      ) {
+        skip = true;
+        // console.log("skip " + skip);
+        !selectedPose ? (counters = counters.map(() => 0)) : null; // Reset all counters in the counters array
+        skipTutorial(2500);
+      } else {
+        skip = false;
+        if (escapeCounters[3] > 0) escapeCounters[3] = 0;
+      }
+    }
+    //info
+    if (infoEl) {
+      if (
+        cursor.x < (infoEl.offsetWidth + windowWidth / 50) * zoomFactor &&
+        cursor.y >
+          (windowHeight / 2 - (infoEl.offsetHeight + windowWidth / 50)) *
+            zoomFactor &&
+        tutorialEnd
+      ) {
+        tutorialQuick.style.display = "block";
+        tutorialQuick.style.visibility = "visible";
+        info = quickTutorialEnd = true;
+
+        // Start or restart the video
+        handleVideoPlayback();
+      } else {
+        info = false;
+      }
+    }
+
+    //goback
+    if (backtotree) {
       if (
         selectedPose &&
         cursor.x < (backtotree.offsetWidth + windowWidth / 50) * zoomFactor &&
@@ -281,17 +350,22 @@ export function draw(shouldDrawHand = true) {
         if (escapeCounters[2] > 0) escapeCounters[2] = 0; //se esco dal counter scende
       }
     }
+  }
 
-    // Applying animations for the going back divs
+  // Applying animations for the going back divs
+  if (backtotree && tutorialEnd) {
+    console.log(selectedPose, noHandAndZeroCounters, escapeCounters[2] > 0);
     if (selectedPose) {
+      // Show elements when pose is selected
       backtotree.style.visibility = "visible";
       backtotree.style.animation = "appear 1s forwards";
-
-      leftgradient.style.visibility = "visible";
-      leftgradient.style.animation = "appear 1s forwards";
-    } else {
+      leftGradient.style.visibility = "visible";
+      leftGradient.style.animation = "appear 1s forwards";
+    } else if (noHandAndZeroCounters || escapeCounters[2] > 0) {
+      // Hide elements when no hand & zero counters, or when going back
       backtotree.style.animation = "disappear 1s forwards";
-      leftgradient.style.animation = "disappear 1s forwards";
+      leftGradient.style.animation = "disappear 1s forwards";
+      noHandAndZeroCounters = false;
     }
   }
 
@@ -320,6 +394,15 @@ export function draw(shouldDrawHand = true) {
     } else if (shouldDrawHand)
       // making the loading invisible while in the 9th pose in all cases but the screensaver
       rect.style.opacity = 0;
+  });
+}
+
+if (tutorialQuick) {
+  // Ensure the "ended" event is set up only once
+  tutorialQuick.addEventListener("ended", () => {
+    videoStarted = false;
+    quickTutorialEnd = false;
+    tutorialQuick.style.display = "none";
   });
 }
 
@@ -397,10 +480,12 @@ let isRedirecting = false; //flag per fare una sola call quando cambia pagina
 function handCounter({ detectedHand, shouldDrawHand, lock }) {
   const maxCounter = 5000;
 
-  if (tutorialEnd === false || lock) return;
+  if (tutorialEnd === false || lock || quickTutorialEnd) return;
 
-  // Only process if we have hands or existing counters
-  if (!hands[0] && counters.every((c) => c === 0)) return;
+  if (!hands[0] && counters.every((c) => c === 0)) {
+    noHandAndZeroCounters = true;
+    return;
+  }
 
   // Update only the relevant counter
   if (hands[0] && detectedHand !== undefined) {
@@ -468,6 +553,24 @@ function goingBackToTree(maxCounter) {
     counters = counters.map(() => 0);
     selectedPose = undefined;
     escapeCounters[2] = 0;
+  }
+}
+//skip tutorial
+function skipTutorial(maxCounter) {
+  drawDOMArc(escapeCounters[3], maxCounter);
+  if (escapeCounters[3] < maxCounter) {
+    escapeCounters[3] += delta_time;
+  } else {
+    tutorial.currentTime = tutorial.duration;
+    counters = counters.map(() => 0); // Reset counters to 0 instead of 3
+    selectedPose = undefined;
+    escapeCounters[3] = 0;
+
+    if (skipEl) skipEl.style.display = "none";
+
+    if (backtostart) backtostart.style.display = "flex";
+    if (infoEl) infoEl.style.display = "flex";
+    if (bottomGradient) bottomGradient.style.display = "block";
   }
 }
 

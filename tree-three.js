@@ -11,6 +11,12 @@ import {
 // HTMLS
 let insCenter = document.getElementById("ins-centr");
 let handLegend = document.getElementById("hands-legend");
+let insStart = document.getElementById("backtostart");
+let skipEl = document.getElementById("skip");
+let infoEl = document.getElementById("info");
+
+let leftGradient = document.getElementById("gradient-left");
+let bottomGradient = document.getElementById("gradient-bottom");
 
 // warning
 let warning = document.getElementById("warning");
@@ -26,20 +32,25 @@ if (imgLoading) {
 
 // TUTORIAL
 let tutorial = document.getElementById("tutorial");
-// tutorialEnd = true; // RIMUOVERE, PER TESTING
 let tutorialEnd = tutorial ? false : undefined;
-// progressbar
 let progressBar = document.getElementById("progress");
-if (tutorial) {
-  tutorial.addEventListener("play", () => {
+
+if (tutorial && progressBar) {
+  tutorial.addEventListener("loadeddata", () => {
+    console.log("Video data loaded");
+
+    console.log("Video metadata loaded, duration:", tutorial.duration);
     const duration = tutorial.duration + "s";
-    console.log(duration);
     progressBar.style.animation = "pippo " + duration + " linear forwards";
   });
 
   tutorial.addEventListener("ended", () => {
-    tutorial.style.animation = "disappear 0.5s forwards";
-    progressBar.style.animation = "disappear 0.5s forwards";
+    insStart.style.display = "flex";
+    infoEl.style.display = "flex";
+    bottomGradient.style.display = "block";
+    skipEl.style.display = "none";
+    tutorial.style.animation = "disappear 0.3s forwards";
+    progressBar.style.animation = "disappear 0.3s forwards";
     tutorialEnd = true;
   });
 }
@@ -52,22 +63,23 @@ let platforms = [];
 let plat;
 
 const branchPlatform = [
-  { value: 149, start: 0.6, end: 0.63, name: "usato.it" },
-  { value: 14, start: 0.6, end: 0.8, name: "TrovaPet" },
-  { value: 3, start: 0.95, end: 1, name: "petpappagalli" },
-  { value: 44, start: 0.6, end: 0.65, name: "Telegram" },
-  { value: 7, start: 0.95, end: 1, name: "animalissimo" },
-  { value: 12, start: 0.6, end: 0.7, name: "Trovalosubito" },
-  { value: 11, start: 0.9, end: 1, name: "likesx" },
-  { value: 149, start: 0.8, end: 0.85, name: "FB pages" },
-  { value: 10, start: 0.6, end: 0.7, name: "Secondamano" },
-  { value: 18, start: 0.9, end: 1, name: "AnimaleAmico" },
-  { value: 14, start: 0.4, end: 0.6, name: "FB marketplace" },
-  { value: 177, start: 0.75, end: 0.85, name: "FB groups" },
+  { value: 149, start: 0.53, end: 0.55, name: "usato.it" },
+  { value: 14, start: 0.98, end: 1, name: "TrovaPet" },
+  { value: 7, start: 0.35, end: 0.4, name: "animalissimo" },
   { value: 19, start: 0.9, end: 1, name: "AAAnnunci" },
-  { value: 11, start: 0.33, end: 0.36, name: "trovacuccioli" },
   { value: 3, start: 0.65, end: 0.7, name: "petfocus" },
-  { value: 94, start: 0.9, end: 0.95, name: "Clasf.it" },
+  { value: 11, start: 0.95, end: 1, name: "trovacuccioli" },
+  { value: 14, start: 0.35, end: 0.4, name: "FB marketplace" },
+  { value: 18, start: 0.75, end: 0.77, name: "AnimaleAmico" },
+  { value: 143, start: 0.83, end: 0.85, name: "subito.it" },
+  { value: 3, start: 0.98, end: 1, name: "petpappagalli" },
+  { value: 12, start: 0.35, end: 0.4, name: "Trovalosubito" },
+  { value: 44, start: 0.94, end: 0.96, name: "Telegram" },
+  { value: 149, start: 0.8, end: 0.82, name: "FB pages" },
+  { value: 11, start: 0.35, end: 0.4, name: "likesx" },
+  { value: 177, start: 0.75, end: 0.85, name: "FB groups" },
+  { value: 10, start: 0.7, end: 0.75, name: "Secondamano" },
+  { value: 94, start: 0.92, end: 0.95, name: "Clasf.it" },
 ];
 
 const handPoses = [
@@ -205,11 +217,10 @@ function setup() {
   document.body.appendChild(renderer.domElement);
 
   const totalDots = listingsData.reduce((acc, { value }) => acc + value, 0);
-  const angles = listingsData.map(
-    ({ value }) => Math.max(0.15, 2 * Math.PI * (value / totalDots)) //distribuisco i rami in maniera proporzionale rispetto al totale, imponendo un angolo minimo di 0.15
-  );
+  const angles = calculateAngles(listingsData);
   let total = 0;
 
+  console.log(angles);
   angles.forEach((a, index) => {
     const angle = total + a / 2 + (index > 0 ? angles[index - 1] / 2 : 0);
 
@@ -256,13 +267,14 @@ function setup() {
 
   detectSetup();
 
-  // branchPlatform.forEach((branch, index) => {
-  //   plat = createDiv();
-  //   plat.class("platform");
-  //   plat.html(`${branch.name} [${branch.value}] `);
-  //   plat.id(branch.name);
-  //   platforms.push(plat);
-  // });
+  branchPlatform.forEach((branch, index) => {
+    plat = createDiv();
+    plat.class("platform");
+    plat.html(`${branch.name} [${branch.value}] `);
+    plat.id(branch.name);
+    platforms.push(plat);
+  });
+  // console.log(platforms);
 
   // intro storyContainer
   storyIntro = createDiv();
@@ -290,22 +302,22 @@ function draw() {
   }
 
   // nomi delle platform
-  // if (branchPositions.length > 0) {
-  //   branchesss.forEach((e, index) => {
-  //     platforms[index].position(
-  //       canvasW / 2 +
-  //         (branchPositions[index].x - canvasW / 2) * zoom * zoom -
-  //         platforms[index].width / 2,
-  //       canvasH / 2 +
-  //         (branchPositions[index].y - canvasH / 2) * zoom * zoom -
-  //         platforms[index].height / 2
-  //     );
+  if (branchPositions.length > 0) {
+    branchesss.forEach((e, index) => {
+      platforms[index].position(
+        canvasW / 2 +
+          (branchPositions[index].x - canvasW / 2) * zoom * zoom -
+          platforms[index].width / 2,
+        canvasH / 2 +
+          (branchPositions[index].y - canvasH / 2) * zoom * zoom -
+          platforms[index].height / 2
+      );
 
-  //     selectedPose
-  //       ? platforms[index].style("animation", "disappear 3s forwards")
-  //       : platforms[index].style("animation", "appear 3s forwards");
-  //   });
-  // }
+      selectedPose
+        ? platforms[index].style("animation", "disappear 3s forwards")
+        : platforms[index].style("animation", "appear 3s forwards");
+    });
+  }
 
   dots.forEach((dot) => {
     dot.move(dots, selectedPose);
@@ -394,4 +406,40 @@ function changeStory(indexStory) {
 
   storyIntro.style("display", "flex");
   insCenter.style.display = "none";
+}
+
+function calculateAngles(listingsData) {
+  const totalDots = listingsData.reduce((acc, { value }) => acc + value, 0);
+
+  const rawAngles = listingsData.map(
+    ({ value }) => 2 * Math.PI * (value / totalDots)
+  );
+
+  const minAngle = 0.2; // Set minimum angle (0.3 radians)
+  // Count how many angles would be below minimum
+  const smallAngles = rawAngles.filter((angle) => angle < minAngle).length;
+
+  // Calculate how much space remains for proportional distribution
+  const reservedSpace = smallAngles * minAngle;
+  const remainingSpace = 2 * Math.PI - reservedSpace;
+
+  // Calculate sum of values for angles that will be proportional
+  const proportionalSum = listingsData
+    .filter(({ value }) => 2 * Math.PI * (value / totalDots) >= minAngle)
+    .reduce((acc, { value }) => acc + value, 0);
+
+  // Final angle calculation
+  const adjustedAngles = listingsData.map(({ value }) => {
+    const rawAngle = 2 * Math.PI * (value / totalDots);
+    if (rawAngle < minAngle) {
+      return minAngle;
+    } else {
+      // Distribute remaining space proportionally
+      return remainingSpace * (value / proportionalSum);
+    }
+  });
+
+  // Verify the sum equals 2π
+  const sum = adjustedAngles.reduce((acc, angle) => acc + angle, 0);
+  return adjustedAngles;
 }

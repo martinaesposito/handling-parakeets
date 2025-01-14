@@ -46,8 +46,8 @@ let restartImgSrc;
 let treeImgSrc;
 
 // getting the elements
-let backtotree = document.getElementById("ins-1");
-let backtostart = document.getElementById("ins-2");
+let backtotree = document.getElementById("backtotree");
+let backtostart = document.getElementById("backtostart");
 let leftgradient = document.getElementById("gradient-left");
 
 let escapeCounters = [

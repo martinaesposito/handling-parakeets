@@ -29,7 +29,7 @@
       }
     </script>
 
-    <link rel="stylesheet" href="index.css" />
+    <link rel="stylesheet" href="style.css" />
   </head>
 
   <body>
@@ -42,27 +42,28 @@
       <img id="loading-img" />
       <div id="loading-text">loading...</div>
     </div>
-    <!-- video -->
-    <!-- <div class="video-controls">
+
+    <!-- TUTORIAL -->
+    <div class="video-controls">
       <div id="progress"></div>
-    </div> -->
-    <!-- video tutorial  -->
-    <!-- <video
-      id="tutorial"
-      class="show"
-      src="assets/tutorial2.mp4"
-      autoplay
-      playsinline
-      muted
-    > -->
-      <!--  muted- da rimuovere il muted quando poi si scarica il manifest-->
+    </div>
+    <!-- tutorial  -->
+    <video id="tutorial" class="show tutorial" autoplay playsinline muted>
+      <source src="assets/tutorial2.mp4" type="video/mp4" />
+      <!--  da rimuovere il muted quando poi si scarica il manifest-->
+    </video>
+    <!-- tutorial breve -->
+    <video id="quick-tutorial" class="tutorial" autoplay playsinline muted>
+      <source src="assets/tutorial_transparent.webm" type="video/webm" />
     </video>
 
     <!-- INSTRUCTIONS TOP-->
     <div id="gradient-left"></div>
     <div id="gradient-right"></div>
+
     <div id="ins-container" class="double top flex-row">
-      <div class="instructions" id="ins-1">
+      <!-- back-->
+      <div class="instructions" id="backtotree">
         <img src="assets/instructions/back.svg" class="icon" />
         <div class="instructions tree">
           <p id="ita">metti qui la mano per scoprire altre pose</p>
@@ -71,14 +72,56 @@
           </p>
         </div>
       </div>
-      <div class="instructions" id="ins-2">
+      <!-- restart-->
+      <div class="instructions" id="backtostart">
         <div class="instructions tree">
           <p id="ita">metti qui la mano per riavviare</p>
           <p id="eng" class="eng tree">put the hand here to restart</p>
         </div>
         <img src="assets/instructions/restart.svg" class="icon" />
       </div>
+      <!-- skip-->
+      <div class="instructions" id="skip">
+        <div class="instructions tree">
+          <p id="ita">metti qui la mano per saltare il tutorial</p>
+          <p id="eng" class="eng tree">
+            put the hand here to skip the tutorial
+          </p>
+        </div>
+        <img src="assets/instructions/skip.svg" class="icon" />
+      </div>
     </div>
+
+    <!-- INSTRUCTIONS BOTTOM (info)-->
+    <div id="gradient-bottom"></div>
+    <div class="instructions" id="info">
+      <img src="assets/instructions/info.svg" class="icon" />
+    </div>
+
+    <!-- INSTRUCTIONS CENTER (home)-->
+    <div class="instructions flex-column" id="ins-centr">
+      <div id="hands-legend"></div>
+      <div class="instructions tree">
+        <p id="ita">fai una posa per scoprire le storie</p>
+        <p id="eng" class="eng tree">strike a pose to uncover the stories</p>
+      </div>
+    </div>
+
+    <!-- WARNING -->
+    <div class="warning flex-column" id="warning">
+      <div id="warning-bg"></div>
+      <div class="overlaybox flex-column gap">
+        <div class="gap flex-row">
+          <p id="ita">riavvio in</p>
+          /
+          <p id="eng" class="eng">restarting in</p>
+        </div>
+        <p id="endCounter"></p>
+      </div>
+    </div>
+
+    <!-- VIDEO CAPTURE -->
+    <video id="capture"></video>
 
     <!-- CURSOR circle -->
     <div id="cursor-container">
@@ -128,50 +171,8 @@
       <img class="cursor-image" src="assets/instructions/back2.svg" />
       <img class="cursor-image" src="assets/instructions/restart2.svg" />
       <img class="cursor-image" src="assets/cursor/8.svg" />
+      <img class="cursor-image" src="assets/instructions/skip2.svg" />
     </div>
-
-    <!-- INSTRUCTIONS BOTTOM-->
-    <!-- <div id="gradient-bottom"></div>
-    <div id="ins-container" class="double bottom flex-row">
-      <div class="instructions" id="ins-1">
-        <div class="instructions tree">
-          <p id="ita">muovi la mano destra per navigare la mappa</p>
-          <p id="eng" class="eng tree">
-            move your right hand to explore the map
-          </p>
-        </div>
-        <img src="assets/instructions/explore.svg" class="explore" />
-      </div>
-      <div class="instructions" id="ins-2">
-        <div class="instructions tree">
-          <p id="ita">fai una posa per scoprire le storie</p>
-          <p id="eng" class="eng tree">strike a pose to uncover the stories</p>
-        </div>
-        <div id="hands-legend"></div>
-      </div>
-    </div> -->
-    <div class="instructions flex-column" id="ins-centr">
-      <div id="hands-legend"></div>
-      <div class="instructions tree">
-        <p id="ita">fai una posa per scoprire le storie</p>
-        <p id="eng" class="eng tree">strike a pose to uncover the stories</p>
-      </div>
-    </div>
-
-    <!-- WARNING -->
-    <div class="warning flex-column" id="warning">
-      <div id="warning-bg"></div>
-      <div class="overlaybox flex-column gap">
-        <div class="gap flex-row">
-          <p id="ita">riavvio in</p>
-          /
-          <p id="eng" class="eng">restarting in</p>
-        </div>
-        <p id="endCounter"></p>
-      </div>
-    </div>
-
-    <video id="capture"></video>
 
     <script src="tree-three.js" type="module"></script>
   </body>

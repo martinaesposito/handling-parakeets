@@ -26,7 +26,6 @@ let points = [];
 let fontSize = 200;
 
 let bounds1, bounds2;
-let subTitle;
 
 //immaginine
 let images = [];
@@ -117,7 +116,7 @@ function setup() {
       z: 0,
     });
   }
-  console.log(randomPoints);
+  // console.log(randomPoints);
 
   // // Get points with translation and add points to array
   points = [
@@ -129,7 +128,7 @@ function setup() {
     }),
     ...randomPoints,
   ];
-  console.log(images);
+  // console.log(images);
   // Initialize positions and velocities
   points.forEach((p, i) => {
     let size = random(12.5, 17.5);
@@ -152,11 +151,6 @@ function setup() {
     targetPositions[i] = new THREE.Vector3(coords.x, coords.y, 0);
     velocities[i] = new THREE.Vector3(0, 0, 0);
   });
-  // console.log(imgPoints);
-
-  // // SUBTITLE
-  // subTitle = document.getElementById("subtitle");
-  // subTitle.style.top = `${canvasH / 2 + (bounds1.h * 3) / 4}px`; // Adjust as needed
 
   loading.style.display = "none"; //nascondo il loading
   detectSetup();

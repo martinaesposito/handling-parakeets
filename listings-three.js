@@ -88,7 +88,7 @@ export class Dot {
     // properties of the forces add to the posiiton
     this.config = {
       maxSpeed: 6,
-      attractionForce: 0.0075,
+      attractionForce: 0.008,
       separationForce: 0.1,
       damping: 0.5,
       noiseStrength: 0.5,
@@ -144,7 +144,7 @@ export class Dot {
     // adding audio
     this.sound =
       itemData.Content_pose && itemData.Content_pose != "Image"
-        ? loadSound("./assets/audio-test/-" + itemData.Image_num + ".ogg")
+        ? loadSound("./assets/audio/-" + itemData.Image_num + ".ogg")
         : null;
 
     // adding audio functionalities

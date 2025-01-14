@@ -116,7 +116,7 @@ export class Dot {
     // adding audio
     this.sound =
       itemData.Content_pose && itemData.Content_pose != "Image"
-        ? loadSound("./assets/audio-test/-" + itemData.Image_num + ".ogg")
+        ? loadSound("./assets/audio/-" + itemData.Image_num + ".ogg")
         : null;
 
     // adding audio functionalities

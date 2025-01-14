@@ -33,7 +33,6 @@
 
   --camera: 15vw;
   --hand: 5vh;
-  --explore: 7.5vh;
 
   --imgLoading: 25vh;
 
@@ -42,10 +41,6 @@
   --intro-story: 50vh;
 }
 
-/* main,
-video {
-  display: none;
-} */
 main {
   display: none;
 }
@@ -64,7 +59,6 @@ video {
 /* //////////////////// */
 
 /* general */
-
 body {
   width: 100%;
   height: 100vh;
@@ -79,14 +73,18 @@ body {
   font-family: IBMplex-sans;
   color: black;
 }
+
 img {
   height: 100%;
   width: fit-content;
 }
+
 p {
   font-size: var(--testi);
   line-height: 120%;
 }
+
+/* //////////////////// */
 
 /* CANVAS */
 .bg {
@@ -131,21 +129,22 @@ canvas {
   height: var(--imgLoading);
   width: auto;
 }
+
 /* VIDEO TUTORIAL */
-#tutorial {
+.tutorial {
   position: fixed;
+
   top: 0;
   left: 0;
-
   display: none;
-
   width: 100%;
   height: 100vh;
 
   object-fit: cover;
   z-index: 20;
 }
-#tutorial.show {
+
+.show {
   display: block;
 }
 
@@ -162,21 +161,6 @@ canvas {
   height: 100%;
   background-color: var(--prak);
   transform-origin: top left;
-}
-
-/* SUBTITLE */
-#subtitle {
-  width: 100%;
-  position: absolute;
-  z-index: -5;
-  top: 50%;
-
-  font-size: var(--subtitle);
-  line-height: 2rem;
-  text-align: center;
-}
-#subtitle > .eng {
-  font-size: var(--subtitle-eng);
 }
 
 /* CURSOR */
@@ -245,22 +229,18 @@ canvas {
   z-index: 20;
   width: 100%;
 }
-#ins-container.bottom {
+
+/* home */
+#ins-container.single {
   bottom: var(--ins-marginBottom);
+  justify-content: space-around;
   font-size-adjust: var(--subtitle);
 }
-#ins-container.top {
+/* tree */
+#ins-container.double {
   top: var(--ins-margin);
-}
-.double {
   justify-content: space-between;
   padding: 0 var(--ins-margin);
-}
-.single {
-  justify-content: space-around;
-}
-.icon {
-  width: 4vh;
 }
 
 .instructions {
@@ -271,30 +251,26 @@ canvas {
   flex-direction: row;
   gap: var(--spacer2);
 }
+.instructions > p {
+  font-size: var(--instruction);
+  font-family: IBMplex-mono;
+  margin: 0;
+}
+
+/* home */
 #home {
-  flex-direction: column;
   gap: 0;
 }
 
+/* tree */
 .instructions.tree {
   flex-direction: column;
   gap: 0;
   text-align: left;
 }
 
-#ins-centr {
-  height: 100vh;
-  width: 100%;
-  position: absolute;
-}
-
-#ins-centr .instructions.tree {
-  text-align: center;
-}
-.instructions > p {
-  font-size: var(--instruction);
-  font-family: IBMplex-mono;
-  margin: 0;
+.icon {
+  width: 4vh;
 }
 
 .eng.tree {
@@ -302,6 +278,12 @@ canvas {
   width: 100%;
 }
 
+#ins-centr {
+  height: 100vh;
+  width: 100%;
+  position: absolute;
+  text-align: center;
+}
 #hands-legend {
   display: flex;
   flex-direction: row;
@@ -313,24 +295,44 @@ canvas {
   width: auto;
   height: var(--hand);
 }
-.explore {
-  height: var(--explore);
+
+/* bottone per rivedere il tutorial breve */
+#info {
+  position: fixed;
+  left: var(--ins-margin);
+  bottom: var(--ins-margin);
+  display: none;
+  z-index: 20;
+}
+#info > .icon {
+  height: auto;
+  width: var(--img-storyIntro);
 }
 
+/* per tornare all''inizio */
+#backtostart {
+  display: none;
+}
+/* per tornare all''inizio */
+#backtotree {
+  visibility: hidden;
+}
+
+/* gradientss */
 #gradient-left {
+  visibility: hidden;
+
   position: absolute;
   left: 0px;
   top: 0px;
   width: 50vw;
   height: 25vh;
-
   background: radial-gradient(
     ellipse at top left,
     var(--prak) 20%,
     rgba(0, 0, 0, 0) 50%
   );
 }
-
 #gradient-right {
   position: absolute;
   left: 100%;
@@ -340,7 +342,6 @@ canvas {
   width: 50vw;
   height: 25vh;
   z-index: 20;
-  /* lo metto leggermente sotto alle ins ma comunque sopra la canvas */
 
   background: radial-gradient(
     ellipse at top right,
@@ -349,17 +350,18 @@ canvas {
   );
 }
 #gradient-bottom {
+  display: none;
   position: fixed;
   bottom: 0;
   left: 0;
-  height: 25vh;
-  width: 100%;
+  height: 17.5vw;
+  width: 25vw;
   z-index: 4;
-  /* background: linear-gradient(
-    180deg,
-    rgba(0, 0, 0, 0) 50% 0%,
-    var(--prak) 100%
-  ); */
+  background: radial-gradient(
+    ellipse at bottom left,
+    var(--prak) 20%,
+    rgba(0, 0, 0, 0) 50%
+  );
 }
 
 /* PLATFORM */
@@ -373,6 +375,8 @@ canvas {
   z-index: 5;
 }
 
+/* //////////////////// */
+
 /* WARNING */
 #warning {
   display: none;
@@ -381,7 +385,7 @@ canvas {
   left: 0;
   width: 100%;
   height: 100vh;
-  z-index: 15;
+  z-index: 25;
 }
 #warning-bg {
   position: fixed;
@@ -401,13 +405,15 @@ canvas {
   width: auto;
   height: auto;
   padding: var(--spacer1);
-  z-index: 11;
+  z-index: 10;
 }
 #endCounter {
   font-size: var(--subtitle);
   text-align: center;
   margin: 0;
 }
+
+/* //////////////////// */
 
 /* STORY */
 .image {
@@ -452,7 +458,6 @@ canvas {
   /* line-height: 110%; */
   z-index: -1;
 }
-
 .introcontainer > .overlaybox {
   background-color: var(--prak);
   padding: 0;
@@ -469,9 +474,12 @@ canvas {
   font-size: var(--testi);
 }
 
+/* testi in evidenza nelle storie */
 .highlight {
   background-color: var(--prak);
 }
+
+/* //////////////////// */
 
 /* general */
 
@@ -492,6 +500,8 @@ canvas {
 .eng {
   opacity: 0.4;
 }
+
+/* //////////////////// */
 
 /* ANIMAZIONI */
 @keyframes appear {
