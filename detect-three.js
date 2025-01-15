@@ -247,7 +247,7 @@ export function draw(shouldDrawHand = true) {
       lock: selectedPose !== undefined,
     });
 
-    console.log(selectedPose, similarHand);
+    // console.log(selectedPose, similarHand);
 
     index = restart
       ? 8
@@ -322,7 +322,8 @@ export function draw(shouldDrawHand = true) {
         cursor.y >
           (windowHeight / 2 - (infoEl.offsetHeight + windowWidth / 50)) *
             zoomFactor &&
-        tutorialEnd
+        tutorialEnd &&
+        !selectedPose
       ) {
         tutorialQuick.style.display = "block";
         tutorialQuick.style.visibility = "visible";
@@ -480,7 +481,7 @@ const drawHands = (shouldDrawHand) => {
       const differences = calculateDifferences(handsData); //calcola la differenza tra gli angoli di riferimento e quelli
       const minDifference = Math.min(...differences);
 
-      console.log(selectedPose, similarHand, shouldDrawHand);
+      // console.log(selectedPose, similarHand, shouldDrawHand);
       let treshold = 300;
       if (similarHand === undefined || (!selectedPose && shouldDrawHand)) {
         similarHand =
@@ -522,13 +523,10 @@ let isRedirecting = false; //flag per fare una sola call quando cambia pagina
 function handCounter({ detectedHand, shouldDrawHand, lock }) {
   const maxCounter = 5000;
 
-  // console.log(tutorialEnd, quickTutorialEnd, lock);
-
   if (tutorialEnd == false || quickTutorialEnd || lock) return;
 
   if (!hands[0] && counters.every((c) => c === 0)) {
     noHandAndZeroCounters = true;
-    return;
   }
 
   // Update only the relevant counter

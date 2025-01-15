@@ -13,6 +13,11 @@ import { camera, audioPlaying, scene, toggleAudio } from "./tree-three.js";
 export let platX;
 export let platY;
 export let branchIndex;
+
+// sottotitolo
+let subtitle = document.getElementById("subtitle");
+let sub = document.getElementById("sub");
+
 export class Dot {
   static colors = [
     //colors
@@ -142,10 +147,19 @@ export class Dot {
     }
 
     // adding audio
-    this.sound =
-      itemData.Content_pose && itemData.Content_pose != "Image"
-        ? loadSound("./assets/audio/" + itemData.Image_num + ".wav")
-        : null;
+    if (itemData.Content_pose && itemData.Content_pose != "Image") {
+      this.sound = loadSound(
+        "./assets/audio/" + itemData.Audio_track + ".wav",
+        null,
+        // Error callback
+        (error) => {
+          console.log(
+            "Could not load audio file " + itemData.Audio_track + ".wav"
+          );
+          this.sound = null;
+        }
+      );
+    }
 
     // adding audio functionalities
     if (this.sound) {
@@ -329,32 +343,32 @@ export class Dot {
 
         if (this.isHovered) {
           if (!audioPlaying) {
-            // avoiding any other div appearing while audio is playing
+            // Only handle new interactions when no audio is playing
             this.div.style("display", "block");
             this.div.style("animation", "appear 0.5s forwards");
-          }
 
-          this.positionStoryCard(); // positioning the divs relating to the screen needs to happen when the div is "displayed"
+            this.positionStoryCard();
 
-          // PLAYING
-          if (this.sound && !audioPlaying) {
-            toggleAudio();
-            this.sound.play(); // play sound if it's not already
+            subtitle.style.display = "flex";
+            sub.innerHTML = this.itemData.Highlights_eng;
+
+            if (this.sound) {
+              toggleAudio();
+              this.sound.play();
+            }
           }
         } else {
-          if (this.sound) {
-            if (!this.sound.isPlaying()) {
-              this.div.style("animation", "disappear 0.5s forwards"); // keep div open while sound plays
-            }
-          } else {
+          // Only hide div if there's no sound or sound isn't playing
+          if (!this.sound || !this.sound.isPlaying()) {
             this.div.style("animation", "disappear 0.5s forwards");
           }
         }
       } else {
-        this.div.style("display", "none");
         targetScale = 1;
+        this.div.style("display", "none");
       }
     }
+
     this.scale += (targetScale - this.scale) * 0.1;
     this.mesh.scale.set(this.scale, this.scale, this.scale);
   }

@@ -308,6 +308,20 @@ canvas {
   height: var(--hand);
 }
 
+#subtitle {
+  display: none;
+  position: absolute;
+  bottom: var(--ins-margin);
+  width: 100%;
+  justify-content: center;
+
+  text-align: center;
+  font-size: var(--testi);
+}
+#sub {
+  padding: var(--mini-spacer);
+}
+
 /* bottone per rivedere il tutorial breve */
 #info {
   position: fixed;
