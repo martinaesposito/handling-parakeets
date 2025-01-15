@@ -9,43 +9,40 @@ import {
 } from "./detect-three.js";
 
 // HTMLS
+let p5Containter = document.getElementById("p5-container"); //setup del container
+
 let insCenter = document.getElementById("ins-centr");
 let handLegend = document.getElementById("hands-legend");
-let insStart = document.getElementById("backtostart");
-let skipEl = document.getElementById("skip");
-let infoEl = document.getElementById("info");
+
+let backtotree = document.getElementById("backtotree");
+let backtostart = document.getElementById("backtostart");
 
 let leftGradient = document.getElementById("gradient-left");
 let bottomGradient = document.getElementById("gradient-bottom");
+let rightGradient = document.getElementById("gradient-right");
+
+let infoEl = document.getElementById("info");
+let skipEl = document.getElementById("skip");
 
 // warning
 let warning = document.getElementById("warning");
 let endCounter = document.getElementById("endCounter");
 
-// loading
-let loading = document.getElementById("loading");
-let imgLoading = document.getElementById("loading-img");
-if (imgLoading) {
-  imgLoading.src =
-    "assets/loading/" + Math.floor(Math.random() * 8 + 1).toString() + ".gif";
-}
-
 // TUTORIAL
 let tutorial = document.getElementById("tutorial");
-let tutorialEnd = tutorial ? false : undefined;
+// let tutorialEnd = tutorial ? false : undefined;
+let tutorialEnd;
 let progressBar = document.getElementById("progress");
 
 if (tutorial && progressBar) {
   tutorial.addEventListener("loadeddata", () => {
-    console.log("Video data loaded");
-
-    console.log("Video metadata loaded, duration:", tutorial.duration);
+    tutorialEnd = false;
     const duration = tutorial.duration + "s";
     progressBar.style.animation = "pippo " + duration + " linear forwards";
   });
 
   tutorial.addEventListener("ended", () => {
-    insStart.style.display = "flex";
+    backtostart.style.display = "flex";
     infoEl.style.display = "flex";
     bottomGradient.style.display = "block";
     skipEl.style.display = "none";
@@ -123,14 +120,20 @@ export {
   endCounter,
   audioPlaying,
   p5Canvas,
+  p5Containter,
+  backtostart,
+  backtotree,
+  rightGradient,
+  leftGradient,
+  bottomGradient,
+  infoEl,
+  skipEl,
   toggleAudio,
 };
 
 ////////////////////////////////////////////////////////////////////
 
 window.setup = async () => {
-  let p5Containter = document.getElementById("p5-container");
-
   p5Canvas = createCanvas(0.15 * windowWidth, (0.15 / 4) * 3 * windowWidth);
   p5Containter.appendChild(p5Canvas.canvas);
 
@@ -228,7 +231,7 @@ function setup() {
   const angles = calculateAngles(listingsData);
   let total = 0;
 
-  console.log(angles);
+  // console.log(angles);
   angles.forEach((a, index) => {
     const angle = total + a / 2 + (index > 0 ? angles[index - 1] / 2 : 0);
 
@@ -339,7 +342,7 @@ function draw() {
     insCenter.style.display = "flex";
   }
 
-  detectDraw();
+  detectDraw(tutorialEnd);
 
   renderer.render(scene, camera);
 }

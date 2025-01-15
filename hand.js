@@ -39,7 +39,7 @@ export const Hand = class {
 
   draw(data, shouldDrawHand, p5Data) {
     let increment = 1;
-    console.log(p5Data);
+    // console.log(p5Data);
 
     if (!data) {
       // Se data non esiste, utilizza this.points per il disegno
@@ -86,7 +86,7 @@ export const Hand = class {
           vertex(...Object.values(this.p5Points[i].pos)); // Usa i punti aggiornati
         }
 
-        strokeWeight(1);
+        strokeWeight(3);
         stroke(prak);
         noFill();
 

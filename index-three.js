@@ -33,8 +33,8 @@ let images = [];
 // loading
 let loading = document.getElementById("loading");
 let imgLoading = document.getElementById("loading-img");
-// imgLoading.src =
-//   "assets/loading/" + Math.floor(Math.random() * 8 + 1).toString() + ".gif";
+imgLoading.src =
+  "assets/loading/" + Math.floor(Math.random() * 8 + 1).toString() + ".gif";
 
 let cursorCtn = document.getElementById("cursor-container");
 let cursorImage = document.getElementById("wave");

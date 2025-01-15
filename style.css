@@ -446,9 +446,6 @@ canvas {
   position: absolute;
   z-index: 15;
 
-  top: 0%;
-  left: 0%;
-
   border: solid var(--mini-spacer) var(--prak);
   background: #ffffff;
   font-size: var(--testi);
@@ -508,7 +505,10 @@ canvas {
   flex-direction: row;
   align-items: center;
 }
-
+.topleft {
+  top: 0%;
+  left: 0%;
+}
 .eng {
   opacity: 0.4;
 }

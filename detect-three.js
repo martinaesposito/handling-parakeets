@@ -1,7 +1,6 @@
 // MEDIAPIPE
-import * as THREE from "three";
+// import * as THREE from "three";
 import {
-  // ImageSegmenter,  per adesso tolgo l'import di questa ai
   HandLandmarker,
   FilesetResolver,
 } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.0";
@@ -12,6 +11,14 @@ import {
   endCounter,
   tutorialEnd,
   p5Canvas,
+  p5Containter,
+  backtostart,
+  backtotree,
+  rightGradient,
+  leftGradient,
+  bottomGradient,
+  infoEl,
+  skipEl,
 } from "./tree-three.js";
 import { Hand } from "./hand.js"; //importa l'oggetto mano definito nel javascript precedente
 
@@ -36,7 +43,6 @@ const handPoses = [
   "Shell",
   "TouchingTips",
 ];
-
 let counters = [
   0, //FingerPerch
   0, //grip
@@ -47,13 +53,7 @@ let counters = [
   0, //TouchingTips
 ];
 
-// RESTART E BACK
-let restart = false;
-let market = false;
-let skip = false;
-let info = false;
-
-// getting the elements
+// TUTORIAL
 let tutorial = document.getElementById("tutorial");
 let tutorialQuick = document.getElementById("quick-tutorial");
 let quickTutorialEnd, videoStarted;
@@ -65,19 +65,27 @@ function handleVideoPlayback() {
     tutorialQuick.currentTime = 0;
     tutorialQuick.play();
     videoStarted = true; // Mark the video as started
+
+    // bottom instructions
+    infoEl.style.animation = "disappear 1s forwards";
+    bottomGradient.style.animation = "disappear 1s forwards";
+
+    //top instructions
+    backtostart.style.animation = "disappear 1s forwards";
+    rightGradient.style.animation = "disappear 1s forwards";
+
+    //p5video
+    p5Containter.style.animation = "disappear 1s forwards";
   }
 }
 
-let noHandAndZeroCounters;
+let noHandAndZeroCounters; //flag di uscita dalla storia
 
-let backtotree = document.getElementById("backtotree");
-let backtostart = document.getElementById("backtostart");
-
-let leftGradient = document.getElementById("gradient-left");
-let bottomGradient = document.getElementById("gradient-bottom");
-
-let infoEl = document.getElementById("info");
-let skipEl = document.getElementById("skip");
+// RESTART, BACK, E SKIP
+let restart = false;
+let market = false;
+let skip = false;
+let info = false;
 
 let escapeCounters = [
   0, // from Tree when inactivity
@@ -134,34 +142,18 @@ async function importJSON(path) {
 
 //SETUP
 export function setup() {
+  // CAMERA
   video = document.getElementById("capture");
-
-  // const texture = new THREE.VideoTexture(video);
-  // texture.wrapS = THREE.RepeatWrapping;
-  // texture.repeat.x = -1;
-  // texture.colorSpace = THREE.SRGBColorSpace;
-
   if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
     const constraints = {
       video: { facingMode: "user" },
     };
-
     navigator.mediaDevices
       .getUserMedia(constraints)
       .then(function (stream) {
-        // VIDEO
         video.srcObject = stream;
         video.play();
         video.addEventListener("playing", () => {
-          // CREO VIDEO IN THREE
-          // const scale = 0.4;
-          // const geometry = new THREE.PlaneGeometry(
-          //   video.videoWidth * scale,
-          //   video.videoHeight * scale
-          // );
-          // const material = new THREE.MeshBasicMaterial({ map: texture });
-          // videoMesh = new THREE.Mesh(geometry, material);
-          // scene.add(videoMesh);
           setTimeout((videoExists = true), 1);
         });
       })
@@ -207,7 +199,7 @@ export function draw(shouldDrawHand = true) {
   delta_time = prev_timestamp ? curr_timestamp - prev_timestamp : 0;
   prev_timestamp = curr_timestamp;
 
-  if (!video) return; //se non c'è il video non va
+  if (!video) return; //se non c'è la camera non va
 
   const videoMoreHorizontalThanScreen =
     video.videoWidth / video.videoHeight > canvasW / canvasH;
@@ -254,13 +246,14 @@ export function draw(shouldDrawHand = true) {
       lock: selectedPose !== undefined,
     });
 
+    console.log(videoStarted);
     index = restart
       ? 8
       : market
       ? 7
       : skip
       ? 10
-      : !shouldDrawHand
+      : !shouldDrawHand || videoStarted
       ? 9
       : similarHand; //se sono in over su restart oppure torna al mercato oppure nessuna mano è detectata se no mano riconosciuta
     cursorImages.forEach((image, i) => {
@@ -275,10 +268,9 @@ export function draw(shouldDrawHand = true) {
   }
   // se non c'è la mano e nessuna posa è selezionata e il video tutorial è finito
   if (!selectedPose && !hands[0] && tutorialEnd) {
-    // if (!selectedPose && !hands[0]) {
     if (counters.every((c) => c === 0)) {
+      //se tutti i counter sono a zero chiama la funzione che riavvia l'esperienza
       let escape = (escapeCounters[0] += delta_time);
-
       escapeTree(20000, escape); //10 secondi
     }
   } else {
@@ -286,9 +278,7 @@ export function draw(shouldDrawHand = true) {
     warning ? (warning.style.display = "none") : null;
   }
 
-  // //////////////////////////////////////////////////////////////////////////
   // BACK E RESTART E INFO E SKIP
-
   if (cursor) {
     //restart
     if (backtostart) {
@@ -296,7 +286,8 @@ export function draw(shouldDrawHand = true) {
         cursor.x >
           (windowWidth - (windowWidth / 50 + backtostart.offsetWidth)) *
             zoomFactor &&
-        cursor.y < (backtostart.offsetHeight + windowWidth / 50) * zoomFactor
+        cursor.y < (backtostart.offsetHeight + windowWidth / 50) * zoomFactor &&
+        !videoStarted
       ) {
         goingBackToStart(5000);
         restart = true;
@@ -314,7 +305,7 @@ export function draw(shouldDrawHand = true) {
         cursor.y < (skipEl.offsetHeight + windowWidth / 50) * zoomFactor
       ) {
         skip = true;
-        // console.log("skip " + skip);
+
         !selectedPose ? (counters = counters.map(() => 0)) : null; // Reset all counters in the counters array
         skipTutorial(2500);
       } else {
@@ -360,23 +351,32 @@ export function draw(shouldDrawHand = true) {
 
   // Applying animations for the going back divs
   if (backtotree && tutorialEnd) {
-    console.log(selectedPose, noHandAndZeroCounters, escapeCounters[2] > 0);
+    // se entro in una storia
     if (selectedPose) {
-      // Show elements when pose is selected
+      // left instruction
       backtotree.style.visibility = "visible";
       backtotree.style.animation = "appear 1s forwards";
       leftGradient.style.visibility = "visible";
       leftGradient.style.animation = "appear 1s forwards";
-    } else if (noHandAndZeroCounters || escapeCounters[2] > 0) {
-      // Hide elements when no hand & zero counters, or when going back
+      //bottom instruction
+      infoEl.style.visibility = "visible";
+      bottomGradient.style.visibility = "visible";
+      infoEl.style.animation = "disappear 1s forwards";
+      bottomGradient.style.animation = "disappear 1s forwards";
+      console.log(noHandAndZeroCounters, escapeCounters[2]);
+      // se esco dalla storia
+    } else if (noHandAndZeroCounters) {
+      // left instruction
       backtotree.style.animation = "disappear 1s forwards";
       leftGradient.style.animation = "disappear 1s forwards";
+      //bottom instruction
+      infoEl.style.animation = "appear 1s forwards";
+      bottomGradient.style.animation = "appear 1s forwards";
       noHandAndZeroCounters = false;
     }
   }
 
   //HTML CURSOR
-  let first = false;
   if (cursor) {
     cursorcontainer.style.display = "block";
     cursorcontainer.style.transform =
@@ -403,12 +403,32 @@ export function draw(shouldDrawHand = true) {
   });
 }
 
+// fino a qui era tutto draw
+// //////////////////////////////////////////////////////////////////////////
+
+// tutorial breve
 if (tutorialQuick) {
   // Ensure the "ended" event is set up only once
   tutorialQuick.addEventListener("ended", () => {
     videoStarted = false;
     quickTutorialEnd = false;
     tutorialQuick.style.display = "none";
+
+    // bottom instructions
+    infoEl.style.visibility = "visible";
+    infoEl.style.animation = "appear 1s forwards";
+    bottomGradient.style.visibility = "visible";
+    bottomGradient.style.animation = "appear 1s forwards";
+
+    //top instructions
+    backtostart.style.visibility = "visible";
+    backtostart.style.animation = "appear 1s forwards";
+    rightGradient.style.visibility = "visible";
+    rightGradient.style.animation = "appear 1s forwards";
+
+    //p5video
+    p5Containter.style.visibility = "visible";
+    p5Containter.style.animation = "appear 1s forwards";
   });
 }
 
@@ -433,11 +453,12 @@ const drawHands = (shouldDrawHand) => {
         cursor = undefined;
         return;
       }
+      //prende i punti della mano e li rimappa
       let points = landmarks?.map((p) =>
         mapCoords(p, videoSize, { w: canvasW, h: canvasH })
-      ); //prende i punti della mano e li rimappa
+      );
+      //prende i punti della mano e li rimappa per disegnarli nella piccola canva sotto
       let p5Points;
-
       if (p5Canvas) {
         p5Points = landmarks?.map((p) => ({
           x: lerp(0, p5Canvas.width, 1 - p.x),
@@ -517,6 +538,7 @@ function handCounter({ detectedHand, shouldDrawHand, lock }) {
       selectedPose = handPoses[detectedHand];
 
       if (!shouldDrawHand && !isRedirecting) {
+        console.log("going to tree");
         window.location.href = "tree.html";
         isRedirecting = true;
       }
@@ -532,8 +554,6 @@ function handCounter({ detectedHand, shouldDrawHand, lock }) {
 }
 
 function drawDOMArc(value, maxCounter) {
-  // counters applied to the DOM cursor loading bar
-
   let cMapped = map(value, 0, maxCounter, 0, 360);
 
   loadingrects.forEach((rect, r) => {
@@ -550,8 +570,10 @@ function drawDOMArc(value, maxCounter) {
       "rotate(" + rot_degrees + "deg) skew(" + (-89 + new_skew) + "deg)";
   });
 }
-// RESTART E GO BACK
-// restart
+
+// //////////////////////////////////////////////////////////////////////////
+
+// RESTART
 function goingBackToStart(maxCounter) {
   !selectedPose ? (counters = counters.map(() => 0)) : null; // Reset all counters in the counters array
 
@@ -563,7 +585,7 @@ function goingBackToStart(maxCounter) {
     if (!isRedirecting) backToStart();
   }
 }
-//go back
+//GO BACK
 function goingBackToTree(maxCounter) {
   drawDOMArc(escapeCounters[2], maxCounter);
   if (escapeCounters[2] < maxCounter) {
@@ -574,7 +596,7 @@ function goingBackToTree(maxCounter) {
     escapeCounters[2] = 0;
   }
 }
-//skip tutorial
+//SKIP
 function skipTutorial(maxCounter) {
   drawDOMArc(escapeCounters[3], maxCounter);
   if (escapeCounters[3] < maxCounter) {
@@ -596,7 +618,6 @@ function skipTutorial(maxCounter) {
 // COUNTER CHE FA ESCAPE DALLA PAGINA NEL CASO IN CUI NESSUNA MANO è DETECTATA
 function escapeTree(maxCounter, escapeCounter) {
   if (escapeCounter < maxCounter) {
-    // console.log("esco");
     //quando sono a metà del counter
     if (escapeCounter > maxCounter / 2) {
       warning ? (warning.style.display = "flex") : null;

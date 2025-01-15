@@ -109,7 +109,7 @@ export class Dot {
     if (this.div) {
       this.div.style("display", "none");
 
-      this.div.addClass("storycontainer");
+      this.div.addClass("storycontainer topleft");
       this.div.addClass(itemData.Pose);
 
       if (this.itemData.Content_pose == "Text") {
@@ -144,7 +144,7 @@ export class Dot {
     // adding audio
     this.sound =
       itemData.Content_pose && itemData.Content_pose != "Image"
-        ? loadSound("./assets/audio/-" + itemData.Image_num + ".ogg")
+        ? loadSound("./assets/audio/" + itemData.Image_num + ".wav")
         : null;
 
     // adding audio functionalities
