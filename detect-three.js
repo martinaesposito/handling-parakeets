@@ -240,13 +240,15 @@ export function draw(shouldDrawHand = true) {
       market = false;
     }
 
+    // console.log(shouldDrawHand);
     handCounter({
       detectedHand: similarHand,
       shouldDrawHand,
       lock: selectedPose !== undefined,
     });
 
-    console.log(videoStarted);
+    console.log(selectedPose, similarHand);
+
     index = restart
       ? 8
       : market
@@ -363,7 +365,7 @@ export function draw(shouldDrawHand = true) {
       bottomGradient.style.visibility = "visible";
       infoEl.style.animation = "disappear 1s forwards";
       bottomGradient.style.animation = "disappear 1s forwards";
-      console.log(noHandAndZeroCounters, escapeCounters[2]);
+      // console.log(noHandAndZeroCounters, escapeCounters[2]);
       // se esco dalla storia
     } else if (noHandAndZeroCounters) {
       // left instruction
@@ -478,9 +480,9 @@ const drawHands = (shouldDrawHand) => {
       const differences = calculateDifferences(handsData); //calcola la differenza tra gli angoli di riferimento e quelli
       const minDifference = Math.min(...differences);
 
-      // console.log(similarHand, shouldDrawHand)
-      if (similarHand === undefined || shouldDrawHand) {
-        let treshold = 300;
+      console.log(selectedPose, similarHand, shouldDrawHand);
+      let treshold = 300;
+      if (similarHand === undefined || (!selectedPose && shouldDrawHand)) {
         similarHand =
           minDifference <= treshold ? differences.indexOf(minDifference) : 9;
       }
@@ -520,7 +522,9 @@ let isRedirecting = false; //flag per fare una sola call quando cambia pagina
 function handCounter({ detectedHand, shouldDrawHand, lock }) {
   const maxCounter = 5000;
 
-  if (tutorialEnd === false || lock || quickTutorialEnd) return;
+  // console.log(tutorialEnd, quickTutorialEnd, lock);
+
+  if (tutorialEnd == false || quickTutorialEnd || lock) return;
 
   if (!hands[0] && counters.every((c) => c === 0)) {
     noHandAndZeroCounters = true;
