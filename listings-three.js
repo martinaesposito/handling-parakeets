@@ -147,7 +147,11 @@ export class Dot {
     }
 
     // adding audio
-    if (itemData.Content_pose && itemData.Content_pose != "Image") {
+    if (
+      itemData.Content_pose &&
+      itemData.Content_pose != "Image" &&
+      itemData.Audio_track == null
+    ) {
       this.sound = loadSound(
         "./assets/audio/" + itemData.Audio_track + ".wav",
         null,
