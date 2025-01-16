@@ -458,7 +458,7 @@ canvas {
 .storycontainer {
   width: var(--img-story);
   position: absolute;
-  z-index: 15;
+  z-index: 25;
 
   border: solid var(--mini-spacer) var(--prak);
   background: #ffffff;

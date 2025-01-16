@@ -4557,10 +4557,10 @@
     "Image_num": "352",
     "Hand": "no_hand",
     "Pose": "HalfClosed",
-    "Content_pose": "Image_and_text",
-    "Audio_track": "352",
-    "Highlights": "Disponibili pulli di parrocchetto dal collare",
-    "Highlights_eng": "Ring-necked parakeet chicks available"
+    "Content_pose": "Image",
+    "Audio_track": null,
+    "Highlights": null,
+    "Highlights_eng": null
   },
   {
     "Link": "https://www.facebook.com/AllevamentoParrocchettiDalCollareAvola/posts/pfbid02qDfcKwubnEgpUGrqULRhXLDaSfG7BjcBB3LTLcZM1aXEDuXwYNpasbopxKKxTs24l",

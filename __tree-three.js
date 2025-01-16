@@ -30,8 +30,8 @@ let endCounter = document.getElementById("endCounter");
 
 // TUTORIAL
 let tutorial = document.getElementById("tutorial");
-let tutorialEnd = tutorial ? false : true;
-
+// let tutorialEnd = tutorial ? false : undefined;
+let tutorialEnd;
 let progressBar = document.getElementById("progress");
 
 if (tutorial && progressBar) {

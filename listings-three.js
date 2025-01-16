@@ -365,6 +365,7 @@ export class Dot {
           // Only hide div if there's no sound or sound isn't playing
           if (!this.sound || !this.sound.isPlaying()) {
             this.div.style("animation", "disappear 0.5s forwards");
+            // subtitle.style.animation = "disappear 0.5s forwards";
           }
         }
       } else {
