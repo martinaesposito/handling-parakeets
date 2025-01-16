@@ -54,7 +54,7 @@
 
     <!-- CURSOR circle -->
     <div id="cursor-container">
-      <div class="loading-circle" id="outer-circle" style="visibility: hidden">
+      <div class="loading-circle" id="outer-circle">
         <div
           class="loading-rectangle rect-1"
           style="transform: rotate(270deg) skew(-90deg)"
@@ -72,7 +72,7 @@
           style="transform: rotate(0deg) skew(-90deg)"
         ></div>
       </div>
-      <div class="loading-circle" id="inner-circle" style="visibility: hidden">
+      <div class="loading-circle" id="inner-circle">
         <div
           class="loading-rectangle rect-1"
           style="transform: rotate(270deg) skew(-90deg)"
@@ -93,7 +93,7 @@
       <img class="cursor-image" src="assets/cursor/1.svg" />
       <img class="cursor-image" src="assets/cursor/2.svg" />
       <img class="cursor-image" src="assets/cursor/3.svg" />
-      <img class="cursor-image" id="wave" src="assets/cursor/4.svg" />
+      <img class="cursor-image" src="assets/cursor/4.svg" />
       <img class="cursor-image" src="assets/cursor/5.svg" />
       <img class="cursor-image" src="assets/cursor/6.svg" />
       <img class="cursor-image" src="assets/cursor/7.svg" />
@@ -102,6 +102,9 @@
       <img class="cursor-image" src="assets/cursor/8.svg" />
       <img class="cursor-image" src="assets/instructions/skip2.svg" />
     </div>
+
+    <!-- FAKE INITIAL CURSOR -->
+    <img id="wave" src="assets/cursor/4.svg" />
 
     <video id="capture"></video>
 

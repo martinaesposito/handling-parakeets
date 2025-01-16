@@ -26,12 +26,14 @@
   --spacer1: 1vh;
   --spacer2: 1.25vw;
   --spacer3: 2.5vh;
+  --progress-bar: 2.25vh;
 
   --ins-margin: 2vw;
   --ins-marginBottom: 6vw;
   --icon: 4vw;
 
   --camera: 15vw;
+  --cameraH: calc((15 / 4 * 3) * 1vw);
   --hand: 5vh;
 
   --imgLoading: 25vh;
@@ -50,8 +52,8 @@ main {
   bottom: var(--ins-margin);
   right: var(--ins-margin);
   width: var(--camera);
-  height: auto;
-  border: var(--prak) var(--mini-spacer) solid;
+  height: var(--cameraH);
+  outline: var(--prak) var(--mini-spacer) solid;
 }
 
 #p5-container #capture {
@@ -162,15 +164,16 @@ canvas {
 
 .video-controls {
   position: fixed;
+  padding: 0 var(--ins-margin);
   bottom: 0;
   left: 0;
-  height: var(--spacer3);
+  height: var(--progress-bar);
   width: 100%;
   z-index: 21;
 }
 
 #progress {
-  height: 100%;
+  height: 40%;
   background-color: var(--prak);
   transform-origin: top left;
 }
@@ -182,10 +185,6 @@ canvas {
   top: 0;
   z-index: 25;
   transition: transform 0.1s ease-out;
-}
-
-#cursor-container > #pos8 {
-  display: block;
 }
 
 .loading-circle {
@@ -231,6 +230,15 @@ canvas {
   width: var(--icon);
   height: var(--icon);
   display: none;
+}
+
+#wave {
+  width: var(--icon);
+  height: var(--icon);
+  position: absolute;
+  bottom: 5vw;
+  left: 64vw;
+  z-index: 20;
 }
 
 /* INSTRUCTIONS */
@@ -314,6 +322,7 @@ canvas {
   bottom: var(--ins-margin);
   width: 100%;
   justify-content: center;
+  z-index: 5;
 
   text-align: center;
   font-size: var(--testi);
@@ -325,9 +334,9 @@ canvas {
 /* bottone per rivedere il tutorial breve */
 #info {
   position: fixed;
+  display: flex;
   left: var(--ins-margin);
   bottom: var(--ins-margin);
-  display: none;
   z-index: 20;
 }
 #info > .icon {
@@ -337,17 +346,16 @@ canvas {
 
 /* per tornare all''inizio */
 #backtostart {
-  display: none;
+  display: flex;
 }
 /* per tornare all''inizio */
-#backtotree {
-  visibility: hidden;
-}
+/* #backtotree {
+visibility: hidden;
+} */
 
 /* gradientss */
 #gradient-left {
-  visibility: hidden;
-
+  /* visibility: hidden; */
   position: absolute;
   left: 0px;
   top: 0px;
@@ -376,7 +384,7 @@ canvas {
   );
 }
 #gradient-bottom {
-  display: none;
+  display: block;
   position: fixed;
   bottom: 0;
   left: 0;
@@ -458,6 +466,7 @@ canvas {
 .storycontainer {
   width: var(--img-story);
   position: absolute;
+  /* display: block; */
   z-index: 25;
 
   border: solid var(--mini-spacer) var(--prak);
@@ -530,6 +539,18 @@ canvas {
 /* //////////////////// */
 
 /* ANIMAZIONI */
+
+.fade-transition {
+  transition: all 1s;
+  visibility: hidden;
+  opacity: 0;
+}
+
+.fade-transition.visible {
+  visibility: visible;
+  opacity: 1;
+}
+
 @keyframes appear {
   from {
     visibility: hidden;

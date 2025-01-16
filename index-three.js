@@ -36,8 +36,7 @@ let imgLoading = document.getElementById("loading-img");
 imgLoading.src =
   "assets/loading/" + Math.floor(Math.random() * 8 + 1).toString() + ".gif";
 
-let cursorCtn = document.getElementById("cursor-container");
-let cursorImage = document.getElementById("wave");
+let fakeCursor = document.getElementById("wave");
 
 ////////////////////////////////////////////////////////////////////
 
@@ -160,19 +159,17 @@ function setup() {
 window.draw = () => {
   draw();
 };
-let first;
+
 function draw() {
   if (!scene || !camera || !renderer) return;
 
   if (!detectCursor) {
-    cursorCtn.style.display = "block";
-    cursorImage.style.display = "block";
-    // console.log(cursorCtn);
-    cursorCtn.style.animation = "wave 3s infinite";
+    fakeCursor.style.display = "block";
+    fakeCursor.style.top = (3 / 4) * windowHeight;
+    fakeCursor.style.left = (3 / 4) * windowWidth;
+    fakeCursor.style.animation = "wave 3s infinite";
   } else {
-    cursorCtn.style.top = "0px";
-    cursorCtn.style.left = "0px";
-    cursorCtn.style.animation = "none";
+    fakeCursor.style.display = "none";
   }
 
   time += 0.01;

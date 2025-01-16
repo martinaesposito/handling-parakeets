@@ -37,33 +37,40 @@
     <div class="bg"></div>
     <div class="container full"></div>
 
-    <!-- LOADING -->
-    <!-- <div id="loading" class="flex-column">
-      <img id="loading-img" />
-      <div id="loading-text">loading...</div>
-    </div> -->
-
     <!-- TUTORIAL -->
     <div class="video-controls">
-      <div id="progress"></div>
+      <div id="progress" class="fade-transition visible"></div>
     </div>
     <!-- tutorial  -->
-    <video id="tutorial" class="tutorial show" autoplay playsinline muted>
-      <source src="assets/tutorial2.mp4" type="video/mp4" />
+    <video
+      id="tutorial"
+      class="tutorial show fade-transition visible"
+      autoplay
+      playsinline
+      muted
+    >
+      <!-- <source src="assets/tutorial.mp4" type="video/mp4" /> -->
+      <source src="assets/tutorial_lungo.webm" type="video/webm" />
       <!--  da rimuovere il muted quando poi si scarica il manifest-->
     </video>
     <!-- tutorial breve -->
-    <video id="quick-tutorial" class="tutorial" autoplay playsinline muted>
-      <source src="assets/tutorial_transparent.webm" type="video/webm" />
+    <video
+      id="quick-tutorial"
+      class="tutorial fade-transition visible"
+      autoplay
+      playsinline
+      muted
+    >
+      <source src="assets/tutorial_corto.webm" type="video/webm" />
     </video>
 
     <!-- INSTRUCTIONS TOP-->
-    <div id="gradient-left"></div>
-    <div id="gradient-right"></div>
+    <div id="gradient-left" class="fade-transition"></div>
+    <div id="gradient-right" class="fade-transition visible"></div>
 
     <div id="ins-container" class="double top flex-row">
       <!-- back-->
-      <div class="instructions" id="backtotree">
+      <div class="instructions fade-transition" id="backtotree">
         <img src="assets/instructions/back.svg" class="icon" />
         <div class="instructions tree">
           <p id="ita">metti qui la mano per scoprire altre pose</p>
@@ -73,7 +80,7 @@
         </div>
       </div>
       <!-- restart-->
-      <div class="instructions" id="backtostart">
+      <div class="instructions fade-transition" id="backtostart">
         <div class="instructions tree">
           <p id="ita">metti qui la mano per riavviare</p>
           <p id="eng" class="eng tree">put the hand here to restart</p>
@@ -81,7 +88,7 @@
         <img src="assets/instructions/restart.svg" class="icon" />
       </div>
       <!-- skip-->
-      <div class="instructions" id="skip">
+      <div class="instructions fade-transition visible" id="skip">
         <div class="instructions tree">
           <p id="ita">metti qui la mano per saltare il tutorial</p>
           <p id="eng" class="eng tree">
@@ -93,13 +100,13 @@
     </div>
 
     <!-- INSTRUCTIONS BOTTOM (info)-->
-    <div id="gradient-bottom"></div>
-    <div class="instructions" id="info">
+    <div id="gradient-bottom" class="fade-transition"></div>
+    <div class="fade-transition" id="info">
       <img src="assets/instructions/info.svg" class="icon" />
     </div>
 
     <!-- INSTRUCTIONS CENTER (home)-->
-    <div class="instructions flex-column" id="ins-centr">
+    <div class="instructions flex-column fade-transition" id="ins-centr">
       <div id="hands-legend"></div>
       <div class="instructions tree">
         <p id="ita">fai una posa per scoprire le storie</p>
@@ -109,7 +116,7 @@
 
     <!-- SUBTITLE-->
     <div class="instructions flex-column tree" id="subtitle">
-      <p id="sub" class="highlight">strike a pose to uncover the stories</p>
+      <p id="sub" class="highlight"></p>
     </div>
 
     <!-- WARNING -->
@@ -126,13 +133,13 @@
     </div>
 
     <!-- VIDEO CAPTURE -->
-    <div id="p5-container">
+    <div id="p5-container" class="fade-transition">
       <video id="capture"></video>
     </div>
 
     <!-- CURSOR circle -->
     <div id="cursor-container">
-      <div class="loading-circle" id="outer-circle" style="visibility: hidden">
+      <div class="loading-circle" id="outer-circle">
         <div
           class="loading-rectangle rect-1"
           style="transform: rotate(270deg) skew(-90deg)"
@@ -150,7 +157,7 @@
           style="transform: rotate(0deg) skew(-90deg)"
         ></div>
       </div>
-      <div class="loading-circle" id="inner-circle" style="visibility: hidden">
+      <div class="loading-circle" id="inner-circle">
         <div
           class="loading-rectangle rect-1"
           style="transform: rotate(270deg) skew(-90deg)"

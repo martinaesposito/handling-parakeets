@@ -8,7 +8,7 @@ import {
   canvasW,
   canvasH,
 } from "./detect-three.js";
-import { camera, audioPlaying, scene, toggleAudio } from "./tree-three.js";
+import { camera, scene } from "./tree-three.js";
 
 export let platX;
 export let platY;
@@ -17,6 +17,8 @@ export let branchIndex;
 // sottotitolo
 let subtitle = document.getElementById("subtitle");
 let sub = document.getElementById("sub");
+
+let audioPlaying = false;
 
 export class Dot {
   static colors = [
@@ -68,26 +70,34 @@ export class Dot {
     this.radius = radius;
     this.scale = 1;
 
+    this.itemData = itemData;
+
     // three
     const geometry = new THREE.PlaneGeometry(this.radius, this.radius);
     const material = new THREE.MeshBasicMaterial({
       ...(!this.texture && {
-        // color: this.color,
         color: new THREE.Color().setRGB(1, 1, 1),
       }),
       ...(this.texture && {
         map: this.texture,
       }),
-
       transparent: true,
     });
+
+    if (this.itemData.Hand === "Hand") {
+      // Add a colored outline to the material
+      material.oneDashed = true;
+      material.dashSize = 2;
+      material.gapSize = 0;
+      material.linewidth = 2;
+      material.color.set("#c9ff4c");
+    }
     this.mesh = new THREE.Mesh(geometry, material);
     this.mesh.position.set(this.pos.x, this.pos.y, this.pos.z);
 
     this.sameBranchDots = [];
     this.samePoseDots = [];
 
-    this.itemData = itemData;
     this.isHovered = false;
 
     // properties of the forces add to the posiiton
@@ -112,8 +122,6 @@ export class Dot {
 
     // Set divs
     if (this.div) {
-      this.div.style("display", "none");
-
       this.div.addClass("storycontainer topleft");
       this.div.addClass(itemData.Pose);
 
@@ -150,7 +158,7 @@ export class Dot {
     if (
       itemData.Content_pose &&
       itemData.Content_pose != "Image" &&
-      itemData.Audio_track == null
+      itemData.Audio_track != null
     ) {
       this.sound = loadSound(
         "./assets/audio/" + itemData.Audio_track + ".wav",
@@ -167,7 +175,10 @@ export class Dot {
 
     // adding audio functionalities
     if (this.sound) {
-      this.sound.onended(toggleAudio);
+      this.sound.onended(() => {
+        audioPlaying = false;
+        subtitle.style.animation = "disappear 0.5s forwards";
+      });
     }
   }
 
@@ -346,6 +357,7 @@ export class Dot {
         targetScale = 4;
 
         if (this.isHovered) {
+          // console.log(audioPlaying);
           if (!audioPlaying) {
             // Only handle new interactions when no audio is playing
             this.div.style("display", "block");
@@ -354,18 +366,19 @@ export class Dot {
             this.positionStoryCard();
 
             subtitle.style.display = "flex";
+            subtitle.style.visibility = "visible";
             sub.innerHTML = this.itemData.Highlights_eng;
 
+            // console.log(this.sound);
             if (this.sound) {
-              toggleAudio();
               this.sound.play();
+              audioPlaying = true;
             }
           }
         } else {
           // Only hide div if there's no sound or sound isn't playing
           if (!this.sound || !this.sound.isPlaying()) {
             this.div.style("animation", "disappear 0.5s forwards");
-            // subtitle.style.animation = "disappear 0.5s forwards";
           }
         }
       } else {

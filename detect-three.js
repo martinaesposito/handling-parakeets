@@ -270,9 +270,9 @@ export function draw(shouldDrawHand = true) {
   if (handCounters.every((c) => c === 0)) {
     selectedPose = undefined;
   }
-
+  // console.log(tutorialEnd, videoStarted);
   // se non c'è la mano e nessuna posa è selezionata e il video tutorial è finito
-  if (!selectedPose && !hands[0] && tutorialEnd) {
+  if (!selectedPose && !hands[0] && tutorialEnd && !videoStarted) {
     if (handCounters.every((c) => c === 0)) {
       //se tutti i counter sono a zero chiama la funzione che riavvia l'esperienza
       let escape = (escapeCounters[0] += delta_time);
@@ -285,26 +285,15 @@ export function draw(shouldDrawHand = true) {
 
   if (marketEl && leftGradient && infoEl && bottomGradient) {
     if (selectedPose) {
-      console.log("flash");
-      // left instruction
-      marketEl.style.visibility = "visible";
-      marketEl.style.animation = "appear 1s forwards";
-      leftGradient.style.visibility = "visible";
-      leftGradient.style.animation = "appear 1s forwards";
-      //bottom instruction
-      infoEl.style.visibility = "visible";
-      bottomGradient.style.visibility = "visible";
-      infoEl.style.animation = "disappear 1s forwards";
-      bottomGradient.style.animation = "disappear 1s forwards";
-      // console.log(noHandAndZeroCounters, escapeCounters[2]);
-      // se esco dalla storia
+      marketEl.classList.add("visible");
+      leftGradient.classList.add("visible");
+      infoEl.classList.remove("visible");
+      bottomGradient.classList.remove("visible");
     } else if (noHandAndZeroCounters) {
-      // left instruction
-      marketEl.style.animation = "disappear 1s forwards";
-      leftGradient.style.animation = "disappear 1s forwards";
-      //bottom instruction
-      infoEl.style.animation = "appear 1s forwards";
-      bottomGradient.style.animation = "appear 1s forwards";
+      marketEl.classList.remove("visible");
+      leftGradient.classList.remove("visible");
+      infoEl.classList.add("visible");
+      bottomGradient.classList.add("visible");
       noHandAndZeroCounters = false;
     }
   }
@@ -323,7 +312,8 @@ export function draw(shouldDrawHand = true) {
   }
 
   // reset the counter when no action
-  loadingrects.forEach((rect, r) => {
+  loadingrects.forEach((rect) => {
+    // console.log(index, shouldDrawHand, tutorialEnd, videoStarted);
     if (index !== 9) {
       if (
         selectedPose &&
@@ -333,9 +323,7 @@ export function draw(shouldDrawHand = true) {
       } else {
         rect.style.opacity = 1;
       }
-    } else if (shouldDrawHand)
-      // making the loading invisible while in the 9th pose in all cases but the screensaver
-      rect.style.opacity = 0;
+    } else if (!tutorialEnd || videoStarted) rect.style.opacity = 0;
   });
 }
 
@@ -343,25 +331,24 @@ export function draw(shouldDrawHand = true) {
 if (tutorialQuick) {
   // Ensure the "ended" event is set up only once
   tutorialQuick.addEventListener("ended", () => {
-    videoStarted = false;
-    quickTutorialEnd = false;
-    tutorialQuick.style.display = "none";
+    if (tutorialEnd) {
+      console.log("non può essere qui");
+      videoStarted = false;
+      quickTutorialEnd = false;
+      tutorialQuick.classList.remove("visible");
+      setTimeout(tutorialQuick.classList.remove("show"), 1000);
 
-    // bottom instructions
-    infoEl.style.visibility = "visible";
-    infoEl.style.animation = "appear 1s forwards";
-    bottomGradient.style.visibility = "visible";
-    bottomGradient.style.animation = "appear 1s forwards";
+      // bottom instructions
+      infoEl.classList.add("visible");
+      bottomGradient.classList.add("visible");
 
-    //top instructions
-    restartEl.style.visibility = "visible";
-    restartEl.style.animation = "appear 1s forwards";
-    rightGradient.style.visibility = "visible";
-    rightGradient.style.animation = "appear 1s forwards";
+      //top instructions
+      restartEl.classList.add("visible");
+      rightGradient.classList.add("visible");
 
-    //p5video
-    p5Containter.style.visibility = "visible";
-    p5Containter.style.animation = "appear 1s forwards";
+      //p5video
+      p5Containter.classList.add("visible");
+    }
   });
 }
 
@@ -519,7 +506,8 @@ function updateCounters() {
           cursor.x > bounds.left - 50 &&
           cursor.x < bounds.left - 50 + bounds.width + 50 &&
           cursor.y > bounds.top - 50 &&
-          cursor.y < bounds.top - 50 + bounds.height + 50
+          cursor.y < bounds.top - 50 + bounds.height + 50 &&
+          elements[counter.name].className.includes("visible")
         ) {
           drawDOMArc(counter.value, counter.max);
           counter.show = true;
@@ -535,6 +523,7 @@ function updateCounters() {
 
             counter.function();
           }
+          // console.log(counter);
         } else {
           counter.value = 0;
           counter.show = false;
@@ -590,24 +579,34 @@ function escapeTree(maxCounter, escapeCounter) {
 }
 
 function backToTree() {
-  handCounters = handCounters.map(() => 0);
+  resetAllCounters();
   selectedPose = undefined;
+  marketEl.classList.remove("visible");
+  leftGradient.classList.remove("visible");
+  infoEl.classList.add("visible");
+  bottomGradient.classList.add("visible");
+}
+function resetAllCounters() {
+  counters = counters.map((c) => ({ ...c, value: 0 }));
+  handCounters = handCounters.map(() => 0);
+  escapeCounters = escapeCounters.map(() => 0);
 }
 
 //SKIP
 function skipTutorial() {
+  console.log("neanche qui può essere");
   if (tutorial) tutorial.currentTime = tutorial.duration;
 
   if (skipEl) skipEl.style.display = "none";
-  if (restartEl) restartEl.style.display = "flex";
-  if (infoEl) infoEl.style.display = "flex";
-  if (bottomGradient) bottomGradient.style.display = "block";
+  if (restartEl) restartEl.classList.add("visible");
+  if (infoEl) infoEl.classList.add("visible");
+  if (bottomGradient) bottomGradient.classList.add("visible");
 }
 
 // Function to play or restart the video
 function showQuickTutorial() {
-  tutorialQuick.style.display = "block";
-  tutorialQuick.style.visibility = "visible";
+  tutorialQuick.classList.add("show");
+  tutorialQuick.classList.add("visible");
   quickTutorialEnd = true;
 
   if (!videoStarted || tutorialQuick.ended) {
@@ -617,15 +616,15 @@ function showQuickTutorial() {
     videoStarted = true; // Mark the video as started
 
     // bottom instructions
-    infoEl.style.animation = "disappear 1s forwards";
-    bottomGradient.style.animation = "disappear 1s forwards";
+    infoEl.classList.remove("visible");
+    bottomGradient.classList.remove("visible");
 
     //top instructions
-    restartEl.style.animation = "disappear 1s forwards";
-    rightGradient.style.animation = "disappear 1s forwards";
+    restartEl.classList.remove("visible");
+    rightGradient.classList.remove("visible");
 
     //p5video
-    p5Containter.style.animation = "disappear 1s forwards";
+    p5Containter.classList.remove("visible");
   }
 }
 

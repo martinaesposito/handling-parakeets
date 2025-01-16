@@ -42,13 +42,19 @@ if (tutorial && progressBar) {
   });
 
   tutorial.addEventListener("ended", () => {
-    backtostart.style.display = "flex";
-    infoEl.style.display = "flex";
-    bottomGradient.style.display = "block";
-    skipEl.style.display = "none";
-    tutorial.style.animation = "disappear 0.3s forwards";
-    progressBar.style.animation = "disappear 0.3s forwards";
+    console.log("tutorial finished");
+    backtostart.classList.add("visible"); //istruzioni
+    insCenter.classList.add("visible");
+    infoEl.classList.add("visible");
+    bottomGradient.classList.add("visible");
+    p5Containter.classList.add("visible"); //camera
+    setTimeout(() => {
+      tutorial.classList.remove("visible"); //tutorial
+      progressBar.classList.remove("visible");
+    }, 200);
+
     tutorialEnd = true;
+    skipEl.style.display = "none";
   });
 }
 
@@ -94,8 +100,6 @@ let imageMap = {}; // Map images by their filename
 
 // STORIES
 let storyIntro, stories;
-// sound
-let audioPlaying = false;
 
 // THREE
 let scene, camera, renderer;
@@ -106,10 +110,6 @@ let p5Canvas;
 let zoom = 1;
 let targetZoom;
 
-function toggleAudio() {
-  audioPlaying = audioPlaying ? false : true;
-}
-
 // esporto tutto
 export {
   zoom,
@@ -118,7 +118,6 @@ export {
   tutorialEnd,
   warning,
   endCounter,
-  audioPlaying,
   p5Canvas,
   p5Containter,
   backtostart,
@@ -128,13 +127,12 @@ export {
   bottomGradient,
   infoEl,
   skipEl,
-  toggleAudio,
 };
 
 ////////////////////////////////////////////////////////////////////
 
 window.setup = async () => {
-  p5Canvas = createCanvas(0.15 * windowWidth, (0.15 / 4) * 3 * windowWidth);
+  p5Canvas = createCanvas(0.15 * windowWidth, 0.15 * windowWidth * (3 / 4));
   p5Containter.appendChild(p5Canvas.canvas);
 
   //setup di p5 - che chiama il finto preload e il finto setup
@@ -280,7 +278,7 @@ function setup() {
 
   branchPlatform.forEach((branch, index) => {
     plat = createDiv();
-    plat.class("platform");
+    plat.class("platform fade-transition visible");
     plat.html(`${branch.name} [${branch.value}] `);
     plat.id(branch.name);
     platforms.push(plat);
@@ -313,7 +311,7 @@ function draw() {
   }
 
   // nomi delle platform
-  if (branchPositions.length > 0) {
+  if (branchPositions.length > 0 && platforms.length > 0) {
     branchesss.forEach((e, index) => {
       platforms[index].position(
         canvasW / 2 +
@@ -325,8 +323,10 @@ function draw() {
       );
 
       selectedPose
-        ? platforms[index].style("animation", "disappear 3s forwards")
-        : platforms[index].style("animation", "appear 3s forwards");
+        ? platforms[index].removeClass("visible")
+        : platforms[index].addClass("visible");
+      // ? platforms[index].style("animation", "disappear 3s forwards")
+      // : platforms[index].style("animation", "appear 3s forwards");
     });
   }
 
