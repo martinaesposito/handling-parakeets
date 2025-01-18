@@ -20,7 +20,7 @@ export let branchIndex;
 let subtitle = document.getElementById("subtitle");
 let sub = document.getElementById("sub");
 
-let audioPlaying = false;
+export let audioPlaying = false;
 
 export class Dot {
   static colors = [
@@ -374,7 +374,7 @@ export class Dot {
             this.div.style("animation", "appear 0.5s forwards");
 
             this.positionStoryCard();
-            console.log(subtitle);
+            // console.log(subtitle);
 
             // console.log(this.sound);
             if (this.sound) {

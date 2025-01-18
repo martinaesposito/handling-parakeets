@@ -445,14 +445,13 @@ function changeStory(indexStory) {
       intro.TitleIta +
       "</br><span class='eng'>" +
       intro.TitleEng +
-      "</span></div><div class='overlaybox intro gap'>" +
+      "</span></div><div id='descr' class='overlaybox intro gap'>" +
       intro.DescriptionIta +
       "</br><span class='eng'>" +
       intro.DescriptionEng +
       "</span></div>"
   );
 
-  console.log(storyIntro);
   storyIntro.style("display", "flex");
   insCenter.style.display = "none";
 }

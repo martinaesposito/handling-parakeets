@@ -506,7 +506,9 @@ visibility: hidden;
 .intro {
   text-align: left;
   font-size: var(--testi);
-  padding: var(--spacer3);
+}
+#descr {
+  padding: var(--spacer1);
 }
 
 /* testi in evidenza nelle storie */

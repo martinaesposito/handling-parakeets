@@ -86,7 +86,7 @@ export const Hand = class {
           vertex(...Object.values(this.p5Points[i].pos)); // Usa i punti aggiornati
         }
 
-        strokeWeight(3);
+        strokeWeight(2.5);
         stroke(prak);
         noFill();
 

@@ -20,6 +20,7 @@ import {
   skipEl,
 } from "./tree-three.js";
 import { Hand } from "./hand.js"; //importa l'oggetto mano definito nel javascript precedente
+import { audioPlaying } from "./listings-three.js";
 
 export let canvasW = window.innerWidth;
 export let canvasH = window.innerHeight;
@@ -263,8 +264,12 @@ export function draw(shouldDrawHand = true, acceptAllHands = false) {
     });
   }
 
+  console.log(handCounters);
   if (handCounters.every((c) => c === 0)) {
-    selectedPose = undefined;
+    console.log(audioPlaying);
+    if (!audioPlaying) {
+      selectedPose = undefined;
+    }
   }
   // console.log(tutorialEnd, videoStarted);
   // se non c'è la mano e nessuna posa è selezionata e il video tutorial è finito
@@ -436,11 +441,9 @@ let isRedirecting = false; //flag per fare una sola call quando cambia pagina
 function updateHandCounters({ detectedHand, shouldDrawHand, lock }) {
   const maxCounter = 5000;
 
-  console.log(detectedHand);
-
   if (tutorialEnd == false || quickTutorialEnd || lock) return;
 
-  if (!hands[0] && handCounters.every((c) => c === 0)) {
+  if (!hands[0] && !audioPlaying && handCounters.every((c) => c === 0)) {
     noHandAndZeroCounters = true;
   }
 
@@ -453,7 +456,7 @@ function updateHandCounters({ detectedHand, shouldDrawHand, lock }) {
       handCounters[detectedHand] !== undefined
     ) {
       handCounters[detectedHand] += delta_time;
-      console.log(handCounters[detectedHand], detectedHand);
+      // console.log(handCounters[detectedHand], detectedHand);
     }
     drawDOMArc(handCounters[detectedHand] || 0, maxCounter);
 
@@ -461,7 +464,6 @@ function updateHandCounters({ detectedHand, shouldDrawHand, lock }) {
       selectedPose = handPoses[detectedHand];
 
       if (!shouldDrawHand && !isRedirecting) {
-        // console.log("going to tree");
         window.location.href = "tree.html";
         isRedirecting = true;
       }
@@ -518,10 +520,10 @@ function updateCounters() {
 
       if (bounds) {
         if (
-          cursor.x > bounds.left - 50 &&
-          cursor.x < bounds.left - 50 + bounds.width + 50 &&
-          cursor.y > bounds.top - 50 &&
-          cursor.y < bounds.top - 50 + bounds.height + 50 &&
+          cursor.x > bounds.left - 75 &&
+          cursor.x < bounds.left - 75 + bounds.width + 75 &&
+          cursor.y > bounds.top - 75 &&
+          cursor.y < bounds.top - 75 + bounds.height + 75 &&
           elements[counter.name].className.includes("visible")
         ) {
           drawDOMArc(counter.value, counter.max);
