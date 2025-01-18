@@ -308,10 +308,6 @@ window.draw = () => {
 function draw() {
   if (!scene || !camera || !renderer) return;
 
-  // if (videoExists) {
-  //   loading.style.display = "none"; //nascondo il loading
-  // }
-
   targetZoom = selectedPose ? 1.8 : 1;
   zoom += (targetZoom - zoom) * 0.1;
 
@@ -335,8 +331,6 @@ function draw() {
       selectedPose
         ? platforms[index].removeClass("visible")
         : platforms[index].addClass("visible");
-      // ? platforms[index].style("animation", "disappear 3s forwards")
-      // : platforms[index].style("animation", "appear 3s forwards");
     });
   }
 
