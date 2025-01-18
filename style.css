@@ -185,7 +185,7 @@ canvas {
   position: absolute;
   left: 0;
   top: 0;
-  z-index: 25;
+  z-index: 21;
   transition: transform 0.1s ease-out;
 }
 
@@ -324,7 +324,7 @@ canvas {
   bottom: var(--ins-margin);
   width: 100%;
   justify-content: center;
-  z-index: 5;
+  z-index: 25;
 
   text-align: center;
   font-size: var(--testi);
@@ -469,7 +469,7 @@ visibility: hidden;
   width: var(--img-story);
   position: absolute;
   display: none;
-  z-index: 25;
+  z-index: 22;
 
   border: solid var(--mini-spacer) var(--prak);
   background: #ffffff;
@@ -501,11 +501,12 @@ visibility: hidden;
   width: var(--img-storyIntro);
 }
 #title > .eng {
-  font-size: var(--testi);
+  font-size: var(--subtitle-eng);
 }
 .intro {
   text-align: left;
   font-size: var(--testi);
+  padding: var(--spacer3);
 }
 
 /* testi in evidenza nelle storie */

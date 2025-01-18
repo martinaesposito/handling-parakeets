@@ -376,11 +376,10 @@ export class Dot {
             this.positionStoryCard();
             console.log(subtitle);
 
-            subtitle.classList.add("visible");
-            sub.innerHTML = this.itemData.Highlights_eng;
-
             // console.log(this.sound);
             if (this.sound) {
+              subtitle.classList.add("visible");
+              sub.innerHTML = this.itemData.Highlights_eng;
               this.sound.play();
               audioPlaying = true;
             }

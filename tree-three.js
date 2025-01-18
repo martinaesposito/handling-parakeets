@@ -452,6 +452,7 @@ function changeStory(indexStory) {
       "</span></div>"
   );
 
+  console.log(storyIntro);
   storyIntro.style("display", "flex");
   insCenter.style.display = "none";
 }

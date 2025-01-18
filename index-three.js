@@ -23,7 +23,7 @@ let currentPositions = []; // Store current positions for easing
 let velocities = []; // Store velocities for each point
 
 let points = [];
-let fontSize = 240;
+let fontSize = 250;
 
 let bounds1, bounds2;
 
@@ -55,7 +55,7 @@ async function preload() {
   for (let i = 2; i < 887; i++) {
     const imagePromise = new Promise((resolve) => {
       loader.load(
-        `assets/image_ultra-compress/${i}.webp`,
+        `assets/image_ultra-compress-HOME/${i}.webp`,
         (texture) => {
           texture.colorSpace = THREE.SRGBColorSpace;
           images.push(texture); // Store with numeric keys

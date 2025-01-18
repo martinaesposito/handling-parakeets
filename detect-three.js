@@ -571,7 +571,7 @@ function drawDOMArc(value, maxCounter) {
       ? (rect.style.visibility = "hidden")
       : (rect.style.visibility = "visible");
     if (new_skew >= 90) new_skew = 90;
-    console.log(new_skew);
+    // console.log(new_skew);
     rect.style.transform =
       "rotate(" + rot_degrees + "deg) skew(" + (-89 + new_skew) + "deg)";
   });
