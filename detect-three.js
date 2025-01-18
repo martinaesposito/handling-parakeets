@@ -58,7 +58,7 @@ let counters = [
   {
     name: "skip_tutorial",
     value: 0,
-    max: 5000,
+    max: 3000,
     show: false,
     function: skipTutorial,
     cursorImage: 10,
@@ -66,7 +66,7 @@ let counters = [
   {
     name: "market",
     value: 0,
-    max: 5000,
+    max: 3000,
     show: false,
     function: backToTree,
     cursorImage: 7,
@@ -82,7 +82,7 @@ let counters = [
   {
     name: "restart",
     value: 0,
-    max: 5000,
+    max: 3000,
     show: false,
     function: backToStart,
     cursorImage: 8,
