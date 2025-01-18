@@ -23,7 +23,8 @@ let currentPositions = []; // Store current positions for easing
 let velocities = []; // Store velocities for each point
 
 let points = [];
-let fontSize = 250;
+const fontSize = 250;
+const sampleFactor = 0.175;
 
 let bounds1, bounds2;
 
@@ -32,9 +33,9 @@ let images = [];
 
 // loading
 let loading = document.getElementById("loading");
-let imgLoading = document.getElementById("loading-img");
-imgLoading.src =
-  "assets/loading/" + Math.floor(Math.random() * 8 + 1).toString() + ".gif";
+// let imgLoading = document.getElementById("loading-img");
+// imgLoading.src =
+//   "assets/loading/" + Math.floor(Math.random() * 8 + 1).toString() + ".gif";
 
 let fakeCursor = document.getElementById("wave");
 
@@ -49,28 +50,26 @@ async function preload() {
   font = loadFont("assets/fonts/IBM_Plex_Sans/IBMPlexSans-Regular.ttf");
 
   //immaginine piccole
-  const imagePromises = [];
   const loader = new THREE.TextureLoader();
+  const imagePromises = Array.from(
+    { length: 885 },
+    (_, i) =>
+      new Promise((resolve) => {
+        loader.load(
+          `assets/image_ultra-compress-HOME/${i + 2}.webp`,
+          (texture) => {
+            texture.colorSpace = THREE.SRGBColorSpace;
+            images[i] = texture;
+            resolve();
+          },
+          undefined,
+          resolve // Resolve even on error
+        );
+      })
+  );
 
-  for (let i = 2; i < 887; i++) {
-    const imagePromise = new Promise((resolve) => {
-      loader.load(
-        `assets/image_ultra-compress-HOME/${i}.webp`,
-        (texture) => {
-          texture.colorSpace = THREE.SRGBColorSpace;
-          images.push(texture); // Store with numeric keys
-          resolve();
-        },
-        () => {},
-        (e) => {
-          resolve(); // Resolve even if the image fails
-        }
-      );
-    });
-    imagePromises.push(imagePromise);
-  }
+  await Promise.all([...imagePromises, detectPreload()]);
 
-  await Promise.all(imagePromises);
   // console.log(images);
   detectPreload();
 }
@@ -93,8 +92,6 @@ function setup() {
   );
   camera.position.z = 1;
 
-  console.log(scene, camera);
-
   renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
   renderer.setPixelRatio(window.devicePixelRatio);
   renderer.setSize(canvasW, canvasH);
@@ -104,7 +101,6 @@ function setup() {
   // Measure text bounds
   bounds1 = font.textBounds("Handling", 0, 0, fontSize);
   bounds2 = font.textBounds("Parakeets", 0, 0, fontSize);
-  const sampleFactor = 0.175;
 
   let randomPoints = [];
 

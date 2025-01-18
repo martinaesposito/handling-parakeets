@@ -475,6 +475,7 @@ function updateHandCounters({ detectedHand, shouldDrawHand, lock }) {
     // se non ci sono mani resetta tutto
     if (!hands[0]) {
       escapeCounters[4]++;
+      console.log(escapeCounters[4]);
       if (escapeCounters[4] > 60) {
         // dopo 60 frame resetta
         handCounters[i] = 0;

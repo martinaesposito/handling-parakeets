@@ -139,8 +139,14 @@ canvas {
 
   gap: var(--spacer3);
 
-  z-index: 25;
+  z-index: 30;
+  background: radial-gradient(
+    ellipse at center center,
+    var(--prak) 5%,
+    var(--bg-grey) 30%
+  );
 }
+
 #loading-img {
   height: var(--imgLoading);
   width: auto;
