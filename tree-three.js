@@ -35,11 +35,21 @@ let tutorialEnd = tutorial ? false : true;
 let progressBar = document.getElementById("progress");
 
 if (tutorial && progressBar) {
-  tutorial.addEventListener("loadeddata", () => {
+  if (tutorial.readyState >= 2) {
+    console.log(
+      "CASO 1: Video is already loaded, execute the code immediately"
+    );
     tutorialEnd = false;
     const duration = tutorial.duration + "s";
     progressBar.style.animation = "pippo " + duration + " linear forwards";
-  });
+  } else {
+    console.log("CASO 2: Video isn't loaded yet, add the event listener");
+    tutorial.addEventListener("loadeddata", () => {
+      tutorialEnd = false;
+      const duration = tutorial.duration + "s";
+      progressBar.style.animation = "pippo " + duration + " linear forwards";
+    });
+  }
 
   tutorial.addEventListener("ended", () => {
     console.log("tutorial finished");
@@ -378,7 +388,33 @@ function generateBranchDots(branches) {
     // Store the final position in branchPositions
     branchPositions.push({ x: baseX, y: baseY });
 
-    // Create dots
+    // TENTATIVO PAZZO CON LE INSTANCE
+    // const geometry = new THREE.PlaneGeometry(12, 12);
+    // let materials = [];
+
+    // // creo un array di texture per ciascun elemento
+    // items.forEach((item, i) => {
+    //   const material = new THREE.MeshBasicMaterial({
+    //     ...(!item.Image_num && {
+    //       color: new THREE.Color().setRGB(1, 1, 1),
+    //     }),
+    //     ...(item.Image_num && {
+    //       map: imageMap[item.Image_num],
+    //     }),
+    //     transparent: true,
+    //   });
+
+    //   materials.push(material);
+    // });
+
+    // // creo un istanza con ciascuna un diverso materiale dell'array
+    // const instancedMesh = new THREE.InstancedMesh(
+    //   geometry,
+    //   materials,
+    //   items.length
+    // );
+    // console.log(instancedMesh);
+
     items.forEach((item, i) => {
       const dot = new Dot(
         { ...branch, index: bIndex, branchT },
@@ -391,6 +427,7 @@ function generateBranchDots(branches) {
       );
       branchDots.push(dot);
 
+      // scene.add(dot.instancedMesh);
       scene.add(dot.mesh);
     });
 

@@ -466,7 +466,7 @@ visibility: hidden;
 .storycontainer {
   width: var(--img-story);
   position: absolute;
-  /* display: block; */
+  display: none;
   z-index: 25;
 
   border: solid var(--mini-spacer) var(--prak);

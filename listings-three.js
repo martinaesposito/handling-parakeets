@@ -14,6 +14,8 @@ export let platX;
 export let platY;
 export let branchIndex;
 
+// const geometry = new THREE.PlaneGeometry(12, 12);
+
 // sottotitolo
 let subtitle = document.getElementById("subtitle");
 let sub = document.getElementById("sub");
@@ -74,6 +76,7 @@ export class Dot {
 
     // three
     const geometry = new THREE.PlaneGeometry(this.radius, this.radius);
+
     const material = new THREE.MeshBasicMaterial({
       ...(!this.texture && {
         color: new THREE.Color().setRGB(1, 1, 1),
@@ -84,16 +87,23 @@ export class Dot {
       transparent: true,
     });
 
-    if (this.itemData.Hand === "Hand") {
-      // Add a colored outline to the material
-      material.oneDashed = true;
-      material.dashSize = 2;
-      material.gapSize = 0;
-      material.linewidth = 2;
-      material.color.set("#c9ff4c");
-    }
     this.mesh = new THREE.Mesh(geometry, material);
+    // this.instancedMesh = new THREE.InstancedMesh(geometry, material, 1);
+
     this.mesh.position.set(this.pos.x, this.pos.y, this.pos.z);
+
+    // if (this.itemData.Hand === "Hand") {
+    //   // Create border using LineSegments
+    //   const edges = new THREE.EdgesGeometry(geometry);
+    //   const borderMaterial = new THREE.LineBasicMaterial({
+    //     color: "#c9ff4c",
+    //     linewidth: 2, // Note: line width might not work in WebGL
+    //   });
+    //   this.border = new THREE.LineSegments(edges, borderMaterial);
+
+    //   // Add border to mesh so it moves with it
+    //   this.mesh.add(this.border);
+    // }
 
     this.sameBranchDots = [];
     this.samePoseDots = [];
@@ -259,7 +269,7 @@ export class Dot {
     }
 
     const targetRadius = this.isHovered
-      ? this.baseRadius * 3
+      ? this.baseRadius * 2
       : this.baseRadius * this.scale; //se l'oggetto viene hoverato aumentail raggio
     this.radius += (targetRadius - this.radius) * 0.1;
 

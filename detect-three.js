@@ -50,6 +50,7 @@ let handCounters = [
   0, //relaxed
   0, //shell
   0, //TouchingTips
+  0, //HOME
 ];
 
 let counters = [
@@ -447,8 +448,13 @@ function updateHandCounters({ detectedHand, shouldDrawHand, lock }) {
   }
 
   // Update only the relevant counter
+  // console.log(detectedHand, handCounters[detectedHand], maxCounter);
   if (hands[0] && detectedHand !== undefined) {
-    if (handCounters[detectedHand] < maxCounter) {
+    console.log(handCounters, escapeCounters, lock);
+    if (
+      handCounters[detectedHand] < maxCounter &&
+      handCounters[detectedHand] !== undefined
+    ) {
       handCounters[detectedHand] += delta_time;
       drawDOMArc(handCounters[detectedHand], maxCounter);
     }
@@ -544,6 +550,7 @@ function getElementBounds(el) {
 }
 
 function drawDOMArc(value, maxCounter) {
+  console.log(value, maxCounter);
   let cMapped = map(value, 0, maxCounter, 0, 360);
 
   loadingrects.forEach((rect, r) => {
