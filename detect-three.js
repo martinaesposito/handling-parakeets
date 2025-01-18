@@ -265,10 +265,10 @@ export function draw(shouldDrawHand = true, acceptAllHands = false) {
   }
 
   if (handCounters.every((c) => c === 0)) {
-    console.log(handCounters);
-    console.log(audioPlaying);
     if (!audioPlaying) {
-      selectedPose = undefined;
+      setTimeout(() => {
+        selectedPose = undefined;
+      }, 100);
     }
   }
   // console.log(tutorialEnd, videoStarted);
