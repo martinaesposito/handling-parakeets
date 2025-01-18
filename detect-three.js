@@ -100,7 +100,7 @@ let escapeCounters = [
   0, // from Tree when inactivity
   0, // from Tree when selected
   0, // from Story
-  0, //from tutorial
+  0, // from tutorial
   0, // reset all hands
 ];
 

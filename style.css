@@ -501,7 +501,7 @@ visibility: hidden;
 #img-introS {
   width: var(--img-storyIntro);
 }
-#title > .eng {
+sub #title > .eng {
   font-size: var(--subtitle-eng);
 }
 .intro {
@@ -510,6 +510,7 @@ visibility: hidden;
 }
 #descr {
   padding: var(--spacer1);
+  gap: var(--spacer2);
 }
 
 /* testi in evidenza nelle storie */
@@ -522,7 +523,7 @@ visibility: hidden;
 /* general */
 
 .gap {
-  gap: 1vh;
+  gap: var(--spacer1);
 }
 .flex-column {
   display: flex;

@@ -445,7 +445,7 @@ function changeStory(indexStory) {
       intro.TitleIta +
       "</br><span class='eng'>" +
       intro.TitleEng +
-      "</span></div><div id='descr' class='overlaybox intro gap'>" +
+      "</span></div><div id='descr' class='overlaybox intro'>" +
       intro.DescriptionIta +
       "</br><span class='eng'>" +
       intro.DescriptionEng +
