@@ -59,6 +59,8 @@ main {
 #p5-container #capture {
   width: 100%;
   height: auto;
+  height: 100%;
+  object-fit: cover;
 }
 
 #p5-container canvas {
@@ -317,7 +319,7 @@ canvas {
 }
 
 #subtitle {
-  display: none;
+  /* display: none; */
   position: absolute;
   bottom: var(--ins-margin);
   width: 100%;

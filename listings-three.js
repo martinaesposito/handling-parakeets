@@ -187,7 +187,7 @@ export class Dot {
     if (this.sound) {
       this.sound.onended(() => {
         audioPlaying = false;
-        subtitle.style.animation = "disappear 0.5s forwards";
+        subtitle.classList.remove("visible");
       });
     }
   }
@@ -209,7 +209,7 @@ export class Dot {
     if (!this.shouldHighlight(currentPose) && currentPose) {
       //quando una posa viene detectata si allontanano
 
-      this.basePos = this.originalPos.clone().multiplyScalar(2);
+      this.basePos = this.originalPos.clone().multiplyScalar(3);
       this.radius = this.baseRadius;
     } else if (!currentPose) {
       this.basePos = this.originalPos;
@@ -374,9 +374,9 @@ export class Dot {
             this.div.style("animation", "appear 0.5s forwards");
 
             this.positionStoryCard();
+            console.log(subtitle);
 
-            subtitle.style.display = "flex";
-            subtitle.style.visibility = "visible";
+            subtitle.classList.add("visible");
             sub.innerHTML = this.itemData.Highlights_eng;
 
             // console.log(this.sound);

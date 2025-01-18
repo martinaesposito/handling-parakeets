@@ -23,7 +23,7 @@ let currentPositions = []; // Store current positions for easing
 let velocities = []; // Store velocities for each point
 
 let points = [];
-let fontSize = 200;
+let fontSize = 240;
 
 let bounds1, bounds2;
 
@@ -255,5 +255,5 @@ function draw() {
 
   renderer.render(scene, camera);
 
-  detectDraw(false);
+  detectDraw(false, true);
 }

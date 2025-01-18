@@ -93,12 +93,6 @@ let tutorial = document.getElementById("tutorial");
 let tutorialQuick = document.getElementById("quick-tutorial");
 let quickTutorialEnd, videoStarted;
 
-if (!tutorial) {
-  setTimeout(() => {
-    skipTutorial();
-  }, 0);
-}
-
 let noHandAndZeroCounters; //flag di uscita dalla storia
 
 let escapeCounters = [
@@ -106,6 +100,7 @@ let escapeCounters = [
   0, // from Tree when selected
   0, // from Story
   0, //from tutorial
+  0, // reset all hands
 ];
 
 export let selectedPose;
@@ -205,7 +200,7 @@ export function setup() {
 }
 
 //DRAW
-export function draw(shouldDrawHand = true) {
+export function draw(shouldDrawHand = true, acceptAllHands = false) {
   let index;
 
   // time and space
@@ -249,7 +244,7 @@ export function draw(shouldDrawHand = true) {
     cursor.x = cursor.x * scale * zoomFactor;
 
     updateHandCounters({
-      detectedHand: similarHand,
+      detectedHand: acceptAllHands ? 7 : similarHand,
       shouldDrawHand,
       lock: selectedPose !== undefined,
     });
@@ -333,7 +328,7 @@ if (tutorialQuick) {
   // Ensure the "ended" event is set up only once
   tutorialQuick.addEventListener("ended", () => {
     if (tutorialEnd) {
-      console.log("non può essere qui");
+      // console.log("non può essere qui");
       videoStarted = false;
       quickTutorialEnd = false;
       tutorialQuick.classList.remove("visible");
@@ -441,6 +436,8 @@ let isRedirecting = false; //flag per fare una sola call quando cambia pagina
 function updateHandCounters({ detectedHand, shouldDrawHand, lock }) {
   const maxCounter = 5000;
 
+  console.log(detectedHand);
+
   if (tutorialEnd == false || quickTutorialEnd || lock) return;
 
   if (!hands[0] && handCounters.every((c) => c === 0)) {
@@ -450,14 +447,15 @@ function updateHandCounters({ detectedHand, shouldDrawHand, lock }) {
   // Update only the relevant counter
   // console.log(detectedHand, handCounters[detectedHand], maxCounter);
   if (hands[0] && detectedHand !== undefined) {
-    console.log(handCounters, escapeCounters, lock);
+    // console.log(handCounters, escapeCounters, lock);
     if (
       handCounters[detectedHand] < maxCounter &&
       handCounters[detectedHand] !== undefined
     ) {
       handCounters[detectedHand] += delta_time;
-      drawDOMArc(handCounters[detectedHand], maxCounter);
+      console.log(handCounters[detectedHand], detectedHand);
     }
+    drawDOMArc(handCounters[detectedHand] || 0, maxCounter);
 
     if (handCounters[detectedHand] >= maxCounter) {
       selectedPose = handPoses[detectedHand];
@@ -472,8 +470,19 @@ function updateHandCounters({ detectedHand, shouldDrawHand, lock }) {
 
   // Decrease other counters
   handCounters.forEach((val, i) => {
-    if (i !== detectedHand && val > 0) {
-      handCounters[i] = Math.max(0, val - delta_time);
+    // se non ci sono mani resetta tutto
+    if (!hands[0]) {
+      escapeCounters[4]++;
+      if (escapeCounters[4] > 60) {
+        // dopo 60 frame resetta
+        handCounters[i] = 0;
+        escapeCounters[4] = 0;
+      }
+    } else {
+      escapeCounters[4] = 0;
+      if (i !== detectedHand && val > 0) {
+        handCounters[i] = Math.max(0, val - delta_time);
+      }
     }
   });
 }
@@ -550,7 +559,7 @@ function getElementBounds(el) {
 }
 
 function drawDOMArc(value, maxCounter) {
-  console.log(value, maxCounter);
+  // console.log(value, maxCounter);
   let cMapped = map(value, 0, maxCounter, 0, 360);
 
   loadingrects.forEach((rect, r) => {
@@ -558,11 +567,11 @@ function drawDOMArc(value, maxCounter) {
 
     let new_skew = cMapped - 90 * (r % 4);
 
-    new_skew < 0
+    new_skew <= 0
       ? (rect.style.visibility = "hidden")
       : (rect.style.visibility = "visible");
     if (new_skew >= 90) new_skew = 90;
-
+    console.log(new_skew);
     rect.style.transform =
       "rotate(" + rot_degrees + "deg) skew(" + (-89 + new_skew) + "deg)";
   });
@@ -601,7 +610,7 @@ function resetAllCounters() {
 
 //SKIP
 function skipTutorial() {
-  console.log("neanche qui può essere");
+  // console.log("neanche qui può essere");
   if (tutorial) tutorial.currentTime = tutorial.duration;
 
   if (skipEl) skipEl.style.display = "none";
