@@ -268,7 +268,7 @@ export function draw(shouldDrawHand = true, acceptAllHands = false) {
     if (!audioPlaying) {
       setTimeout(() => {
         selectedPose = undefined;
-      }, 100);
+      }, 1000);
     }
   }
   // console.log(tutorialEnd, videoStarted);

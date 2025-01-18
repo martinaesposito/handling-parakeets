@@ -16,11 +16,11 @@
   --bg-grey: #eeeeee;
   --transparent: 255, 0, 0, 0;
 
-  --testi: 0.9rem;
-  --info: 0.7rem;
-  --instruction: 1.1rem;
-  --subtitle-eng: 1.3rem; /* this style is also used for the stories */
-  --subtitle: 1.5rem;
+  --testi: 1rem;
+  --info: 0.8rem;
+  --instruction: 1.2rem;
+  --subtitle-eng: 1.4rem; /* this style is also used for the stories */
+  --subtitle: 1.6rem;
 
   --mini-spacer: 0.25vw;
   --spacer1: 1vh;
