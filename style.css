@@ -320,7 +320,6 @@ canvas {
 
 #subtitle {
   /* display: none; */
-  font-family: IBMplex-sans;
   position: absolute;
   bottom: var(--ins-margin);
   width: 100%;
@@ -331,6 +330,7 @@ canvas {
   font-size: var(--testi);
 }
 #sub {
+  font-family: IBMplex-sans;
   padding: var(--mini-spacer);
 }
 
@@ -510,7 +510,9 @@ sub #title > .eng {
 }
 #descr {
   padding: var(--spacer1);
-  gap: var(--spacer2);
+
+  text-align: left;
+  font-size: var(--testi);
 }
 
 /* testi in evidenza nelle storie */
