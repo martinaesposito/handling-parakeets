@@ -320,6 +320,7 @@ canvas {
 
 #subtitle {
   /* display: none; */
+  font-family: IBMplex-sans;
   position: absolute;
   bottom: var(--ins-margin);
   width: 100%;

@@ -264,8 +264,8 @@ export function draw(shouldDrawHand = true, acceptAllHands = false) {
     });
   }
 
-  console.log(handCounters);
   if (handCounters.every((c) => c === 0)) {
+    console.log(handCounters);
     console.log(audioPlaying);
     if (!audioPlaying) {
       selectedPose = undefined;
