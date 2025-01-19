@@ -72,7 +72,7 @@ export class Dot {
     this.config = {
       maxSpeed: 6,
       attractionForce: 0.008,
-      separationForce: 0.08,
+      separationForce: 0.09,
       damping: 0.5,
       noiseStrength: 0.5,
       noiseStep: 0.005,

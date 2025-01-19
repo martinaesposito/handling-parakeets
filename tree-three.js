@@ -127,7 +127,7 @@ const atlas = {
 };
 let instancedMesh;
 
-const radius = 15;
+const radius = 17.5;
 const imagesCount = 885;
 
 const squareSize = 125; //dimensione delle immagini nell'atlas
