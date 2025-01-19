@@ -518,7 +518,7 @@ sub #title > .eng {
   padding: var(--spacer1);
 
   text-align: left;
-  font-size: var(--testi);
+  font-size: var(--instruction);
 }
 
 /* testi in evidenza nelle storie */
