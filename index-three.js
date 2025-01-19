@@ -8,7 +8,7 @@ import {
   video,
 } from "./detect-three.js";
 
-import { random, sceneToScreen, screenToScene } from "./utils.js";
+import { random, screenToScene } from "./utils.js";
 
 import * as THREE from "three";
 // THREE
@@ -16,11 +16,7 @@ let scene, camera, renderer;
 
 // TITOLONE
 let font;
-let imgPoints = []; //array dei punti dei titoli
 let time = 0;
-let targetPositions = []; // Store target positions for easing
-let currentPositions = []; // Store current positions for easing
-let velocities = []; // Store velocities for each point
 
 let points = [];
 const fontSize = 250;
@@ -28,16 +24,26 @@ const sampleFactor = 0.175;
 
 let bounds1, bounds2;
 
-//immaginine
-let images = [];
-
 // loading
 let loading = document.getElementById("loading");
-// let imgLoading = document.getElementById("loading-img");
-// imgLoading.src =
-//   "assets/loading/" + Math.floor(Math.random() * 8 + 1).toString() + ".gif";
 
 let fakeCursor = document.getElementById("wave");
+
+const atlas = {
+  texture: undefined,
+  width: 0,
+  height: 0,
+};
+let instancedMesh;
+
+const radius = 15;
+const planesCount = 2500;
+const imagesCount = 885;
+
+const squareSize = 125; //dimensione delle immagini nell'atlas
+const imagesPerRow = 30;
+
+const uvOffsets = new Float32Array(planesCount * 2); // Store UV offsets for each plane
 
 ////////////////////////////////////////////////////////////////////
 
@@ -46,32 +52,67 @@ window.setup = async () => {
   await preload();
   setup();
 };
+
 async function preload() {
   font = loadFont("assets/fonts/IBM_Plex_Sans/IBMPlexSans-Regular.ttf");
 
-  //immaginine piccole
+  const { texture, width, height } = await loadTextureAtlas(imagesCount);
+
+  atlas.texture = texture;
+  atlas.width = width;
+  atlas.height = height;
+
+  await detectPreload();
+}
+
+async function loadTextureAtlas(imageCount) {
   const loader = new THREE.TextureLoader();
-  const imagePromises = Array.from(
-    { length: 885 },
-    (_, i) =>
-      new Promise((resolve) => {
-        loader.load(
-          `assets/image_ultra-compress-HOME/${i + 2}.webp`,
-          (texture) => {
-            texture.colorSpace = THREE.SRGBColorSpace;
-            images[i] = texture;
-            resolve();
-          },
-          undefined,
-          resolve // Resolve even on error
-        );
-      })
-  );
 
-  await Promise.all([...imagePromises, detectPreload()]);
+  const atlasWidth = imagesPerRow * squareSize; // Adjust based on your needs
+  const atlasHeight = imagesPerRow * squareSize;
 
-  // console.log(images);
-  detectPreload();
+  // const canvas = document.createElement("canvas");
+  // canvas.classList.add("hidden");
+  // canvas.width = atlasWidth;
+  // canvas.height = atlasHeight;
+  // const ctx = canvas.getContext("2d");
+
+  // const imagePromises = Array.from(
+  //   { length: imageCount },
+  //   (_, i) =>
+  //     new Promise((resolve) => {
+  //       loader.load(
+  //         `assets/image_ultra-compress-HOME/${i + 2}.webp`,
+  //         (texture) => {
+  //           const img = texture.image;
+  //           const x = (i % imagesPerRow) * 125 + 1;
+  //           const y = Math.floor(i / imagesPerRow) * 125 + 1;
+  //           ctx.drawImage(img, x, y, 123, 123);
+  //           resolve();
+  //         },
+  //         undefined,
+  //         (e) => {
+  //           resolve();
+  //         }
+  //       );
+  //     })
+  // );
+
+  // await Promise.all(imagePromises);
+
+  // let link = document.createElement("a");
+  // link.setAttribute("download", "atlas.png");
+  // link.setAttribute(
+  //   "href",
+  //   canvas.toDataURL("image/png").replace("image/png", "image/octet-stream")
+  // );
+  // link.click();
+
+  // const atlasTexture = new THREE.CanvasTexture(canvas);
+
+  const atlasTexture = loader.load("assets/atlas.png");
+  atlasTexture.colorSpace = THREE.SRGBColorSpace;
+  return { texture: atlasTexture, width: atlasWidth, height: atlasHeight };
 }
 
 // SETUP
@@ -102,8 +143,8 @@ function setup() {
   bounds1 = font.textBounds("Handling", 0, 0, fontSize);
   bounds2 = font.textBounds("Parakeets", 0, 0, fontSize);
 
+  // altri punti sparsi nello schermo
   let randomPoints = [];
-
   for (let i = 0; i < 30; i++) {
     randomPoints.push({
       x: random(-canvasW / 2, canvasW / 2),
@@ -111,9 +152,8 @@ function setup() {
       z: 0,
     });
   }
-  // console.log(randomPoints);
 
-  // // Get points with translation and add points to array
+  //array con le coordinate di tutto
   points = [
     ...font.textToPoints("Handling", -bounds1.w / 2, -bounds1.h / 2, fontSize, {
       sampleFactor,
@@ -123,33 +163,100 @@ function setup() {
     }),
     ...randomPoints,
   ];
-  // console.log(images);
-  // Initialize positions and velocities
-  points.forEach((p, i) => {
-    let size = random(12.5, 17.5);
-    const geometry = new THREE.PlaneGeometry(size, size);
 
-    const material = new THREE.MeshBasicMaterial({
-      transparent: true,
-      // color: new THREE.Color().setRGB(0, 0, 0),
-      map: i < images.length ? images[i] : images[floor(random(images.length))],
-    });
-    const mesh = new THREE.Mesh(geometry, material);
-    let coords = screenToScene(camera, [p.x + canvasW / 2, p.y + canvasH / 2]);
-    mesh.position.set(coords.x, coords.y, 0);
+  points = points.map((p) => ({
+    position: p,
+  }));
 
-    imgPoints.push(mesh);
-    scene.add(mesh);
-
-    // Initialize positions
-    currentPositions[i] = new THREE.Vector3(coords.x, coords.y, 0);
-    targetPositions[i] = new THREE.Vector3(coords.x, coords.y, 0);
-    velocities[i] = new THREE.Vector3(0, 0, 0);
+  const instanceGeometry = new THREE.PlaneGeometry(radius, radius);
+  const instanceMaterial = new THREE.MeshBasicMaterial({
+    map: atlas.texture,
+    transparent: true,
   });
+
+  instancedMesh = new THREE.InstancedMesh(
+    instanceGeometry,
+    instanceMaterial,
+    planesCount
+  );
+
+  const vector = new THREE.Vector3();
+  let matrix = new THREE.Matrix4();
+
+  points.forEach((p, i) => {
+    let coords = screenToScene(camera, [
+      p.position.x + canvasW / 2,
+      p.position.y + canvasH / 2,
+    ]);
+    coords = new THREE.Vector3(coords.x, coords.y, 0);
+
+    p.position = coords;
+    p.origin = coords.clone();
+    p.targetPosition = coords.clone();
+    p.velocity = vector;
+
+    matrix.setPosition(coords);
+
+    instancedMesh.setMatrixAt(i, matrix);
+
+    const index = i > imagesCount ? round(random(885)) : i;
+
+    // Calculate UV offsets based on the atlas grid
+    const atlasX = index % imagesPerRow; // Position in the 30x30 grid
+    const atlasY = imagesPerRow - 1 - Math.floor(index / imagesPerRow);
+
+    // Each cell is 125px in a texture that's (125 * 30)px wide/high
+    uvOffsets[i * 2] = atlasX / imagesPerRow; // U coordinate
+    uvOffsets[i * 2 + 1] = atlasY / imagesPerRow; // V coordinate
+  });
+
+  instancedMesh.geometry.setAttribute(
+    "uvOffset",
+    new THREE.InstancedBufferAttribute(uvOffsets, 2)
+  );
+
+  instancedMesh.material.onBeforeCompile = (shader) => {
+    console.log("Modifying shader...");
+    shader.vertexShader = `
+            attribute vec2 uvOffset;
+            varying vec2 vUv;
+
+            ${shader.vertexShader}
+        `.replace(
+      "#include <uv_vertex>",
+      `
+            float uvPaddingX = 5.0 / ${atlas.width.toFixed(1)};
+            float uvPaddingY = 5.0 / ${atlas.height.toFixed(1)};
+            
+            vUv = uvOffset + uv * vec2(118.0 / ${atlas.width.toFixed(
+              1
+            )}, 118.0 / ${atlas.height.toFixed(
+        1
+      )}) + vec2(uvPaddingX, uvPaddingY);
+            `
+    );
+
+    shader.fragmentShader = `
+            varying vec2 vUv;
+
+            ${shader.fragmentShader}
+        `.replace(
+      "#include <map_fragment>",
+      `#ifdef USE_MAP
+                vec4 texColor = texture2D(map, vUv);
+                
+                diffuseColor = texColor;
+            #endif`
+    );
+    console.log("Shader modified successfully.");
+  };
+
+  scene.add(instancedMesh);
 
   loading.style.display = "none"; //nascondo il loading
   detectSetup();
   video ? (video.style.display = "none") : null;
+  renderer.render(scene, camera);
 }
 
 window.draw = () => {
@@ -171,6 +278,8 @@ function draw() {
   time += 0.01;
 
   let sceneCursor = screenToScene(camera, [detectCursor?.x, detectCursor?.y]);
+  let cursorVec = new THREE.Vector3();
+  let matrix = new THREE.Matrix4();
 
   points.forEach((p, i) => {
     // Calculate noise-based movement
@@ -190,63 +299,44 @@ function draw() {
     );
 
     // Vector math for cursor distance
-    const cursorVec = new THREE.Vector2(
-      detectCursor ? sceneCursor.x : currentPositions[i].x,
-      detectCursor ? -sceneCursor.y : currentPositions[i].y
-    );
-    const pointVec = new THREE.Vector2(
-      currentPositions[i].x,
-      -currentPositions[i].y
-    );
-    const distance = cursorVec.distanceTo(pointVec);
-
-    const originalPos = screenToScene(camera, [
-      p.x + canvasW / 2,
-      -p.y + canvasH / 2,
-    ]);
-    // console.log(Math.round(distance));
-    // Update target position
-    targetPositions[i].set(
-      originalPos.x + xOffset,
-      -(originalPos.y + yOffset),
+    cursorVec.set(
+      detectCursor ? sceneCursor.x : p.origin.x,
+      detectCursor ? sceneCursor.y : p.origin.y,
       0
     );
 
+    const distance = cursorVec.distanceTo(p.position);
+
+    p.targetPosition.set(p.origin.x + xOffset, p.origin.y + yOffset, 0);
+
     // Mouse repulsion
-    const repulsionRadius = imgPoints[i].geometry.parameters.width * 4;
+    const repulsionRadius = radius * 4;
+
     if (detectCursor && distance < repulsionRadius) {
-      const repulsionForce =
-        (1 - distance / repulsionRadius) ** 2 *
-        imgPoints[i].geometry.parameters.width *
-        100;
+      const repulsionForce = (1 - distance / repulsionRadius) * 2 * radius * 10;
       const angle = Math.atan2(
-        currentPositions[i].y - sceneCursor.y,
-        currentPositions[i].x - sceneCursor.x
+        p.position.y - sceneCursor.y,
+        p.position.x - sceneCursor.x
       );
-      targetPositions[i].x += Math.cos(angle) * repulsionForce;
-      targetPositions[i].y += Math.sin(angle) * repulsionForce;
-      targetPositions[i].x += xOffset;
-      targetPositions[i].y += yOffset;
+      p.targetPosition.x += Math.cos(angle) * repulsionForce;
+      p.targetPosition.y += Math.sin(angle) * repulsionForce;
+      p.targetPosition.x += xOffset;
+      p.targetPosition.y += yOffset;
     }
 
     // Smooth movement
     const easing = 0.05;
-    velocities[i].lerp(
-      new THREE.Vector3(
-        (targetPositions[i].x - currentPositions[i].x) * easing,
-        (targetPositions[i].y - currentPositions[i].y) * easing,
-        0
-      ),
-      1
+
+    p.position.set(
+      p.position.x + (p.targetPosition.x - p.position.x) * easing,
+      p.position.y + (p.targetPosition.y - p.position.y) * easing,
+      0
     );
 
-    currentPositions[i].add(velocities[i]);
+    matrix.setPosition(p.position);
+    instancedMesh.setMatrixAt(i, matrix);
 
-    imgPoints[i].position.set(
-      currentPositions[i].x,
-      currentPositions[i].y,
-      currentPositions[i].z
-    );
+    instancedMesh.instanceMatrix.needsUpdate = true;
   });
 
   renderer.render(scene, camera);
