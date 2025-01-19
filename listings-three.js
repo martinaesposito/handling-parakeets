@@ -374,11 +374,17 @@ export class Dot {
     let divw = this.div.size().width;
     let divxoffset = -divw / 2;
     let divyoffset = -divh / 2;
-
+    console.log(this.itemData.Highlights_eng);
     //sotto
     if (screenPos.y > canvasH / 2) {
-      if (screenPos.y + divh / 2 > canvasH) {
-        divyoffset += canvasH - (screenPos.y + divh / 2);
+      if (
+        screenPos.y + divh / 2 >
+        canvasH - (this.itemData.Highlights_eng ? 100 : 0)
+      ) {
+        divyoffset +=
+          canvasH -
+          (this.itemData.Highlights_eng ? 100 : 0) -
+          (screenPos.y + divh / 2);
       }
       //sopra
     } else if (screenPos.y <= canvasH / 2) {
