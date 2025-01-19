@@ -15,6 +15,8 @@ Starting from the seven poses, the _Mediapipe Hand Landmark detection algorithm_
 
 🦜🦜🦜</br>
 
+---
+
 #### Team
 
 Martina Esposito</br>
