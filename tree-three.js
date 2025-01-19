@@ -1,5 +1,4 @@
 import * as THREE from "three";
-import { sceneToScreen, screenToScene } from "./utils.js";
 import { Dot } from "./listings-three.js";
 import {
   preload as detectPreload,
@@ -184,7 +183,23 @@ async function loadTextureAtlas(imageCount) {
   //           resolve();
   //         },
   //         undefined,
-  //         (e) => {
+  //         (error) => {
+  //           // Create a temporary canvas for the white image
+  //           const tempCanvas = document.createElement("canvas");
+  //           tempCanvas.width = 123;
+  //           tempCanvas.height = 123;
+  //           const tempCtx = tempCanvas.getContext("2d");
+
+  //           // Fill it with white
+  //           tempCtx.fillStyle = "white";
+  //           tempCtx.fillRect(0, 0, 123, 123);
+
+  //           // Draw the white square in the correct position
+  //           const x = (i % imagesPerRow) * 125 + 1;
+  //           const y = Math.floor(i / imagesPerRow) * 125 + 1;
+  //           ctx.drawImage(tempCanvas, x, y);
+
+  //           console.warn(`Failed to load image ${i + 2}: ${error}`);
   //           resolve();
   //         }
   //       );
@@ -216,28 +231,6 @@ window.setup = async () => {
 };
 
 async function preload() {
-  // immagini
-  const imagePromises = [];
-  const loader = new THREE.TextureLoader();
-  for (let i = 2; i < 887; i++) {
-    const imagePromise = new Promise((resolve) => {
-      loader.load(
-        `assets/image_ultra-compress/${i}.webp`,
-        (texture) => {
-          texture.colorSpace = THREE.SRGBColorSpace;
-          imageMap[Number(i)] = texture; // Store with numeric keys
-          resolve();
-        },
-        () => {},
-        (e) => {
-          resolve(); // Resolve even if the image fails
-        }
-      );
-    });
-    imagePromises.push(imagePromise);
-  }
-  await Promise.all(imagePromises);
-
   // ATLAS
   const { texture, width, height } = await loadTextureAtlas(imagesCount);
   atlas.texture = texture;
@@ -426,15 +419,12 @@ function draw() {
 function generateBranchDots(branches) {
   const allDots = [];
 
-  // TENTATIVO PAZZO CON LE INSTANCE
+  // INS
   const instanceGeometry = new THREE.PlaneGeometry(radius, radius);
   const instanceMaterial = new THREE.MeshBasicMaterial({
     map: atlas.texture,
     transparent: true,
   });
-
-  const vector = new THREE.Vector3();
-  let matrix = new THREE.Matrix4();
 
   uvOffsets = new Float32Array(885 * 2); // Store UV offsets for each plane
 
@@ -473,30 +463,24 @@ function generateBranchDots(branches) {
     branchPositions.push({ x: baseX, y: baseY });
 
     items.forEach((item, i) => {
-      // Calculate UV offsets based on the atlas grid
-      const dotIndex = allDots.length + branchDots.length; //valore incredile che va da 1 a 855
+      const dotIndex = allDots.length + branchDots.length; //indice dell'immagine che va da 1 a 855
 
+      // Calculate UV offsets based on the atlas grid
       const atlasX = dotIndex % imagesPerRow; // Position in the 30x30 grid
       const atlasY = imagesPerRow - 1 - Math.floor(dotIndex / imagesPerRow);
-
-      // Each cell is 125px in a texture that's (125 * 30)px wide/high
       uvOffsets[dotIndex * 2] = atlasX / imagesPerRow; // U coordinate
       uvOffsets[dotIndex * 2 + 1] = atlasY / imagesPerRow; // V coordinate
 
-      // console.log(allDots.length + branchDots.length);
       const dot = new Dot(
         { ...branch, index: bIndex, branchT },
         dotIndex,
-        random(15, 20),
+        15,
         item,
-        imageMap[item.Image_num],
         { x: baseX, y: baseY }, // Base position
         { x: finalX, y: finalY }, // Final position
         instancedMesh
       );
       branchDots.push(dot);
-
-      // scene.add(dot.mesh);
     });
 
     allDots.push(...branchDots);

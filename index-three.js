@@ -83,7 +83,7 @@ async function loadTextureAtlas(imageCount) {
   //   (_, i) =>
   //     new Promise((resolve) => {
   //       loader.load(
-  //         `assets/image_ultra-compress-HOME/${i + 2}.webp`,
+  //         `assets/image_ultra-compress/${i + 2}.webp`,
   //         (texture) => {
   //           const img = texture.image;
   //           const x = (i % imagesPerRow) * 125 + 1;
@@ -92,7 +92,23 @@ async function loadTextureAtlas(imageCount) {
   //           resolve();
   //         },
   //         undefined,
-  //         (e) => {
+  //         (error) => {
+  //           // Create a temporary canvas for the white image
+  //           const tempCanvas = document.createElement("canvas");
+  //           tempCanvas.width = 123;
+  //           tempCanvas.height = 123;
+  //           const tempCtx = tempCanvas.getContext("2d");
+
+  //           // Fill it with white
+  //           tempCtx.fillStyle = "white";
+  //           tempCtx.fillRect(0, 0, 123, 123);
+
+  //           // Draw the white square in the correct position
+  //           const x = (i % imagesPerRow) * 125 + 1;
+  //           const y = Math.floor(i / imagesPerRow) * 125 + 1;
+  //           ctx.drawImage(tempCanvas, x, y);
+
+  //           console.warn(`Failed to load image ${i + 2}: ${error}`);
   //           resolve();
   //         }
   //       );

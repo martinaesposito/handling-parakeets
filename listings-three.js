@@ -14,8 +14,6 @@ export let platX;
 export let platY;
 export let branchIndex;
 
-// const geometry = new THREE.PlaneGeometry(12, 12);
-
 // sottotitolo
 let subtitle = document.getElementById("subtitle");
 let sub = document.getElementById("sub");
@@ -23,27 +21,15 @@ let sub = document.getElementById("sub");
 export let audioPlaying = false;
 
 export class Dot {
-  static colors = [
-    //colors
-    // "#D4FF5F",
-    // "#B0FF7B",
-    "#68EA28",
-    "#34DC74",
-    "#1EBF2B",
-    "#198E3E",
-    "#00755F",
-  ];
-
   //CONTSTRUCTOR
   constructor(
     branch,
     index,
     radius,
     itemData,
-    img,
     basePosition,
     finalPosition,
-    instanceMesh
+    instancedMesh
   ) {
     const sceneBasePos = screenToScene(camera, [
       basePosition.x,
@@ -54,64 +40,27 @@ export class Dot {
       finalPosition.y,
     ]);
 
-    this.texture = img;
-    this.finalPosition = finalPosition;
     this.branch = branch.index;
-    // Base position along the branch (without offset)
-    this.basePos = new THREE.Vector3(sceneBasePos.x, sceneBasePos.y, 0);
 
-    // Final position with offset applied
-    this.pos = new THREE.Vector3(sceneFinalPos.x, sceneFinalPos.y, 0);
+    // position
+    this.finalPosition = finalPosition;
+    this.basePos = new THREE.Vector3(sceneBasePos.x, sceneBasePos.y, 0); // Base position along the branch (without offset)
+    this.pos = new THREE.Vector3(sceneFinalPos.x, sceneFinalPos.y, 0); // Final position with offset applied
+    this.originalPos = this.basePos.clone(); // Original position copy
 
-    // Original position copy
-    this.originalPos = this.basePos.clone();
     // PROPERTIES
     this.index = index;
-    this.color = Dot.colors[Math.floor(random(Dot.colors.length))];
-    let maxRadius = 2;
+    // this.color = Dot.colors[Math.floor(random(Dot.colors.length))];
     this.baseRadius = radius;
     this.radius = radius;
     this.scale = 1;
 
     this.itemData = itemData;
 
-    this.instanceMesh = instanceMesh;
-
     // three
-    const geometry = new THREE.PlaneGeometry(this.radius, this.radius);
-
-    const material = new THREE.MeshBasicMaterial({
-      ...(!this.texture && {
-        color: new THREE.Color().setRGB(1, 1, 1),
-      }),
-      ...(this.texture && {
-        map: this.texture,
-      }),
-      transparent: true,
-    });
-
-    this.mesh = new THREE.Mesh(geometry, material);
-    // this.instancedMesh = new THREE.InstancedMesh(geometry, material, 1);
-
+    this.instancedMesh = instancedMesh;
+    this.dummy = new THREE.Object3D(); // Add a dummy object for matrix calculations
     this.matrix = new THREE.Matrix4();
-
-    this.mesh.position.set(this.pos.x, this.pos.y, this.pos.z);
-
-    // matrix.setPosition(this.mesh.position);
-    // instancedMesh.setMatrixAt(this.index, matrix);
-
-    // if (this.itemData.Hand === "Hand") {
-    //   // Create border using LineSegments
-    //   const edges = new THREE.EdgesGeometry(geometry);
-    //   const borderMaterial = new THREE.LineBasicMaterial({
-    //     color: "#c9ff4c",
-    //     linewidth: 2, // Note: line width might not work in WebGL
-    //   });
-    //   this.border = new THREE.LineSegments(edges, borderMaterial);
-
-    //   // Add border to mesh so it moves with it
-    //   this.mesh.add(this.border);
-    // }
 
     this.sameBranchDots = [];
     this.samePoseDots = [];
@@ -122,7 +71,7 @@ export class Dot {
     this.config = {
       maxSpeed: 6,
       attractionForce: 0.008,
-      separationForce: 0.1,
+      separationForce: 0.08,
       damping: 0.5,
       noiseStrength: 0.5,
       noiseStep: 0.005,
@@ -138,7 +87,6 @@ export class Dot {
     // DIVs
     this.div = itemData.Content_pose ? createDiv() : null;
 
-    // Set divs
     if (this.div) {
       this.div.addClass("storycontainer topleft");
       this.div.addClass(itemData.Pose);
@@ -172,7 +120,7 @@ export class Dot {
       }
     }
 
-    // adding audio
+    //audio
     if (
       itemData.Content_pose &&
       itemData.Content_pose != "Image" &&
@@ -190,8 +138,6 @@ export class Dot {
         }
       );
     }
-
-    // adding audio functionalities
     if (this.sound) {
       this.sound.onended(() => {
         audioPlaying = false;
@@ -216,7 +162,6 @@ export class Dot {
     // RESET BASE POSITION
     if (!this.shouldHighlight(currentPose) && currentPose) {
       //quando una posa viene detectata si allontanano
-
       this.basePos = this.originalPos.clone().multiplyScalar(3);
       this.radius = this.baseRadius;
     } else if (!currentPose) {
@@ -277,7 +222,7 @@ export class Dot {
     }
 
     const targetRadius = this.isHovered
-      ? this.baseRadius * 2
+      ? this.baseRadius * 2.5
       : this.baseRadius * this.scale; //se l'oggetto viene hoverato aumentail raggio
     this.radius += (targetRadius - this.radius) * 0.1;
 
@@ -362,10 +307,16 @@ export class Dot {
     // Update position
     this.pos.add(this.vel);
 
-    this.matrix.setPosition(this.pos);
-    this.instanceMesh.setMatrixAt(this.index, this.matrix);
+    // Update position and scale using dummy object
+    this.dummy.position.copy(this.pos);
+    this.dummy.scale.setScalar(this.scale);
+    this.dummy.updateMatrix();
 
-    // this.mesh.position.set(this.pos.x, this.pos.y, this.pos.z);
+    this.matrix.setPosition(this.pos);
+    // this.instancedMesh.setMatrixAt(this.index, this.matrix);
+
+    // Set the matrix for this instance
+    this.instancedMesh.setMatrixAt(this.index, this.dummy.matrix);
   }
 
   //DRAW
@@ -408,7 +359,7 @@ export class Dot {
     }
 
     this.scale += (targetScale - this.scale) * 0.1;
-    this.mesh.scale.set(this.scale, this.scale, this.scale);
+    // this.mesh.scale.set(this.scale, this.scale, this.scale);
   }
 
   positionStoryCard() {
