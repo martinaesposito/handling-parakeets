@@ -253,14 +253,24 @@ export class Dot {
         this.index * 0.1
       );
 
-      // definisco la zona in cui staranno gli elementi intorno al quadrato centrale
-      const outerRepulsionZone =
-        this.baseRadius + Math.max(halfWidth, halfHeight) * 3; //margini più ampi per l'esterno
-      const innerRepulsionZone =
-        this.baseRadius + Math.min(halfWidth, halfHeight) * 1.5;
+      // Define rectangular repulsion zones
+      const outerRepulsionZoneX = this.baseRadius + halfWidth * 4;
+      const outerRepulsionZoneY = this.baseRadius + halfHeight * 2.5;
+      const innerRepulsionZoneX = this.baseRadius + halfWidth * 2;
+      const innerRepulsionZoneY = this.baseRadius + halfHeight * 1.2;
+
+      // Use the larger of the two for the overall check
+      const outerRepulsionZone = Math.max(
+        outerRepulsionZoneX,
+        outerRepulsionZoneY
+      );
+      const innerRepulsionZone = Math.max(
+        innerRepulsionZoneX,
+        innerRepulsionZoneY
+      );
 
       if (distance < outerRepulsionZone) {
-        //forza di repulsione tre gli elementi
+        // Scale repulsion strength based on position in rectangle
         let repulsionStrength = map(
           distance * (1 + individualNoise * 0.5),
           innerRepulsionZone,
@@ -268,9 +278,14 @@ export class Dot {
           this.config.separationForce * 10,
           this.config.separationForce * 0.1
         );
-        let repulsionVector = new THREE.Vector3(distanceX, distanceY, 0);
-        repulsionVector.normalize();
 
+        // Create repulsion vector that takes into account rectangular shape
+        let repulsionVector = new THREE.Vector3(
+          distanceX * (outerRepulsionZoneY / outerRepulsionZoneX),
+          distanceY * (outerRepulsionZoneX / outerRepulsionZoneY),
+          0
+        );
+        repulsionVector.normalize();
         repulsionVector.multiplyScalar(repulsionStrength);
         //sommo forze di separazione
         separation.add(repulsionVector);
