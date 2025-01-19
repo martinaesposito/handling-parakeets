@@ -521,12 +521,14 @@ function updateCounters() {
       // console.log(bounds);
 
       if (bounds) {
+        console.log(audioPlaying);
         if (
           cursor.x > bounds.left - 75 &&
           cursor.x < bounds.left - 75 + bounds.width + 75 &&
           cursor.y > bounds.top - 75 &&
           cursor.y < bounds.top - 75 + bounds.height + 75 &&
-          elements[counter.name].className.includes("visible")
+          elements[counter.name].className.includes("visible") &&
+          !audioPlaying
         ) {
           drawDOMArc(counter.value, counter.max);
           counter.show = true;

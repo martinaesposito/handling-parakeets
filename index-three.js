@@ -25,6 +25,10 @@ const sampleFactor = 0.175;
 let bounds1, bounds2;
 
 // loading
+let ready;
+let frameCount = 0;
+const FRAMES_TO_WAIT = 30; // Adjust this number as needed
+
 let loading = document.getElementById("loading");
 let fakeCursor = document.getElementById("wave");
 
@@ -44,11 +48,6 @@ const squareSize = 125; //dimensione delle immagini nell'atlas
 const imagesPerRow = 30;
 
 let uvOffsets;
-
-let resourcesLoaded = {
-  font: false,
-  atlas: false,
-};
 
 ////////////////////////////////////////////////////////////////////
 
@@ -81,7 +80,6 @@ async function loadCustomFont(path) {
       // Success callback
       (font) => {
         fontLoaded = true;
-        resourcesLoaded.font = true;
         resolve(font);
       },
       // Error callback
@@ -155,7 +153,6 @@ async function loadTextureAtlas(imageCount) {
 
   const atlasTexture = loader.load("assets/atlas.png");
   atlasTexture.colorSpace = THREE.SRGBColorSpace;
-  resourcesLoaded.atlas = true;
   return { texture: atlasTexture, width: atlasWidth, height: atlasHeight };
 }
 
@@ -302,11 +299,6 @@ function setup() {
   detectSetup();
   video ? (video.style.display = "none") : null;
   renderer.render(scene, camera);
-
-  // Only hide loading when all resources are ready
-  if (resourcesLoaded.font && resourcesLoaded.atlas) {
-    loading.style.display = "none";
-  }
 }
 
 window.draw = () => {
@@ -315,7 +307,6 @@ window.draw = () => {
 
 function draw() {
   if (!scene || !camera || !renderer) return;
-  if (!resourcesLoaded.font || !resourcesLoaded.atlas) return;
 
   if (!detectCursor) {
     fakeCursor.style.display = "block";
@@ -393,4 +384,12 @@ function draw() {
   renderer.render(scene, camera);
 
   detectDraw(false, true);
+  // Wait for several frames before hiding loading
+  if (!ready) {
+    frameCount++;
+    if (frameCount >= FRAMES_TO_WAIT) {
+      ready = true;
+      loading.style.display = "none";
+    }
+  }
 }
