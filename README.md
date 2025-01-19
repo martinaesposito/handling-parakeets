@@ -23,3 +23,7 @@ Ming Hu</br>
 Nausicaa Naibo</br>
 Fabio Pennone</br>
 Anita Ruggiu</br>
+
+#### Context
+
+Final Synthesis Design Studio, Master in Communication Design, Politecnico di Milano </br>
