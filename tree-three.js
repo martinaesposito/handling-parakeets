@@ -235,21 +235,32 @@ async function preload() {
   atlas.texture = texture;
   atlas.width = width;
   atlas.height = height;
-  console.log(atlas);
 
   // prendo tutti i listings dal json
   try {
     const response = await fetch("json/listings.json"); //carico tutti i listings
-    const jsonData = await response.json();
+    let jsonData = await response.json();
+    jsonData = jsonData.map((item, index) => ({ ...item, index }));
+
+    console.log(jsonData.length);
 
     listingsData = branchPlatform.map((config) => ({
       ...config, //crea un array che a partire dai dati originali di config aggiunge the number of items in jsonData matching the platform
       //se non viene trovato prende il valore di elementi di config
-      value:
-        jsonData.filter((item) => item.Platform === config.name).length ||
-        config.value,
+      value: jsonData.filter((item) => item.Platform === config.name).length,
+      //  ||config.value,
       items: jsonData.filter((item) => item.Platform === config.name),
     }));
+
+    console.log(
+      jsonData.find(
+        (item) =>
+          !listingsData
+            .map((i) => i.items)
+            .flat()
+            .find((i) => i === item)
+      )
+    );
   } catch (error) {
     // If it fails, create a fallback listingsData that uses original branch configuration but with empty items
     console.error("Failed to load listings data", error);
@@ -351,7 +362,7 @@ function setup() {
   branchPlatform.forEach((branch, index) => {
     plat = createDiv();
     plat.class("platform fade-transition visible");
-    plat.html(`${branch.name} [${branch.value}] `);
+    plat.html(`${branch.name} [${listingsData[index].value}] `);
     plat.id(branch.name);
     platforms.push(plat);
   });
@@ -460,19 +471,20 @@ function generateBranchDots(branches) {
 
     // Store the final position in branchPositions
     branchPositions.push({ x: baseX, y: baseY });
+    console.log(items.length);
 
     items.forEach((item, i) => {
       const dotIndex = allDots.length + branchDots.length; //indice dell'immagine che va da 1 a 855
-
+      // console.log(dotIndex, item);
       // Calculate UV offsets based on the atlas grid
-      const atlasX = dotIndex % imagesPerRow; // Position in the 30x30 grid
-      const atlasY = imagesPerRow - 1 - Math.floor(dotIndex / imagesPerRow);
-      uvOffsets[dotIndex * 2] = atlasX / imagesPerRow; // U coordinate
-      uvOffsets[dotIndex * 2 + 1] = atlasY / imagesPerRow; // V coordinate
+      const atlasX = item.index % imagesPerRow; // Position in the 30x30 grid
+      const atlasY = imagesPerRow - 1 - Math.floor(item.index / imagesPerRow);
+      uvOffsets[item.index * 2] = atlasX / imagesPerRow; // U coordinate
+      uvOffsets[item.index * 2 + 1] = atlasY / imagesPerRow; // V coordinate
 
       const dot = new Dot(
         { ...branch, index: bIndex, branchT },
-        dotIndex,
+        item.index,
         15,
         item,
         { x: baseX, y: baseY }, // Base position
@@ -491,7 +503,6 @@ function generateBranchDots(branches) {
   );
 
   instancedMesh.material.onBeforeCompile = (shader) => {
-    console.log("Modifying shader...");
     shader.vertexShader = `
               attribute vec2 uvOffset;
               varying vec2 vUv;
@@ -523,7 +534,6 @@ function generateBranchDots(branches) {
                   diffuseColor = texColor;
               #endif`
     );
-    console.log("Shader modified successfully.");
   };
 
   scene.add(instancedMesh);

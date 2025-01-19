@@ -279,7 +279,7 @@ export function draw(shouldDrawHand = true, acceptAllHands = false) {
     if (handCounters.every((c) => c === 0)) {
       //se tutti i counter sono a zero chiama la funzione che riavvia l'esperienza
       let escape = (escapeCounters[0] += delta_time);
-      escapeTree(20000, escape); //10 secondi
+      escapeTree(60000, escape); //10 secondi
     }
   } else {
     escapeCounters[0] = 0; //counter di uscita si riavvia e il warning scompare
@@ -591,7 +591,7 @@ function drawDOMArc(value, maxCounter) {
 function escapeTree(maxCounter, escapeCounter) {
   if (escapeCounter < maxCounter) {
     //quando sono a metà del counter
-    if (escapeCounter > maxCounter / 2) {
+    if (escapeCounter > maxCounter - 10000) {
       warning ? (warning.style.display = "flex") : null;
 
       endCounter
