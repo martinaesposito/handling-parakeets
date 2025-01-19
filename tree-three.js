@@ -292,7 +292,16 @@ function setup() {
   );
   camera.position.z = 1;
 
-  renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  renderer = new THREE.WebGLRenderer({
+    antialias: true,
+    alpha: true,
+    powerPreference: "high-performance",
+    stencil: false,
+    depth: false, // If you don't need depth testing
+  });
+
+  renderer.shadowMap.autoUpdate = false;
+
   renderer.setPixelRatio(window.devicePixelRatio);
   renderer.setSize(canvasW, canvasH);
   document.body.appendChild(renderer.domElement);
@@ -398,7 +407,9 @@ function draw() {
     dot.move(dots, selectedPose);
     dot.draw(selectedPose);
   });
+
   instancedMesh.instanceMatrix.needsUpdate = true;
+  instancedMesh.geometry.attributes.position.needsUpdate = true;
 
   if (selectedPose) {
     changeStory(stories.findIndex((s) => s.Pose == selectedPose)); //gli passo l'indice della storia giusta
