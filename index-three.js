@@ -26,9 +26,9 @@ let bounds1, bounds2;
 
 // loading
 let loading = document.getElementById("loading");
-
 let fakeCursor = document.getElementById("wave");
 
+// atlas
 const atlas = {
   texture: undefined,
   width: 0,
@@ -43,7 +43,7 @@ const imagesCount = 885;
 const squareSize = 125; //dimensione delle immagini nell'atlas
 const imagesPerRow = 30;
 
-const uvOffsets = new Float32Array(planesCount * 2); // Store UV offsets for each plane
+let uvOffsets;
 
 ////////////////////////////////////////////////////////////////////
 
@@ -54,7 +54,7 @@ window.setup = async () => {
 };
 
 async function preload() {
-  font = loadFont("assets/fonts/IBM_Plex_Sans/IBMPlexSans-Regular.ttf");
+  font = await loadFont("assets/fonts/IBM_Plex_Sans/IBMPlexSans-Regular.ttf");
 
   const { texture, width, height } = await loadTextureAtlas(imagesCount);
 
@@ -71,6 +71,7 @@ async function loadTextureAtlas(imageCount) {
   const atlasWidth = imagesPerRow * squareSize; // Adjust based on your needs
   const atlasHeight = imagesPerRow * squareSize;
 
+  // CREO L'ATLAS
   // const canvas = document.createElement("canvas");
   // canvas.classList.add("hidden");
   // canvas.width = atlasWidth;
@@ -107,8 +108,6 @@ async function loadTextureAtlas(imageCount) {
   //   canvas.toDataURL("image/png").replace("image/png", "image/octet-stream")
   // );
   // link.click();
-
-  // const atlasTexture = new THREE.CanvasTexture(canvas);
 
   const atlasTexture = loader.load("assets/atlas.png");
   atlasTexture.colorSpace = THREE.SRGBColorSpace;
@@ -174,10 +173,12 @@ function setup() {
     transparent: true,
   });
 
+  uvOffsets = new Float32Array(points.length * 2); // Store UV offsets for each plane
+
   instancedMesh = new THREE.InstancedMesh(
     instanceGeometry,
     instanceMaterial,
-    planesCount
+    points.length
   );
 
   const vector = new THREE.Vector3();

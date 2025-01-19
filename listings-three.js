@@ -42,7 +42,8 @@ export class Dot {
     itemData,
     img,
     basePosition,
-    finalPosition
+    finalPosition,
+    instanceMesh
   ) {
     const sceneBasePos = screenToScene(camera, [
       basePosition.x,
@@ -74,6 +75,8 @@ export class Dot {
 
     this.itemData = itemData;
 
+    this.instanceMesh = instanceMesh;
+
     // three
     const geometry = new THREE.PlaneGeometry(this.radius, this.radius);
 
@@ -90,7 +93,12 @@ export class Dot {
     this.mesh = new THREE.Mesh(geometry, material);
     // this.instancedMesh = new THREE.InstancedMesh(geometry, material, 1);
 
+    this.matrix = new THREE.Matrix4();
+
     this.mesh.position.set(this.pos.x, this.pos.y, this.pos.z);
+
+    // matrix.setPosition(this.mesh.position);
+    // instancedMesh.setMatrixAt(this.index, matrix);
 
     // if (this.itemData.Hand === "Hand") {
     //   // Create border using LineSegments
@@ -354,7 +362,10 @@ export class Dot {
     // Update position
     this.pos.add(this.vel);
 
-    this.mesh.position.set(this.pos.x, this.pos.y, this.pos.z);
+    this.matrix.setPosition(this.pos);
+    this.instanceMesh.setMatrixAt(this.index, this.matrix);
+
+    // this.mesh.position.set(this.pos.x, this.pos.y, this.pos.z);
   }
 
   //DRAW

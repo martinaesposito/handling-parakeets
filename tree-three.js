@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { sceneToScreen, screenToScene } from "./utils.js";
 import { Dot } from "./listings-three.js";
 import {
   preload as detectPreload,
@@ -120,6 +121,22 @@ let p5Canvas;
 let zoom = 1;
 let targetZoom;
 
+// ATLAS
+const atlas = {
+  texture: undefined,
+  width: 0,
+  height: 0,
+};
+let instancedMesh;
+
+const radius = 15;
+const imagesCount = 885;
+
+const squareSize = 125; //dimensione delle immagini nell'atlas
+const imagesPerRow = 30;
+
+let uvOffsets;
+
 // esporto tutto
 export {
   zoom,
@@ -140,6 +157,54 @@ export {
 };
 
 ////////////////////////////////////////////////////////////////////
+async function loadTextureAtlas(imageCount) {
+  const loader = new THREE.TextureLoader();
+
+  const atlasWidth = imagesPerRow * squareSize; // Adjust based on your needs
+  const atlasHeight = imagesPerRow * squareSize;
+
+  // CREO L'ATLAS
+  // const canvas = document.createElement("canvas");
+  // canvas.classList.add("hidden");
+  // canvas.width = atlasWidth;
+  // canvas.height = atlasHeight;
+  // const ctx = canvas.getContext("2d");
+
+  // const imagePromises = Array.from(
+  //   { length: imageCount },
+  //   (_, i) =>
+  //     new Promise((resolve) => {
+  //       loader.load(
+  //         `assets/image_ultra-compress-HOME/${i + 2}.webp`,
+  //         (texture) => {
+  //           const img = texture.image;
+  //           const x = (i % imagesPerRow) * 125 + 1;
+  //           const y = Math.floor(i / imagesPerRow) * 125 + 1;
+  //           ctx.drawImage(img, x, y, 123, 123);
+  //           resolve();
+  //         },
+  //         undefined,
+  //         (e) => {
+  //           resolve();
+  //         }
+  //       );
+  //     })
+  // );
+
+  // await Promise.all(imagePromises);
+
+  // let link = document.createElement("a");
+  // link.setAttribute("download", "atlas.png");
+  // link.setAttribute(
+  //   "href",
+  //   canvas.toDataURL("image/png").replace("image/png", "image/octet-stream")
+  // );
+  // link.click();
+
+  const atlasTexture = loader.load("assets/atlas_tree.png");
+  atlasTexture.colorSpace = THREE.SRGBColorSpace;
+  return { texture: atlasTexture, width: atlasWidth, height: atlasHeight };
+}
 
 window.setup = async () => {
   p5Canvas = createCanvas(0.15 * windowWidth, 0.15 * windowWidth * (3 / 4));
@@ -154,7 +219,6 @@ async function preload() {
   // immagini
   const imagePromises = [];
   const loader = new THREE.TextureLoader();
-
   for (let i = 2; i < 887; i++) {
     const imagePromise = new Promise((resolve) => {
       loader.load(
@@ -172,8 +236,14 @@ async function preload() {
     });
     imagePromises.push(imagePromise);
   }
-
   await Promise.all(imagePromises);
+
+  // ATLAS
+  const { texture, width, height } = await loadTextureAtlas(imagesCount);
+  atlas.texture = texture;
+  atlas.width = width;
+  atlas.height = height;
+  console.log(atlas);
 
   // prendo tutti i listings dal json
   try {
@@ -197,6 +267,7 @@ async function preload() {
     }));
   }
 
+  // stories
   stories = await fetch("./json/stories.json").then((response) =>
     response.json()
   );
@@ -239,7 +310,6 @@ function setup() {
   const angles = calculateAngles(listingsData);
   let total = 0;
 
-  // console.log(angles);
   angles.forEach((a, index) => {
     const angle = total + a / 2 + (index > 0 ? angles[index - 1] / 2 : 0);
 
@@ -293,7 +363,6 @@ function setup() {
     plat.id(branch.name);
     platforms.push(plat);
   });
-  // console.log(platforms);
 
   // intro storyContainer
   storyIntro = createDiv();
@@ -301,7 +370,7 @@ function setup() {
   storyIntro.addClass("introcontainer flex-column");
 }
 
-//
+//DRAW
 window.draw = () => {
   draw();
 };
@@ -338,6 +407,7 @@ function draw() {
     dot.move(dots, selectedPose);
     dot.draw(selectedPose);
   });
+  instancedMesh.instanceMatrix.needsUpdate = true;
 
   if (selectedPose) {
     changeStory(stories.findIndex((s) => s.Pose == selectedPose)); //gli passo l'indice della storia giusta
@@ -351,8 +421,28 @@ function draw() {
   renderer.render(scene, camera);
 }
 
+// //////////////////////////////////////////////////////////////////////////
+//funzione che genera i listings per ciascun ramo che viene chiamata nel setup
 function generateBranchDots(branches) {
   const allDots = [];
+
+  // TENTATIVO PAZZO CON LE INSTANCE
+  const instanceGeometry = new THREE.PlaneGeometry(radius, radius);
+  const instanceMaterial = new THREE.MeshBasicMaterial({
+    map: atlas.texture,
+    transparent: true,
+  });
+
+  const vector = new THREE.Vector3();
+  let matrix = new THREE.Matrix4();
+
+  uvOffsets = new Float32Array(885 * 2); // Store UV offsets for each plane
+
+  instancedMesh = new THREE.InstancedMesh(
+    instanceGeometry,
+    instanceMaterial,
+    885
+  );
 
   branches.forEach((branch, bIndex) => {
     const branchDots = [];
@@ -376,60 +466,89 @@ function generateBranchDots(branches) {
 
     // Final position with perpendicular offset
     const offset = randomGaussian() * 50;
-    const commonX = baseX + Math.cos(perpAngle) * offset;
-    const commonY = baseY + Math.sin(perpAngle) * offset;
+    const finalX = baseX + Math.cos(perpAngle) * offset;
+    const finalY = baseY + Math.sin(perpAngle) * offset;
 
     // Store the final position in branchPositions
     branchPositions.push({ x: baseX, y: baseY });
 
-    // TENTATIVO PAZZO CON LE INSTANCE
-    // const geometry = new THREE.PlaneGeometry(12, 12);
-    // let materials = [];
-
-    // // creo un array di texture per ciascun elemento
-    // items.forEach((item, i) => {
-    //   const material = new THREE.MeshBasicMaterial({
-    //     ...(!item.Image_num && {
-    //       color: new THREE.Color().setRGB(1, 1, 1),
-    //     }),
-    //     ...(item.Image_num && {
-    //       map: imageMap[item.Image_num],
-    //     }),
-    //     transparent: true,
-    //   });
-
-    //   materials.push(material);
-    // });
-
-    // // creo un istanza con ciascuna un diverso materiale dell'array
-    // const instancedMesh = new THREE.InstancedMesh(
-    //   geometry,
-    //   materials,
-    //   items.length
-    // );
-    // console.log(instancedMesh);
-
     items.forEach((item, i) => {
+      // Calculate UV offsets based on the atlas grid
+      const dotIndex = allDots.length + branchDots.length; //valore incredile che va da 1 a 855
+
+      const atlasX = dotIndex % imagesPerRow; // Position in the 30x30 grid
+      const atlasY = imagesPerRow - 1 - Math.floor(dotIndex / imagesPerRow);
+
+      // Each cell is 125px in a texture that's (125 * 30)px wide/high
+      uvOffsets[dotIndex * 2] = atlasX / imagesPerRow; // U coordinate
+      uvOffsets[dotIndex * 2 + 1] = atlasY / imagesPerRow; // V coordinate
+
+      // console.log(allDots.length + branchDots.length);
       const dot = new Dot(
         { ...branch, index: bIndex, branchT },
-        allDots.length + branchDots.length,
+        dotIndex,
         random(15, 20),
         item,
         imageMap[item.Image_num],
         { x: baseX, y: baseY }, // Base position
-        { x: commonX, y: commonY } // Final position
+        { x: finalX, y: finalY }, // Final position
+        instancedMesh
       );
       branchDots.push(dot);
 
-      // scene.add(dot.instancedMesh);
-      scene.add(dot.mesh);
+      // scene.add(dot.mesh);
     });
 
     allDots.push(...branchDots);
   });
+
+  instancedMesh.geometry.setAttribute(
+    "uvOffset",
+    new THREE.InstancedBufferAttribute(uvOffsets, 2)
+  );
+
+  instancedMesh.material.onBeforeCompile = (shader) => {
+    console.log("Modifying shader...");
+    shader.vertexShader = `
+              attribute vec2 uvOffset;
+              varying vec2 vUv;
+  
+              ${shader.vertexShader}
+          `.replace(
+      "#include <uv_vertex>",
+      `
+              float uvPaddingX = 5.0 / ${atlas.width.toFixed(1)};
+              float uvPaddingY = 5.0 / ${atlas.height.toFixed(1)};
+              
+              vUv = uvOffset + uv * vec2(118.0 / ${atlas.width.toFixed(
+                1
+              )}, 118.0 / ${atlas.height.toFixed(
+        1
+      )}) + vec2(uvPaddingX, uvPaddingY);
+              `
+    );
+
+    shader.fragmentShader = `
+              varying vec2 vUv;
+  
+              ${shader.fragmentShader}
+          `.replace(
+      "#include <map_fragment>",
+      `#ifdef USE_MAP
+                  vec4 texColor = texture2D(map, vUv);
+                  
+                  diffuseColor = texColor;
+              #endif`
+    );
+    console.log("Shader modified successfully.");
+  };
+
+  scene.add(instancedMesh);
+
   return allDots;
 }
 
+// //////////////////////////////////////////////////////////////////
 function changeStory(indexStory) {
   let intro = stories[indexStory];
   storyIntro.html(
