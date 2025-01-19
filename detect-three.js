@@ -89,6 +89,8 @@ let counters = [
   },
 ];
 
+export let inbounds;
+
 // TUTORIAL
 let tutorial = document.getElementById("tutorial");
 let tutorialQuick = document.getElementById("quick-tutorial");
@@ -528,6 +530,7 @@ function updateCounters() {
         ) {
           drawDOMArc(counter.value, counter.max);
           counter.show = true;
+          inbounds = true;
 
           if (selectedPose === undefined) {
             handCounters = handCounters.map(() => 0);
@@ -544,6 +547,7 @@ function updateCounters() {
         } else {
           counter.value = 0;
           counter.show = false;
+          inbounds = false;
         }
       }
     }

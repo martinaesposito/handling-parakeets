@@ -7,6 +7,7 @@ import {
   video,
   canvasW,
   canvasH,
+  inbounds,
 } from "./detect-three.js";
 import { camera, scene } from "./tree-three.js";
 
@@ -313,7 +314,6 @@ export class Dot {
     this.dummy.updateMatrix();
 
     this.matrix.setPosition(this.pos);
-    // this.instancedMesh.setMatrixAt(this.index, this.matrix);
 
     // Set the matrix for this instance
     this.instancedMesh.setMatrixAt(this.index, this.dummy.matrix);
@@ -328,6 +328,8 @@ export class Dot {
       if (this.itemData.Pose == selectedPose) {
         targetScale = 4;
 
+        console.log(!inbounds);
+        // if (this.isHovered && !inbounds) {
         if (this.isHovered) {
           // console.log(audioPlaying);
           if (!audioPlaying) {

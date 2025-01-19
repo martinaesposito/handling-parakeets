@@ -45,6 +45,11 @@ const imagesPerRow = 30;
 
 let uvOffsets;
 
+let resourcesLoaded = {
+  font: false,
+  atlas: false,
+};
+
 ////////////////////////////////////////////////////////////////////
 
 window.setup = async () => {
@@ -54,7 +59,9 @@ window.setup = async () => {
 };
 
 async function preload() {
-  font = await loadFont("assets/fonts/IBM_Plex_Sans/IBMPlexSans-Regular.ttf");
+  font = await loadCustomFont(
+    "assets/fonts/IBM_Plex_Sans/IBMPlexSans-Regular.ttf"
+  );
 
   const { texture, width, height } = await loadTextureAtlas(imagesCount);
 
@@ -63,6 +70,27 @@ async function preload() {
   atlas.height = height;
 
   await detectPreload();
+}
+let fontLoaded = false; // Add this flag to track font loading status
+
+async function loadCustomFont(path) {
+  return new Promise((resolve, reject) => {
+    // Use p5's loadFont directly here, not our function name
+    window.loadFont(
+      path,
+      // Success callback
+      (font) => {
+        fontLoaded = true;
+        resourcesLoaded.font = true;
+        resolve(font);
+      },
+      // Error callback
+      (err) => {
+        console.error("Error loading font:", err);
+        reject(err);
+      }
+    );
+  });
 }
 
 async function loadTextureAtlas(imageCount) {
@@ -127,6 +155,7 @@ async function loadTextureAtlas(imageCount) {
 
   const atlasTexture = loader.load("assets/atlas.png");
   atlasTexture.colorSpace = THREE.SRGBColorSpace;
+  resourcesLoaded.atlas = true;
   return { texture: atlasTexture, width: atlasWidth, height: atlasHeight };
 }
 
@@ -270,10 +299,14 @@ function setup() {
 
   scene.add(instancedMesh);
 
-  loading.style.display = "none"; //nascondo il loading
   detectSetup();
   video ? (video.style.display = "none") : null;
   renderer.render(scene, camera);
+
+  // Only hide loading when all resources are ready
+  if (resourcesLoaded.font && resourcesLoaded.atlas) {
+    loading.style.display = "none";
+  }
 }
 
 window.draw = () => {
@@ -282,6 +315,7 @@ window.draw = () => {
 
 function draw() {
   if (!scene || !camera || !renderer) return;
+  if (!resourcesLoaded.font || !resourcesLoaded.atlas) return;
 
   if (!detectCursor) {
     fakeCursor.style.display = "block";

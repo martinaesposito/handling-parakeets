@@ -106,7 +106,6 @@ const handPoses = [
 ];
 
 let listingsData;
-let imageMap = {}; // Map images by their filename
 
 // STORIES
 let storyIntro, stories;
