@@ -36,14 +36,14 @@ let progressBar = document.getElementById("progress");
 
 if (tutorial && progressBar) {
   if (tutorial.readyState >= 2) {
-    console.log(
-      "CASO 1: Video is already loaded, execute the code immediately"
-    );
+    // console.log(
+    //   "CASO 1: Video is already loaded, execute the code immediately"
+    // );
     tutorialEnd = false;
     const duration = tutorial.duration + "s";
     progressBar.style.animation = "pippo " + duration + " linear forwards";
   } else {
-    console.log("CASO 2: Video isn't loaded yet, add the event listener");
+    // console.log("CASO 2: Video isn't loaded yet, add the event listener");
     tutorial.addEventListener("loadeddata", () => {
       tutorialEnd = false;
       const duration = tutorial.duration + "s";
@@ -52,7 +52,7 @@ if (tutorial && progressBar) {
   }
 
   tutorial.addEventListener("ended", () => {
-    console.log("tutorial finished");
+    // console.log("tutorial finished");
     backtostart.classList.add("visible"); //istruzioni
     insCenter.classList.add("visible");
     infoEl.classList.add("visible");
@@ -242,8 +242,6 @@ async function preload() {
     let jsonData = await response.json();
     jsonData = jsonData.map((item, index) => ({ ...item, index }));
 
-    console.log(jsonData.length);
-
     listingsData = branchPlatform.map((config) => ({
       ...config, //crea un array che a partire dai dati originali di config aggiunge the number of items in jsonData matching the platform
       //se non viene trovato prende il valore di elementi di config
@@ -251,16 +249,6 @@ async function preload() {
       //  ||config.value,
       items: jsonData.filter((item) => item.Platform === config.name),
     }));
-
-    console.log(
-      jsonData.find(
-        (item) =>
-          !listingsData
-            .map((i) => i.items)
-            .flat()
-            .find((i) => i === item)
-      )
-    );
   } catch (error) {
     // If it fails, create a fallback listingsData that uses original branch configuration but with empty items
     console.error("Failed to load listings data", error);
@@ -471,7 +459,7 @@ function generateBranchDots(branches) {
 
     // Store the final position in branchPositions
     branchPositions.push({ x: baseX, y: baseY });
-    console.log(items.length);
+    // console.log(items.length);
 
     items.forEach((item, i) => {
       const dotIndex = allDots.length + branchDots.length; //indice dell'immagine che va da 1 a 855

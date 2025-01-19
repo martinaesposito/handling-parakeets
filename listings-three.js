@@ -328,7 +328,7 @@ export class Dot {
       if (this.itemData.Pose == selectedPose) {
         targetScale = 4;
 
-        console.log(!inbounds);
+        // console.log(!inbounds);
         // if (this.isHovered && !inbounds) {
         if (this.isHovered) {
           // console.log(audioPlaying);

@@ -273,13 +273,15 @@ export function draw(shouldDrawHand = true, acceptAllHands = false) {
       }, 1000);
     }
   }
-  // console.log(tutorialEnd, videoStarted);
+
   // se non c'è la mano e nessuna posa è selezionata e il video tutorial è finito
   if (!selectedPose && !hands[0] && tutorialEnd && !videoStarted) {
     if (handCounters.every((c) => c === 0)) {
-      //se tutti i counter sono a zero chiama la funzione che riavvia l'esperienza
-      let escape = (escapeCounters[0] += delta_time);
-      escapeTree(60000, escape); //10 secondi
+      if (shouldDrawHand) {
+        //se tutti i counter sono a zero chiama la funzione che riavvia l'esperienza
+        let escape = (escapeCounters[0] += delta_time);
+        escapeTree(60000, escape); //10 secondi
+      }
     }
   } else {
     escapeCounters[0] = 0; //counter di uscita si riavvia e il warning scompare
@@ -443,22 +445,17 @@ let isRedirecting = false; //flag per fare una sola call quando cambia pagina
 function updateHandCounters({ detectedHand, shouldDrawHand, lock }) {
   const maxCounter = 5000;
 
-  if (tutorialEnd == false || quickTutorialEnd || lock) return;
-
+  if (tutorialEnd == false || quickTutorialEnd) return;
   if (!hands[0] && !audioPlaying && handCounters.every((c) => c === 0)) {
     noHandAndZeroCounters = true;
   }
 
-  // Update only the relevant counter
-  // console.log(detectedHand, handCounters[detectedHand], maxCounter);
-  if (hands[0] && detectedHand !== undefined) {
-    // console.log(handCounters, escapeCounters, lock);
+  if (hands[0] && detectedHand !== undefined && !lock) {
     if (
       handCounters[detectedHand] < maxCounter &&
       handCounters[detectedHand] !== undefined
     ) {
       handCounters[detectedHand] += delta_time;
-      // console.log(handCounters[detectedHand], detectedHand);
     }
     drawDOMArc(handCounters[detectedHand] || 0, maxCounter);
 
@@ -472,10 +469,9 @@ function updateHandCounters({ detectedHand, shouldDrawHand, lock }) {
     }
   }
 
-  // Decrease other counters
   handCounters.forEach((val, i) => {
     // se non ci sono mani resetta tutto
-    if (!hands[0]) {
+    if (!hands[0] && !selectedPose) {
       escapeCounters[4]++;
       if (escapeCounters[4] > 30) {
         // dopo 60 frame resetta
@@ -484,7 +480,10 @@ function updateHandCounters({ detectedHand, shouldDrawHand, lock }) {
       }
     } else {
       escapeCounters[4] = 0;
-      if (i !== detectedHand && val > 0) {
+
+      if (hands[0] && selectedPose && handPoses[i] === selectedPose) {
+        handCounters[i] = maxCounter;
+      } else if (i !== detectedHand && val > 0) {
         handCounters[i] = Math.max(0, val - delta_time);
       }
     }
@@ -503,13 +502,6 @@ function updateCounters() {
     };
 
     if (elements[counter.name]) {
-      // if (
-      //   !counter.bounds?.top &&
-      //   !counter.bounds?.left &&
-      //   !counter.bounds?.width &&
-      //   !counter.bounds?.height
-      // ) {
-      // }
       counter.bounds = getElementBounds(elements[counter.name]);
 
       bounds = {
@@ -521,7 +513,7 @@ function updateCounters() {
       // console.log(bounds);
 
       if (bounds) {
-        console.log(audioPlaying);
+        // console.log(audioPlaying);
         if (
           cursor.x > bounds.left - 75 &&
           cursor.x < bounds.left - 75 + bounds.width + 75 &&
