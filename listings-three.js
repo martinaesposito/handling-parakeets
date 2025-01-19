@@ -71,7 +71,7 @@ export class Dot {
     // properties of the forces add to the posiiton
     this.config = {
       maxSpeed: 6,
-      attractionForce: 0.008,
+      attractionForce: 0.005,
       separationForce: 0.09,
       damping: 0.5,
       noiseStrength: 0.5,

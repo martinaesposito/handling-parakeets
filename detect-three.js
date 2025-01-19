@@ -444,7 +444,7 @@ function calculateDifferences(dataSet) {
 let isRedirecting = false; //flag per fare una sola call quando cambia pagina
 function updateHandCounters({ detectedHand, shouldDrawHand, lock }) {
   const maxCounter = 5000;
-
+  console.log(handCounters);
   if (tutorialEnd == false || quickTutorialEnd) return;
   if (!hands[0] && !audioPlaying && handCounters.every((c) => c === 0)) {
     noHandAndZeroCounters = true;
@@ -481,7 +481,11 @@ function updateHandCounters({ detectedHand, shouldDrawHand, lock }) {
     } else {
       escapeCounters[4] = 0;
 
-      if (hands[0] && selectedPose && handPoses[i] === selectedPose) {
+      if (
+        (hands[0] || audioPlaying) &&
+        selectedPose &&
+        handPoses[i] === selectedPose
+      ) {
         handCounters[i] = maxCounter;
       } else if (i !== detectedHand && val > 0) {
         handCounters[i] = Math.max(0, val - delta_time);
