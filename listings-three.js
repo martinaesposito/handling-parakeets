@@ -326,7 +326,7 @@ export class Dot {
 
     if (this.div) {
       if (this.itemData.Pose == selectedPose) {
-        targetScale = 4;
+        targetScale = 3;
 
         // console.log(!inbounds);
         // if (this.isHovered && !inbounds) {
