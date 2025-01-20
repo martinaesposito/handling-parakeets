@@ -444,7 +444,7 @@ function calculateDifferences(dataSet) {
 let isRedirecting = false; //flag per fare una sola call quando cambia pagina
 function updateHandCounters({ detectedHand, shouldDrawHand, lock }) {
   const maxCounter = 5000;
-  console.log(handCounters);
+  // console.log(handCounters);
   if (tutorialEnd == false || quickTutorialEnd) return;
   if (!hands[0] && !audioPlaying && handCounters.every((c) => c === 0)) {
     noHandAndZeroCounters = true;
