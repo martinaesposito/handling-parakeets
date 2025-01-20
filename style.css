@@ -312,6 +312,10 @@ canvas {
   position: absolute;
   text-align: center;
 }
+
+#ins-centr-center {
+  text-align: center;
+}
 #hands-legend {
   display: flex;
   flex-direction: row;
