@@ -29,6 +29,20 @@
         }
       }
     </script>
+    <script>
+      setInterval(() => {
+        fetch("/")
+          .then((response) => {
+            if (response.ok) {
+              console.log("Server attivo!");
+            }
+          })
+          .catch(() => {
+            console.log("Server non trovato, ricarico...");
+            location.reload();
+          });
+      }, 5000); // Controlla il server ogni 5 secondi
+    </script>
 
     <link rel="stylesheet" href="style.css" />
   </head>

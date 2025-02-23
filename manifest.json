@@ -14,7 +14,7 @@
     }
   ],
   "id": "/?source=pwa",
-  "start_url": "/?source=pwa",
+  "start_url": "http://localhost:8000/?source=pwa",
   "background_color": "#C9FF4C",
   "display": "fullscreen",
   "scope": "/",
