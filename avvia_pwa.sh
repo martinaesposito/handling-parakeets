@@ -13,5 +13,9 @@ while ! nc -z localhost 8000; do
   echo "Aspettando che il server si avvii..."
 done
 
-echo "Server attivo! Aprendo la PWA..."
-open "http://localhost:8000/?source=pwa"
+echo "Server attivo! Avviando la PWA installata..."
+
+# Apri direttamente l'app PWA invece del browser
+open -a "Handling Parakeets"
+
+echo "PWA avviata in modalità app!"
